@@ -66,21 +66,156 @@ cp .env.example .env.local
 # 修改 VITE_API_BASE_URL=http://localhost:8080
 ```
 
+---
+
 ## ML 服务集成
 
-ML 服务由其他人实现，后端已预留接口。ML 服务需要运行在 `http://localhost:5000`：
+### 概述
 
-```bash
-# ML 服务需实现以下端点：
-# - POST /api/v1/predict      租金预测
-# - POST /api/v1/recommend    个性化推荐
-# - GET  /api/v1/health       健康检查
+后端已完整集成机器学习服务，提供**租金预测**和**个性化推荐**两大核心功能。ML 服务需要单独部署运行。
+
+### ML 服务地址配置
+
+ML 服务地址可通过 `application.yml` 或环境变量配置：
+
+**方式一：修改配置文件**
+```yaml
+ml:
+  service:
+    url: http://localhost:5000  # ML 服务地址
+    timeout: 30000              # 请求超时时间（毫秒）
 ```
 
-ML 服务地址可通过环境变量配置：
+**方式二：环境变量**
 ```bash
 ML_SERVICE_URL=http://localhost:5000 mvn spring-boot:run
 ```
+
+### ML 服务 API 接口
+
+ML 服务需要实现以下 REST API 端点：
+
+#### 1. 租金预测
+- **端点**：`POST /api/v1/predict`
+- **描述**：基于房源特征预测租金价格
+- **请求体**：
+```json
+{
+  "bedrooms": 2,           // 必填：卧室数量
+  "area": 80.0,           // 必填：面积（平方米）
+  "city": "北京",          // 必填：城市
+  "region": "朝阳区",       // 区域
+  "bathrooms": 1.5,       // 可选：卫生间数量
+  "propertyType": "公寓",   // 可选：房屋类型
+  "decoration": "精装",     // 可选：装修情况
+  "floor": 5,             // 可选：楼层
+  "totalFloors": 20,      // 可选：总楼层
+  "orientation": "南",      // 可选：朝向
+  "hasParking": true,     // 可选：是否有停车位
+  "hasElevator": true,    // 可选：是否有电梯
+  "hasBalcony": true      // 可选：是否有阳台
+}
+```
+- **响应体**：
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "predictedPrice": 6500.00,
+    "currency": "CNY",
+    "confidence": 0.92,
+    "lowerBound": 6000.00,
+    "upperBound": 7000.00,
+    "modelVersion": "v1.2.0",
+    "algorithmName": "XGBoost",
+    "featureImportance": [
+      {"feature": "area", "importance": 0.35},
+      {"feature": "bedrooms", "importance": 0.25},
+      {"feature": "city", "importance": 0.20}
+    ],
+    "responseTimeMs": 156
+  }
+}
+```
+
+#### 2. 个性化推荐
+- **端点**：`POST /api/v1/recommend`
+- **描述**：基于用户偏好推荐房源
+- **请求体**：
+```json
+{
+  "userId": 7,                     // 用户ID
+  "budgetMin": 3000,                // 预算下限
+  "budgetMax": 8000,               // 预算上限
+  "preferredRegions": ["朝阳区", "海淀区"],  // 偏好区域
+  "minBedrooms": 2,                 // 最少卧室数
+  "maxBedrooms": 3,                 // 最多卧室数
+  "minArea": 50.0,                  // 最小面积
+  "maxArea": 100.0,                 // 最大面积
+  "propertyTypes": ["公寓", "小区"],  // 房屋类型偏好
+  "limit": 10,                      // 返回数量限制
+  "excludeListingIds": [1, 2, 3]    // 排除的房源ID
+}
+```
+- **响应体**：
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "recommendations": [
+      {
+        "listingId": 1001,
+        "title": "朝阳公园附近精装两居室",
+        "predictedMatchScore": 0.95,
+        "predictedRent": 5500.00,
+        "reason": "符合您的预算和区域偏好，交通便利"
+      }
+    ],
+    "totalCount": 5,
+    "modelVersion": "v1.2.0"
+  }
+}
+```
+
+#### 3. 健康检查
+- **端点**：`GET /api/v1/health`
+- **描述**：检查 ML 服务是否可用
+- **响应**：`200 OK` 表示服务可用
+
+### 后端 ML API 端点
+
+后端为前端提供了以下 REST API：
+
+| 方法 | 端点                | 描述          | 权限              |
+| ---- | ------------------- | ------------- | ----------------- |
+| POST | `/api/ml/predict`   | 租金预测      | TENANT/LANDLORD/ADMIN |
+| POST | `/api/ml/recommend` | 个性化推荐    | TENANT/LANDLORD/ADMIN |
+| GET  | `/api/ml/status`    | ML 服务状态   | 已登录            |
+
+### 启动 ML 服务（示例）
+
+```bash
+# 假设 ML 服务使用 Python/Flask 实现
+cd ml-service
+pip install -r requirements.txt
+python app.py
+```
+
+ML 服务默认运行在 `http://localhost:5000`。
+
+### 错误处理
+
+| 错误码 | 说明                          |
+| ------ | ----------------------------- |
+| 400    | 请求参数错误                   |
+| 500    | ML 服务不可用或内部错误        |
+| 501    | ML 功能未实现                  |
+
+当 ML 服务不可用时，后端会返回 500 错误，前端应提供友好的错误提示。
+
+---
 
 ## 技术栈
 
@@ -89,6 +224,7 @@ ML_SERVICE_URL=http://localhost:5000 mvn spring-boot:run
 - Spring Data JPA + MySQL
 - Lombok + Validation
 - Swagger/OpenAPI 3.0
+- RestTemplate（ML 服务客户端）
 
 ## 项目结构
 
@@ -132,9 +268,11 @@ backend/
 │       │   ├── entity/
 │       │   └── repository/
 │       └── ml/                   # ML 服务接口
-│           ├── client/
-│           ├── dto/
-│           └── exception/
+│           ├── controller/       # ML API 控制器
+│           ├── service/          # ML 服务层
+│           ├── client/          # ML 客户端实现
+│           ├── dto/             # 数据传输对象
+│           └── exception/       # ML 异常定义
 └── src/main/resources/
     ├── application.yml            # 应用配置
     └── schema.sql                 # 数据库脚本
@@ -178,16 +316,16 @@ backend/
 | POST | `/api/inquiries`            | 提交咨询           | TENANT          |
 | POST | `/api/inquiries/{id}/reply` | 回复咨询           | LANDLORD        |
 | POST | `/api/inquiries/{id}/close` | 关闭咨询           | LANDLORD/TENANT |
-| GET  | `/api/inquiries/my`         | 获取我的咨询列表   | TENANT          |
-| GET  | `/api/inquiries/landlord`   | 获取收到的咨询列表 | LANDLORD        |
+| GET  | `/api/inquiries/my`          | 获取我的咨询列表   | TENANT          |
+| GET  | `/api/inquiries/landlord`    | 获取收到的咨询列表 | LANDLORD        |
 | GET  | `/api/inquiries/{id}`       | 获取咨询详情       | 已登录          |
 
 ### ML 模块
-| 方法 | 端点                | 描述        | 权限   |
-| ---- | ------------------- | ----------- | ------ |
-| POST | `/api/ml/predict`   | 租金预测    | 已登录 |
-| POST | `/api/ml/recommend` | 个性化推荐  | 已登录 |
-| GET  | `/api/ml/status`    | ML 服务状态 | 已登录 |
+| 方法 | 端点                | 描述        | 权限              |
+| ---- | ------------------- | ----------- | ----------------- |
+| POST | `/api/ml/predict`   | 租金预测    | TENANT/LANDLORD/ADMIN |
+| POST | `/api/ml/recommend` | 个性化推荐  | TENANT/LANDLORD/ADMIN |
+| GET  | `/api/ml/status`    | ML 服务状态 | 已登录            |
 
 ## 角色说明
 
