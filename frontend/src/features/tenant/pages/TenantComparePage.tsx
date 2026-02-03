@@ -1,0 +1,75 @@
+import { Button, Card, Space, Table, Typography } from 'antd'
+import type { ColumnsType } from 'antd/es/table'
+import { Link } from 'react-router-dom'
+import { PageHeader } from '../../../shared/ui/PageHeader'
+import type { Listing } from '../../../shared/api/types'
+import { mockListings } from '../../../shared/api/mockData'
+
+const KEY = 'compareListingIds'
+
+function loadIds(): string[] {
+  try {
+    const raw = localStorage.getItem(KEY)
+    if (!raw) return []
+    const v = JSON.parse(raw)
+    return Array.isArray(v) ? v.filter((x) => typeof x === 'string') : []
+  } catch {
+    return []
+  }
+}
+
+function saveIds(ids: string[]) {
+  localStorage.setItem(KEY, JSON.stringify(ids))
+}
+
+export function TenantComparePage() {
+  const ids = loadIds()
+  const data = mockListings.filter((x) => ids.includes(x.id))
+
+  const columns: ColumnsType<Listing> = [
+    { title: '标题', dataIndex: 'title' },
+    { title: '区域', dataIndex: 'region', render: (v) => v ?? '-' },
+    { title: '租金', dataIndex: 'rent', render: (v) => `¥ ${v}` },
+    { title: '卧室', dataIndex: 'bedrooms', render: (v) => v ?? '-' },
+    { title: '卫生间', dataIndex: 'bathrooms', render: (v) => v ?? '-' },
+    { title: '面积', dataIndex: 'area', render: (v) => v ?? '-' },
+  ]
+
+  return (
+    <Space orientation="vertical" size={16} style={{ width: '100%' }}>
+      <PageHeader title="租客-房源对比" subtitle="（占位页）后续实现对比表与收藏" />
+      <Card>
+        <Typography.Paragraph>
+          目前先用本地 localStorage 存一份对比列表（基于 mock 房源）。你可以从房源列表页进入详情后再扩展“加入对比”按钮。
+        </Typography.Paragraph>
+        <Space style={{ marginBottom: 12 }}>
+          <Button
+            onClick={() => {
+              saveIds(['1', '2'])
+              window.location.reload()
+            }}
+          >
+            填充示例对比
+          </Button>
+          <Button
+            danger
+            onClick={() => {
+              saveIds([])
+              window.location.reload()
+            }}
+          >
+            清空
+          </Button>
+          <Link to="/tenant/listings">返回房源列表</Link>
+        </Space>
+        <Table<Listing>
+          rowKey="id"
+          columns={columns}
+          dataSource={data}
+          pagination={false}
+        />
+      </Card>
+    </Space>
+  )
+}
+
