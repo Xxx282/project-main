@@ -49,7 +49,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 String username = jwtUtil.getUsernameFromToken(jwt);
                 String role = jwtUtil.getRoleFromToken(jwt);
 
-                log.debug("JWT 认证成功: userId={}, username={}, role={}", userId, username, role);
+            log.debug("JWT Token 认证成功: userId={}", userId);
 
                 // 创建 UserDetails
                 UserDetails userDetails = User.builder()
@@ -72,7 +72,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception e) {
-            log.error("JWT 认证失败: {}", e.getMessage());
+            log.warn("JWT Token 解析失败: {}", e.getMessage());
         }
 
         filterChain.doFilter(request, response);

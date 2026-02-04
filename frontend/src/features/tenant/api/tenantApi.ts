@@ -84,7 +84,7 @@ export async function savePreferences(p: TenantPreferences): Promise<TenantPrefe
 
 export async function listMyInquiries(): Promise<Inquiry[]> {
   try {
-    const { data } = await http.get<ListResponse<Inquiry>>('/tenant/inquiries')
+    const { data } = await http.get<ListResponse<Inquiry>>('/inquiries/my')
     return data.data
   } catch {
     return mockInquiries

@@ -11,6 +11,7 @@ C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\aut
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\security\UserDetailsServiceImpl.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\config\SecurityConfig.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\common\util\JwtUtil.java
+C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\tenant\controller\TenantController.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\ml\dto\RecommendationRequest.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\config\MlServiceConfig.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\inquiry\entity\Inquiry.java

@@ -29,8 +29,7 @@ public class MlService {
         // 调用 ML 服务
         PricePredictionResponse response = mlServiceClient.predictPrice(request);
 
-        // 记录预测日志
-        log.info("租金预测完成: predictedPrice={}, confidence={}",
+        log.debug("租金预测完成: predictedPrice={}, confidence={}",
                 response.getPredictedPrice(), response.getConfidence());
 
         return response;
@@ -48,7 +47,7 @@ public class MlService {
         // 调用 ML 服务
         RecommendationResponse response = mlServiceClient.getRecommendations(request);
 
-        log.info("推荐完成: count={}", response.getTotalCount());
+        log.debug("推荐完成: count={}", response.getTotalCount());
 
         return response;
     }
