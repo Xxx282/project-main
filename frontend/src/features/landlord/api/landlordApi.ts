@@ -33,7 +33,7 @@ export type PricePredictResponse = {
 
 export async function listMyListings(): Promise<Listing[]> {
   try {
-    const { data } = await http.get<ListResponse<Listing>>('/listings', { params: { mine: true } })
+    const { data } = await http.get<ListResponse<Listing>>('/listings/mine')
     return data.data
   } catch {
     return mockListings
@@ -45,11 +45,11 @@ export async function createListing(payload: Partial<Listing>): Promise<Listing>
     const { data } = await http.post<SingleResponse<Listing>>('/listings', payload)
     return data.data
   } catch {
-    return { ...(payload as Listing), id: `mock-${Date.now()}`, rent: payload.rent ?? 0, title: payload.title ?? '新房源' }
+    return { ...(payload as Listing), id: Date.now(), rent: payload.rent ?? 0, title: payload.title ?? '新房源' }
   }
 }
 
-export async function updateListing(id: string, payload: Partial<Listing>): Promise<Listing> {
+export async function updateListing(id: number, payload: Partial<Listing>): Promise<Listing> {
   try {
     const { data } = await http.put<SingleResponse<Listing>>(`/listings/${id}`, payload)
     return data.data
@@ -59,7 +59,7 @@ export async function updateListing(id: string, payload: Partial<Listing>): Prom
   }
 }
 
-export async function deleteListing(id: string): Promise<void> {
+export async function deleteListing(id: number): Promise<void> {
   try {
     await http.delete(`/listings/${id}`)
   } catch {
@@ -86,7 +86,7 @@ export async function listLandlordInquiries(): Promise<Inquiry[]> {
     return data.data
   } catch {
     return [
-      { id: 'lq-1', listingId: '1', message: '什么时候方便看房？', status: 'pending' },
+      { id: 'lq-1', listingId: 1, message: '什么时候方便看房？', status: 'pending' },
     ]
   }
 }

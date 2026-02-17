@@ -1,7 +1,7 @@
 # 智能租房系统 - 前端
 
 ## 环境要求
-- Node.js 已安装（你当前已安装）
+- Node.js 18+ 已安装
 
 ## 启动
 
@@ -31,6 +31,34 @@ VITE_API_BASE_URL=http://localhost:8080
 ## 当前实现说明
 - 未启动后端时：Tenant/Landlord/Admin 页面会尝试请求接口，失败则自动使用 mock 数据，方便先做 UI。
 - 启动后端后：按接口返回值自动切换为真实数据。
+
+---
+
+## 功能页面
+
+### 租客端（Tenant）
+| 路由 | 描述 |
+|------|------|
+| `/tenant/listings` | 浏览房源列表 |
+| `/tenant/listings/:id` | 房源详情 |
+| `/tenant/recommendations` | 个性化推荐 |
+| `/tenant/inquiries` | 我的咨询 |
+| `/tenant/preferences` | 偏好设置 |
+
+### 房东端（Landlord）
+| 路由 | 描述 |
+|------|------|
+| `/landlord/listings` | 我的房源列表 |
+| `/landlord/listings/create` | 发布新房源 |
+| `/landlord/listings/:id/edit` | 编辑房源 |
+| `/landlord/inquiries` | 收到的咨询 |
+| `/landlord/price-predict` | 租金预测 |
+
+### 管理员端（Admin）
+| 路由 | 描述 |
+|------|------|
+| `/admin/users` | 用户管理 |
+| `/admin/users/:id` | 用户详情 |
 
 ---
 
@@ -105,87 +133,12 @@ frontend/
 │   │       ├── api/              # API 调用
 │   │       └── pages/            # 用户管理/房源审核等
 │   └── shared/                    # 共享资源
-│       ├── api/                   # HTTP 配置
+│       ├── api/                   # HTTP 配置、类型定义、Mock 数据
 │       ├── ui/                    # 公共 UI 组件
 │       └── types/                 # TypeScript 类型定义
 ├── public/                        # 静态资源
 ├── package.json
 ├── vite.config.ts                 # Vite 配置
-└── tsconfig.json                  # TypeScript 配置
-```
-
----
-
-# React + TypeScript + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+├── tsconfig.json                  # TypeScript 配置
+└── .env.example                   # 环境变量示例
 ```

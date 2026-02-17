@@ -68,6 +68,31 @@ cp .env.example .env.local
 
 ---
 
+## 房源字段说明
+
+创建/更新房源时支持的字段：
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| title | String | 是 | 房源标题 |
+| city | String | 是 | 城市 |
+| region | String | 是 | 区域 |
+| address | String | 是 | 详细地址 |
+| bedrooms | Integer | 是 | 卧室数量 |
+| bathrooms | Double | 是 | 卫生间数量 |
+| area | BigDecimal | 是 | 面积（平方米） |
+| price | BigDecimal | 是 | 租金（每月） |
+| deposit | BigDecimal | 否 | 押金 |
+| propertyType | String | 否 | 房屋类型 |
+| floor | Integer | 否 | 楼层 |
+| totalFloors | Integer | 否 | 总楼层 |
+| orientation | String | 否 | 朝向 |
+| decoration | String | 否 | 装修情况 |
+| facilities | String (JSON) | 否 | 设施列表 |
+| description | String | 否 | 房源描述 |
+
+---
+
 ## ML 服务集成
 
 ### 概述

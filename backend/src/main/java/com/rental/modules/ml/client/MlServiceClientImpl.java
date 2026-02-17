@@ -37,7 +37,7 @@ public class MlServiceClientImpl implements MlServiceClient {
     @Override
     public PricePredictionResponse predictPrice(PricePredictionRequest request) {
         String url = mlServiceUrl + PREDICT_ENDPOINT;
-        log.debug("调用 ML 预测服务: {}", url);
+        log.info("调用 ML 预测服务: {}", url);
 
         try {
             HttpHeaders headers = new HttpHeaders();
@@ -48,14 +48,14 @@ public class MlServiceClientImpl implements MlServiceClient {
                 mlRestTemplate.postForEntity(url, entity, PricePredictionResponse.class);
 
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                log.debug("预测成功: predictedPrice={}", response.getBody().getPredictedPrice());
+                log.info("预测成功: predictedPrice={}", response.getBody().getPredictedPrice());
                 return response.getBody();
             }
 
             throw new MlServiceException("ML 服务返回异常状态: " + response.getStatusCode());
 
         } catch (RestClientException e) {
-            log.warn("ML 预测服务调用失败: {}", e.getMessage());
+            log.error("ML 预测服务调用失败: {}", e.getMessage());
             throw new MlServiceException("ML 服务不可用: " + e.getMessage());
         }
     }
@@ -63,7 +63,7 @@ public class MlServiceClientImpl implements MlServiceClient {
     @Override
     public RecommendationResponse getRecommendations(RecommendationRequest request) {
         String url = mlServiceUrl + RECOMMEND_ENDPOINT;
-        log.debug("调用 ML 推荐服务: {}", url);
+        log.info("调用 ML 推荐服务: {}", url);
 
         try {
             HttpHeaders headers = new HttpHeaders();
@@ -74,14 +74,14 @@ public class MlServiceClientImpl implements MlServiceClient {
                 mlRestTemplate.postForEntity(url, entity, RecommendationResponse.class);
 
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                log.debug("推荐成功: count={}", response.getBody().getTotalCount());
+                log.info("推荐成功: count={}", response.getBody().getTotalCount());
                 return response.getBody();
             }
 
             throw new MlServiceException("ML 服务返回异常状态: " + response.getStatusCode());
 
         } catch (RestClientException e) {
-            log.warn("ML 推荐服务调用失败: {}", e.getMessage());
+            log.error("ML 推荐服务调用失败: {}", e.getMessage());
             throw new MlServiceException("ML 服务不可用: " + e.getMessage());
         }
     }
@@ -89,13 +89,13 @@ public class MlServiceClientImpl implements MlServiceClient {
     @Override
     public boolean healthCheck() {
         String url = mlServiceUrl + HEALTH_ENDPOINT;
-        log.debug("ML 服务健康检查: {}", url);
+        log.info("ML 服务健康检查: {}", url);
 
         try {
             ResponseEntity<String> response = mlRestTemplate.getForEntity(url, String.class);
             return response.getStatusCode().is2xxSuccessful();
         } catch (Exception e) {
-            log.debug("ML 服务健康检查失败: {}", e.getMessage());
+            log.warn("ML 服务健康检查失败: {}", e.getMessage());
             return false;
         }
     }

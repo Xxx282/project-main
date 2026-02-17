@@ -43,7 +43,7 @@ export async function listListings(query: ListingsQuery): Promise<Listing[]> {
   }
 }
 
-export async function getListing(id: string): Promise<Listing> {
+export async function getListing(id: number): Promise<Listing> {
   try {
     const { data } = await http.get<SingleResponse<Listing>>(`/listings/${id}`)
     return data.data
@@ -84,14 +84,14 @@ export async function savePreferences(p: TenantPreferences): Promise<TenantPrefe
 
 export async function listMyInquiries(): Promise<Inquiry[]> {
   try {
-    const { data } = await http.get<ListResponse<Inquiry>>('/inquiries/my')
+    const { data } = await http.get<ListResponse<Inquiry>>('/tenant/inquiries')
     return data.data
   } catch {
     return mockInquiries
   }
 }
 
-export async function createInquiry(req: { listingId: string; message: string }): Promise<Inquiry> {
+export async function createInquiry(req: { listingId: number; message: string }): Promise<Inquiry> {
   try {
     const { data } = await http.post<SingleResponse<Inquiry>>('/inquiries', req)
     return data.data

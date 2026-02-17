@@ -6,7 +6,7 @@ import { listLandlordInquiries } from '../api/landlordApi'
 
 type InquiryRow = {
   id: string
-  listingId: string
+  listingId: number
   fromUser: string
   message: string
   status: 'pending' | 'replied' | 'closed'

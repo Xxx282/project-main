@@ -1,7 +1,9 @@
 import { Button, Layout, Menu, Space, Typography } from 'antd'
 import type { MenuProps } from 'antd'
+import { useMemo } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../features/auth/context/AuthContext'
+import type { UserRole } from '../../features/auth/store/authStore'
 
 const { Header, Content } = Layout
 
@@ -9,6 +11,7 @@ type TopNavKey =
   | 'tenant_listings'
   | 'tenant_reco'
   | 'tenant_prefs'
+  | 'tenant_compare'
   | 'tenant_inquiries'
   | 'landlord_listings'
   | 'landlord_predict'
@@ -19,21 +22,6 @@ type TopNavKey =
   | 'auth_login'
   | 'auth_register'
 
-const items: MenuProps['items'] = [
-  { key: 'tenant_listings', label: '租客-房源', onClick: () => void 0 },
-  { key: 'tenant_reco', label: '租客-推荐', onClick: () => void 0 },
-  { key: 'tenant_prefs', label: '租客-偏好', onClick: () => void 0 },
-  { key: 'tenant_inquiries', label: '租客-咨询', onClick: () => void 0 },
-  { key: 'landlord_listings', label: '房东-房源', onClick: () => void 0 },
-  { key: 'landlord_predict', label: '房东-预测', onClick: () => void 0 },
-  { key: 'landlord_inquiries', label: '房东-咨询', onClick: () => void 0 },
-  { key: 'admin_dashboard', label: '管理-看板', onClick: () => void 0 },
-  { key: 'admin_users', label: '管理-用户', onClick: () => void 0 },
-  { key: 'admin_listings', label: '管理-审核', onClick: () => void 0 },
-  { key: 'auth_login', label: '登录', onClick: () => void 0 },
-  { key: 'auth_register', label: '注册', onClick: () => void 0 },
-]
-
 function keyToPath(key: TopNavKey): string {
   switch (key) {
     case 'tenant_listings':
@@ -42,6 +30,8 @@ function keyToPath(key: TopNavKey): string {
       return '/tenant/recommendations'
     case 'tenant_prefs':
       return '/tenant/preferences'
+    case 'tenant_compare':
+      return '/tenant/compare'
     case 'tenant_inquiries':
       return '/tenant/inquiries'
     case 'landlord_listings':
@@ -66,6 +56,7 @@ function keyToPath(key: TopNavKey): string {
 function pathToKey(pathname: string): TopNavKey {
   if (pathname.startsWith('/tenant/recommendations')) return 'tenant_reco'
   if (pathname.startsWith('/tenant/preferences')) return 'tenant_prefs'
+  if (pathname.startsWith('/tenant/compare')) return 'tenant_compare'
   if (pathname.startsWith('/tenant/inquiries')) return 'tenant_inquiries'
   if (pathname.startsWith('/tenant')) return 'tenant_listings'
 
@@ -82,15 +73,49 @@ function pathToKey(pathname: string): TopNavKey {
   return 'tenant_listings'
 }
 
+const ROLE_MENU: Record<UserRole, { key: TopNavKey; label: string }[]> = {
+  tenant: [
+    { key: 'tenant_listings', label: '房源' },
+    { key: 'tenant_reco', label: '推荐' },
+    { key: 'tenant_prefs', label: '偏好' },
+    { key: 'tenant_compare', label: '对比' },
+    { key: 'tenant_inquiries', label: '咨询' },
+  ],
+  landlord: [
+    { key: 'landlord_listings', label: '房源管理' },
+    { key: 'landlord_predict', label: '租金预测' },
+    { key: 'landlord_inquiries', label: '咨询管理' },
+  ],
+  admin: [
+    { key: 'admin_dashboard', label: '看板' },
+    { key: 'admin_users', label: '用户管理' },
+    { key: 'admin_listings', label: '房源审核' },
+  ],
+}
+
 export function MainLayout() {
   const navigate = useNavigate()
   const location = useLocation()
   const auth = useAuth()
   const selectedKey = pathToKey(location.pathname)
 
-  const onClick: MenuProps['onClick'] = (e) => {
-    navigate(keyToPath(e.key as TopNavKey))
-  }
+  // 未登录默认显示租客菜单；登录后按用户角色显示
+  const effectiveRole: UserRole = auth.user?.role ?? 'tenant'
+
+  const menuItems: MenuProps['items'] = useMemo(() => {
+    const base = ROLE_MENU[effectiveRole].map(({ key, label }) => ({
+      key,
+      label,
+      onClick: () => navigate(keyToPath(key)),
+    }))
+    if (!auth.user) {
+      base.push(
+        { key: 'auth_login', label: '登录', onClick: () => navigate('/login') },
+        { key: 'auth_register', label: '注册', onClick: () => navigate('/register') },
+      )
+    }
+    return base
+  }, [effectiveRole, auth.user, navigate])
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -102,21 +127,22 @@ export function MainLayout() {
           theme="dark"
           mode="horizontal"
           selectedKeys={[selectedKey]}
-          items={items}
-          onClick={onClick}
+          items={menuItems}
           style={{ flex: 1, minWidth: 0 }}
         />
         <Space>
           {auth.user ? (
             <>
               <Typography.Text style={{ color: 'rgba(255,255,255,0.85)' }}>
-                {auth.user.role}
+                {auth.user.role === 'tenant' && '租客'}
+                {auth.user.role === 'landlord' && '房东'}
+                {auth.user.role === 'admin' && '管理员'}
               </Typography.Text>
               <Button
                 size="small"
                 onClick={() => {
                   auth.logout()
-                  navigate('/login', { replace: true })
+                  navigate('/tenant/listings', { replace: true })
                 }}
               >
                 退出

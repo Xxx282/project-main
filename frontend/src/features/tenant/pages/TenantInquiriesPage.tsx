@@ -1,4 +1,4 @@
-import { Button, Card, Form, Input, Space, Table, Tag, message } from 'antd'
+import { Button, Card, Form, Input, InputNumber, Space, Table, Tag, message } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import { useQuery } from '@tanstack/react-query'
 import { PageHeader } from '../../../shared/ui/PageHeader'
@@ -6,7 +6,7 @@ import { createInquiry, listMyInquiries } from '../api/tenantApi'
 
 type InquiryRow = {
   id: string
-  listingId: string
+  listingId: number
   message: string
   status: 'pending' | 'replied' | 'closed'
 }
@@ -35,7 +35,7 @@ export function TenantInquiriesPage() {
     queryFn: () => listMyInquiries(),
   })
 
-  const [form] = Form.useForm<{ listingId: string; message: string }>()
+  const [form] = Form.useForm<{ listingId: number; message: string }>()
 
   return (
     <Space orientation="vertical" size={16} style={{ width: '100%' }}>
@@ -57,7 +57,7 @@ export function TenantInquiriesPage() {
           }}
         >
           <Form.Item name="listingId" label="房源 ID" rules={[{ required: true }]}>
-            <Input placeholder="例如 1001" />
+            <InputNumber style={{ width: '100%' }} placeholder="例如 1001" />
           </Form.Item>
           <Form.Item name="message" label="咨询内容" rules={[{ required: true }]}>
             <Input.TextArea rows={4} placeholder="请输入咨询内容" />

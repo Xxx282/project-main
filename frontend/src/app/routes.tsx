@@ -28,22 +28,9 @@ export function AppRoutes() {
 
         <Route path="tenant">
           <Route index element={<Navigate to="listings" replace />} />
-          <Route
-            path="listings"
-            element={
-              <RequireAuth roles={['tenant']}>
-                <TenantListingsPage />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="listings/:id"
-            element={
-              <RequireAuth roles={['tenant']}>
-                <TenantListingDetailPage />
-              </RequireAuth>
-            }
-          />
+          {/* 未登录默认租户界面：房源列表与详情可匿名访问 */}
+          <Route path="listings" element={<TenantListingsPage />} />
+          <Route path="listings/:id" element={<TenantListingDetailPage />} />
           <Route
             path="recommendations"
             element={

@@ -9,13 +9,14 @@ import { getListing } from '../../tenant/api/tenantApi'
 
 export function LandlordListingEditPage(props: { mode: 'create' | 'edit' }) {
   const { id } = useParams()
+  const numericId = id ? Number(id) : undefined
   const navigate = useNavigate()
   const title = props.mode === 'create' ? '发布房源' : '编辑房源'
 
   const listingQ = useQuery({
-    queryKey: ['landlord', 'listing', id],
-    queryFn: () => getListing(id!),
-    enabled: props.mode === 'edit' && Boolean(id),
+    queryKey: ['landlord', 'listing', numericId],
+    queryFn: () => getListing(numericId!),
+    enabled: props.mode === 'edit' && numericId !== undefined,
   })
 
   const [form] = Form.useForm<Partial<Listing>>()
@@ -40,7 +41,7 @@ export function LandlordListingEditPage(props: { mode: 'create' | 'edit' }) {
                 void message.success('已发布')
                 navigate(`/landlord/listings/${created.id}/edit`, { replace: true })
               } else {
-                await updateListing(id!, v)
+                await updateListing(numericId!, v)
                 void message.success('已保存')
               }
             } catch {
@@ -59,8 +60,26 @@ export function LandlordListingEditPage(props: { mode: 'create' | 'edit' }) {
           <Form.Item name="rent" label="租金（每月）" rules={[{ required: true }]}>
             <InputNumber style={{ width: '100%' }} min={0} placeholder="例如 3500" />
           </Form.Item>
-          <Form.Item name="region" label="地址/区域">
-            <Input placeholder="例如：浦东新区..." />
+          <Form.Item name="address" label="地址" rules={[{ required: true }]}>
+            <Input placeholder="例如：浦东新区张江路123号" />
+          </Form.Item>
+          <Form.Item name="city" label="城市" rules={[{ required: true }]}>
+            <Input placeholder="例如：上海" />
+          </Form.Item>
+          <Form.Item name="region" label="区域" rules={[{ required: true }]}>
+            <Input placeholder="例如：浦东新区" />
+          </Form.Item>
+          <Form.Item name="bedrooms" label="卧室数" rules={[{ required: true }]}>
+            <InputNumber style={{ width: '100%' }} min={0} placeholder="例如 2" />
+          </Form.Item>
+          <Form.Item name="bathrooms" label="卫生间数" rules={[{ required: true }]}>
+            <InputNumber style={{ width: '100%' }} min={0} placeholder="例如 1" />
+          </Form.Item>
+          <Form.Item name="area" label="面积（㎡）" rules={[{ required: true }]}>
+            <InputNumber style={{ width: '100%' }} min={0} placeholder="例如 65" />
+          </Form.Item>
+          <Form.Item name="price" label="租金（每月）" rules={[{ required: true }]}>
+            <InputNumber style={{ width: '100%' }} min={0} placeholder="例如 3500" />
           </Form.Item>
           <Button type="primary" htmlType="submit" loading={listingQ.isLoading}>
             {props.mode === 'create' ? '发布' : '保存'}
