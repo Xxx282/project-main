@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -125,7 +126,7 @@ public class InquiryController {
      */
     @Data
     public static class CreateInquiryRequest {
-        @NotBlank(message = "房源ID不能为空")
+        @NotNull(message = "房源ID不能为空")
         private Long listingId;
         @NotBlank(message = "咨询内容不能为空")
         private String message;

@@ -6,7 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.UpdateTimestamp;
+
 import java.time.LocalDateTime;
 
 /**
@@ -28,6 +30,12 @@ public class Inquiry {
 
     @Column(name = "tenant_id", nullable = false)
     private Long tenantId;
+
+    /**
+     * 提问者用户名，通过 SQL 子查询直接获取
+     */
+    @Formula("(SELECT u.username FROM users u WHERE u.id = tenant_id)")
+    private String tenantUsername;
 
     @Column(name = "landlord_id", nullable = false)
     private Long landlordId;

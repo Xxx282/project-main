@@ -6,6 +6,7 @@ com\rental\modules\inquiry\entity\Inquiry$InquiryStatus.class
 com\rental\modules\auth\dto\LoginResponse$LoginResponseBuilder.class
 com\rental\modules\property\entity\Property.class
 com\rental\modules\ml\service\MlService.class
+com\rental\modules\tenant\service\TenantPreferenceService.class
 com\rental\modules\property\service\PropertyService.class
 com\rental\modules\inquiry\entity\Inquiry$InquiryBuilder.class
 com\rental\modules\auth\service\AuthService.class
@@ -15,6 +16,7 @@ com\rental\config\SwaggerConfig.class
 com\rental\modules\inquiry\service\InquiryService.class
 com\rental\modules\user\service\UserService.class
 com\rental\modules\property\entity\Property$PropertyBuilder.class
+com\rental\modules\tenant\entity\TenantPreference$TenantPreferenceBuilder.class
 com\rental\modules\property\service\PropertyServiceImpl.class
 com\rental\common\exception\GlobalExceptionHandler.class
 com\rental\modules\auth\dto\LoginResponse$UserInfo$UserInfoBuilder.class
@@ -26,11 +28,14 @@ com\rental\config\MlServiceConfig.class
 com\rental\modules\inquiry\controller\InquiryController.class
 com\rental\modules\ml\dto\PricePredictionResponse$FeatureImportance.class
 com\rental\modules\ml\dto\RecommendationRequest.class
+com\rental\modules\property\entity\Property$Decoration.class
 com\rental\modules\ml\dto\RecommendationResponse$ListingRecommendation.class
+com\rental\modules\tenant\entity\TenantPreference.class
 com\rental\modules\auth\dto\LoginRequest.class
 com\rental\RentalApplication.class
 com\rental\modules\auth\service\AuthServiceImpl.class
 com\rental\modules\ml\dto\PricePredictionRequest.class
+com\rental\modules\property\entity\Property$Orientation.class
 com\rental\config\CorsConfig.class
 com\rental\modules\user\entity\UserEntity$UserEntityBuilder.class
 com\rental\modules\user\entity\UserEntity.class
@@ -40,6 +45,7 @@ com\rental\modules\inquiry\controller\InquiryController$CreateInquiryRequest.cla
 com\rental\security\JwtAuthenticationFilter.class
 com\rental\modules\inquiry\repository\InquiryRepository.class
 com\rental\common\ResultCode.class
+com\rental\modules\tenant\controller\TenantPreferenceController.class
 com\rental\modules\user\controller\UserController.class
 com\rental\modules\auth\dto\RegisterRequest.class
 com\rental\modules\property\controller\PropertyController.class
@@ -55,3 +61,4 @@ com\rental\modules\auth\controller\AuthController.class
 com\rental\modules\ml\dto\RecommendationResponse.class
 com\rental\modules\ml\exception\MlServiceException.class
 com\rental\modules\ml\client\MlServiceClientImpl.class
+com\rental\modules\tenant\repository\TenantPreferenceRepository.class

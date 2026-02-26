@@ -10,9 +10,11 @@ C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\pro
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\auth\dto\RegisterRequest.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\security\UserDetailsServiceImpl.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\config\SecurityConfig.java
+C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\tenant\repository\TenantPreferenceRepository.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\common\util\JwtUtil.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\ml\dto\RecommendationRequest.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\config\MlServiceConfig.java
+C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\tenant\entity\TenantPreference.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\inquiry\entity\Inquiry.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\user\repository\UserRepository.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\RentalApplication.java
@@ -33,10 +35,12 @@ C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\inq
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\common\ResultCode.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\auth\dto\LoginResponse.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\property\controller\PropertyController.java
+C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\tenant\controller\TenantPreferenceController.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\ml\client\MlServiceClientImpl.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\property\service\PropertyServiceImpl.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\inquiry\controller\InquiryController.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\common\exception\BusinessException.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\common\exception\GlobalExceptionHandler.java
+C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\tenant\service\TenantPreferenceService.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\user\entity\UserEntity.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\user\service\UserService.java

@@ -31,14 +31,39 @@ export function TenantListingsPage() {
   })
 
   const columns: ColumnsType<Listing> = [
+    { title: 'ID', dataIndex: 'id', width: 60 },
     { title: '标题', dataIndex: 'title' },
-    { title: '区域', dataIndex: 'region', render: (v) => v ?? '-' },
-    { title: '租金', dataIndex: 'rent', render: (v) => `¥ ${v}` },
+    {
+      title: '城市/区域',
+      render: (_, row) => (
+        <span>
+          {row.city ?? '-'} {row.region ? `/ ${row.region}` : ''}
+        </span>
+      ),
+    },
+    { title: '租金', dataIndex: 'price', render: (v) => `¥ ${v}` },
     {
       title: '户型',
       render: (_, row) => (
         <Tag>
           {(row.bedrooms ?? '-') + '室'} / {(row.bathrooms ?? '-') + '卫'}
+        </Tag>
+      ),
+    },
+    {
+      title: '装修/朝向',
+      render: (_, row) => (
+        <Tag>
+          {row.decoration === 'rough' && '毛坯'}
+          {row.decoration === 'simple' && '简装'}
+          {row.decoration === 'fine' && '精装'}
+          {row.decoration === 'luxury' && '豪华'}
+          {row.decoration ? ' / ' : ''}
+          {row.orientation === 'east' && '东'}
+          {row.orientation === 'south' && '南'}
+          {row.orientation === 'west' && '西'}
+          {row.orientation === 'north' && '北'}
+          {!row.decoration && !row.orientation && '-'}
         </Tag>
       ),
     },

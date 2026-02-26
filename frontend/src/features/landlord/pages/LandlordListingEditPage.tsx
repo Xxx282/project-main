@@ -1,4 +1,4 @@
-import { Button, Card, Form, Input, InputNumber, Space, message } from 'antd'
+import { Button, Card, Form, Input, InputNumber, Select, Space, message } from 'antd'
 import { useQuery } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -6,6 +6,24 @@ import { PageHeader } from '../../../shared/ui/PageHeader'
 import type { Listing } from '../../../shared/api/types'
 import { createListing, updateListing } from '../api/landlordApi'
 import { getListing } from '../../tenant/api/tenantApi'
+
+const { TextArea } = Input
+
+// 朝向选项
+const orientationOptions = [
+  { label: '东', value: 'east' },
+  { label: '南', value: 'south' },
+  { label: '西', value: 'west' },
+  { label: '北', value: 'north' },
+]
+
+// 装修情况选项
+const decorationOptions = [
+  { label: '毛坯', value: 'rough' },
+  { label: '简装', value: 'simple' },
+  { label: '精装', value: 'fine' },
+  { label: '豪华', value: 'luxury' },
+]
 
 export function LandlordListingEditPage(props: { mode: 'create' | 'edit' }) {
   const { id } = useParams()
@@ -49,19 +67,11 @@ export function LandlordListingEditPage(props: { mode: 'create' | 'edit' }) {
             }
           }}
         >
-          {props.mode === 'edit' ? (
-            <Form.Item label="房源 ID">
-              <Input value={id} disabled />
-            </Form.Item>
-          ) : null}
           <Form.Item name="title" label="标题" rules={[{ required: true }]}>
             <Input placeholder="例如：近地铁两室一厅" />
           </Form.Item>
-          <Form.Item name="rent" label="租金（每月）" rules={[{ required: true }]}>
+          <Form.Item name="price" label="租金（每月）" rules={[{ required: true }]}>
             <InputNumber style={{ width: '100%' }} min={0} placeholder="例如 3500" />
-          </Form.Item>
-          <Form.Item name="address" label="地址" rules={[{ required: true }]}>
-            <Input placeholder="例如：浦东新区张江路123号" />
           </Form.Item>
           <Form.Item name="city" label="城市" rules={[{ required: true }]}>
             <Input placeholder="例如：上海" />
@@ -78,8 +88,17 @@ export function LandlordListingEditPage(props: { mode: 'create' | 'edit' }) {
           <Form.Item name="area" label="面积（㎡）" rules={[{ required: true }]}>
             <InputNumber style={{ width: '100%' }} min={0} placeholder="例如 65" />
           </Form.Item>
-          <Form.Item name="price" label="租金（每月）" rules={[{ required: true }]}>
-            <InputNumber style={{ width: '100%' }} min={0} placeholder="例如 3500" />
+          <Form.Item name="totalFloors" label="总楼层数">
+            <InputNumber style={{ width: '100%' }} min={0} placeholder="例如 30" />
+          </Form.Item>
+          <Form.Item name="orientation" label="朝向">
+            <Select options={orientationOptions} placeholder="请选择朝向" allowClear />
+          </Form.Item>
+          <Form.Item name="decoration" label="装修情况">
+            <Select options={decorationOptions} placeholder="请选择装修情况" allowClear />
+          </Form.Item>
+          <Form.Item name="description" label="房源描述">
+            <TextArea rows={4} placeholder="请输入房源描述" />
           </Form.Item>
           <Button type="primary" htmlType="submit" loading={listingQ.isLoading}>
             {props.mode === 'create' ? '发布' : '保存'}

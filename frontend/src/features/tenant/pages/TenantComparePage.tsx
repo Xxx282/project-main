@@ -1,9 +1,10 @@
 import { Button, Card, Space, Table, Typography } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import { Link } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
 import { PageHeader } from '../../../shared/ui/PageHeader'
 import type { Listing } from '../../../shared/api/types'
-import { mockListings } from '../../../shared/api/mockData'
+import { listListings } from '../api/tenantApi'
 
 const KEY = 'compareListingIds'
 
@@ -24,12 +25,17 @@ function saveIds(ids: string[]) {
 
 export function TenantComparePage() {
   const ids = loadIds()
-  const data = mockListings.filter((x) => ids.includes(x.id))
+  const listingsQ = useQuery({
+    queryKey: ['tenant', 'listings', 'compare'],
+    queryFn: () => listListings({}),
+  })
+
+  const data = listingsQ.data?.filter((x) => ids.includes(String(x.id))) ?? []
 
   const columns: ColumnsType<Listing> = [
     { title: '标题', dataIndex: 'title' },
     { title: '区域', dataIndex: 'region', render: (v) => v ?? '-' },
-    { title: '租金', dataIndex: 'rent', render: (v) => `¥ ${v}` },
+    { title: '租金', dataIndex: 'price', render: (v) => `¥ ${v}` },
     { title: '卧室', dataIndex: 'bedrooms', render: (v) => v ?? '-' },
     { title: '卫生间', dataIndex: 'bathrooms', render: (v) => v ?? '-' },
     { title: '面积', dataIndex: 'area', render: (v) => v ?? '-' },
@@ -40,7 +46,7 @@ export function TenantComparePage() {
       <PageHeader title="租客-房源对比" subtitle="（占位页）后续实现对比表与收藏" />
       <Card>
         <Typography.Paragraph>
-          目前先用本地 localStorage 存一份对比列表（基于 mock 房源）。你可以从房源列表页进入详情后再扩展“加入对比”按钮。
+          目前先用本地 localStorage 存一份对比列表。你可以从房源列表页进入详情后再扩展"加入对比"按钮。
         </Typography.Paragraph>
         <Space style={{ marginBottom: 12 }}>
           <Button
@@ -66,10 +72,10 @@ export function TenantComparePage() {
           rowKey="id"
           columns={columns}
           dataSource={data}
+          loading={listingsQ.isLoading}
           pagination={false}
         />
       </Card>
     </Space>
   )
 }
-

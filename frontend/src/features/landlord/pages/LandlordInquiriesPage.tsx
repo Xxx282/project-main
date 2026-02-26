@@ -40,7 +40,7 @@ export function LandlordInquiriesPage() {
   const data: InquiryRow[] = (q.data ?? []).map((x) => ({
     id: x.id,
     listingId: x.listingId,
-    fromUser: 'tenant',
+    fromUser: x.tenantUsername ?? '租客',
     message: x.message,
     status: x.status,
   }))

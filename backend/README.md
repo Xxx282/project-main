@@ -49,13 +49,6 @@ app:
 - Swagger UI：`http://localhost:8080/swagger-ui.html`
 - OpenAPI JSON：`http://localhost:8080/v3/api-docs`
 
-## 测试账号
-
-| 角色   | 邮箱                    | 密码     |
-| ------ | ----------------------- | -------- |
-| 房东   | landlord001@example.com | password |
-| 租客   | tenant001@example.com   | password |
-| 管理员 | admin001@example.com    | password |
 
 ## 联调前端
 
@@ -298,6 +291,11 @@ backend/
 │           ├── client/          # ML 客户端实现
 │           ├── dto/             # 数据传输对象
 │           └── exception/       # ML 异常定义
+│       └── tenant/               # 租客模块
+│           ├── controller/       # 租客 API 控制器
+│           ├── service/          # 租客业务逻辑
+│           ├── entity/           # 租客实体
+│           └── repository/       # 租客数据访问
 └── src/main/resources/
     ├── application.yml            # 应用配置
     └── schema.sql                 # 数据库脚本
@@ -352,10 +350,16 @@ backend/
 | POST | `/api/ml/recommend` | 个性化推荐  | TENANT/LANDLORD/ADMIN |
 | GET  | `/api/ml/status`    | ML 服务状态 | 已登录            |
 
+### 租客模块
+|| 方法 | 端点                   | 描述                 | 权限     |
+|| ---- | ---------------------- | -------------------- | -------- |
+|| GET  | `/api/tenant/preferences` | 获取偏好设置      | TENANT   |
+|| PUT  | `/api/tenant/preferences` | 保存偏好设置      | TENANT   |
+
 ## 角色说明
 
-| 角色     | 描述   | 主要权限                           |
-| -------- | ------ | ---------------------------------- |
-| tenant   | 租客   | 浏览房源、提交咨询、查看我的咨询   |
-| landlord | 房东   | 管理房源、回复咨询、查看收到的咨询 |
-| admin    | 管理员 | 用户管理、禁用/启用用户            |
+| 角色     | 描述   | 主要权限                                       |
+| -------- | ------ | --------------------------------------------- |
+| tenant   | 租客   | 浏览房源、提交咨询、查看我的咨询、偏好设置     |
+| landlord | 房东   | 管理房源、回复咨询、查看收到的咨询             |
+| admin    | 管理员 | 用户管理、禁用/启用用户                      |

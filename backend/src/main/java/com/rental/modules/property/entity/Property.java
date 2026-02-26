@@ -30,8 +30,6 @@ public class Property {
     private String city;
     @Column(nullable = false, length = 100)
     private String region;
-    @Column(nullable = false, length = 255)
-    private String address;
     @Column(name = "bedrooms", nullable = false)
     private Integer bedrooms;
     @Column(name = "bathrooms", nullable = false)
@@ -40,29 +38,20 @@ public class Property {
     private BigDecimal area;
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
-    @Column(precision = 10, scale = 2)
-    private BigDecimal deposit;
-    @Column(name = "property_type", length = 50)
-    private String propertyType;
-    private Integer floor;
     @Column(name = "total_floors")
     private Integer totalFloors;
+    @Enumerated(EnumType.STRING)
     @Column(length = 20)
-    private String orientation;
+    private Orientation orientation;
+    @Enumerated(EnumType.STRING)
     @Column(length = 50)
-    private String decoration;
-    @Column(columnDefinition = "JSON")
-    private String facilities;
+    private Decoration decoration;
     @Lob
     private String description;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     @Builder.Default
     private PropertyStatus status = PropertyStatus.available;
-    @Column(precision = 10, scale = 7)
-    private BigDecimal longitude;
-    @Column(precision = 10, scale = 7)
-    private BigDecimal latitude;
     @Column(name = "view_count")
     @Builder.Default
     private Integer viewCount = 0;
@@ -79,5 +68,25 @@ public class Property {
         available,  // 可租
         rented,      // 已租
         offline      // 下架
+    }
+
+    /**
+     * 朝向枚举
+     */
+    public enum Orientation {
+        east,   // 东
+        south,  // 南
+        west,   // 西
+        north   // 北
+    }
+
+    /**
+     * 装修情况枚举
+     */
+    public enum Decoration {
+        rough,   // 毛坯
+        simple,  // 简装
+        fine,    // 精装
+        luxury   // 豪华
     }
 }

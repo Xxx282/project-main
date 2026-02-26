@@ -1,4 +1,12 @@
-import { Button, Card, Form, InputNumber, Select, Space, message } from 'antd'
+/*
+ * @Author: Mendax
+ * @Date: 2026-02-17 21:23:56
+ * @LastEditors: Mendax
+ * @LastEditTime: 2026-02-26 16:09:22
+ * @Description: 
+ * @FilePath: \project-main\frontend\src\features\tenant\pages\TenantPreferencesPage.tsx
+ */
+import { Button, Card, Form, Input, InputNumber, Select, Space, message } from 'antd'
 import { useQuery } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { PageHeader } from '../../../shared/ui/PageHeader'
@@ -42,14 +50,7 @@ export function TenantPreferencesPage() {
           </Form.Item>
           <Form.Item label="区域">
             <Form.Item name="region" noStyle>
-              <Select
-                allowClear
-                options={[
-                  { label: '示例区域 A', value: '示例区域 A' },
-                  { label: '示例区域 B', value: '示例区域 B' },
-                ]}
-                placeholder="请选择"
-              />
+              <Input placeholder="例如 朝阳区" />
             </Form.Item>
           </Form.Item>
           <Form.Item label="户型">

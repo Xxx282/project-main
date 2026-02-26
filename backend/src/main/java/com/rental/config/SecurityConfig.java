@@ -9,6 +9,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -49,6 +50,8 @@ public class SecurityConfig {
                         .requestMatchers("/ml/status").permitAll()
                         // 健康检查
                         .requestMatchers("/actuator/health").permitAll()
+                        // 房源列表和详情公开访问（未登录用户可查看）
+                        .requestMatchers(HttpMethod.GET, "/listings/**").permitAll()
                         // 其他请求需要认证
                         .anyRequest().authenticated())
                 // 添加 JWT 过滤器

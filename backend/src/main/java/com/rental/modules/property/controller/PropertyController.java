@@ -106,18 +106,13 @@ public class PropertyController {
                 .title(request.getTitle())
                 .city(request.getCity())
                 .region(request.getRegion())
-                .address(request.getAddress())
                 .bedrooms(request.getBedrooms())
                 .bathrooms(request.getBathrooms())
                 .area(request.getArea())
                 .price(request.getPrice())
-                .deposit(request.getDeposit())
-                .propertyType(request.getPropertyType())
-                .floor(request.getFloor())
                 .totalFloors(request.getTotalFloors())
-                .orientation(request.getOrientation())
-                .decoration(request.getDecoration())
-                .facilities(request.getFacilities())
+                .orientation(request.getOrientation() != null ? Property.Orientation.valueOf(request.getOrientation()) : null)
+                .decoration(request.getDecoration() != null ? Property.Decoration.valueOf(request.getDecoration()) : null)
                 .description(request.getDescription())
                 .status(Property.PropertyStatus.available)
                 .build();
@@ -148,18 +143,17 @@ public class PropertyController {
         existing.setTitle(request.getTitle());
         existing.setCity(request.getCity());
         existing.setRegion(request.getRegion());
-        existing.setAddress(request.getAddress());
         existing.setBedrooms(request.getBedrooms());
         existing.setBathrooms(request.getBathrooms());
         existing.setArea(request.getArea());
         existing.setPrice(request.getPrice());
-        existing.setDeposit(request.getDeposit());
-        existing.setPropertyType(request.getPropertyType());
-        existing.setFloor(request.getFloor());
         existing.setTotalFloors(request.getTotalFloors());
-        existing.setOrientation(request.getOrientation());
-        existing.setDecoration(request.getDecoration());
-        existing.setFacilities(request.getFacilities());
+        if (request.getOrientation() != null) {
+            existing.setOrientation(Property.Orientation.valueOf(request.getOrientation()));
+        }
+        if (request.getDecoration() != null) {
+            existing.setDecoration(Property.Decoration.valueOf(request.getDecoration()));
+        }
         existing.setDescription(request.getDescription());
 
         Property saved = propertyService.updateProperty(existing);
@@ -230,18 +224,13 @@ public class PropertyController {
         private String title;
         private String city;
         private String region;
-        private String address;
         private Integer bedrooms;
         private Double bathrooms;
         private BigDecimal area;
         private BigDecimal price;
-        private BigDecimal deposit;
-        private String propertyType;
-        private Integer floor;
         private Integer totalFloors;
         private String orientation;
         private String decoration;
-        private String facilities;
         private String description;
     }
 
@@ -250,18 +239,13 @@ public class PropertyController {
         private String title;
         private String city;
         private String region;
-        private String address;
         private Integer bedrooms;
         private Double bathrooms;
         private BigDecimal area;
         private BigDecimal price;
-        private BigDecimal deposit;
-        private String propertyType;
-        private Integer floor;
         private Integer totalFloors;
         private String orientation;
         private String decoration;
-        private String facilities;
         private String description;
     }
 }

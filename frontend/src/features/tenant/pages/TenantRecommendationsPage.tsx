@@ -15,7 +15,7 @@ export function TenantRecommendationsPage() {
   const columns: ColumnsType<Listing> = [
     { title: '标题', dataIndex: 'title' },
     { title: '区域', dataIndex: 'region', render: (v) => v ?? '-' },
-    { title: '租金', dataIndex: 'rent', render: (v) => `¥ ${v}` },
+    { title: '租金', dataIndex: 'price', render: (v) => `¥ ${v}` },
     { title: '操作', render: (_, row) => <Link to={`/tenant/listings/${row.id}`}>详情</Link> },
   ]
 

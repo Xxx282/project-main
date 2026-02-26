@@ -93,6 +93,11 @@ const ROLE_MENU: Record<UserRole, { key: TopNavKey; label: string }[]> = {
   ],
 }
 
+// 未登录用户的菜单配置：只显示房源
+const GUEST_MENU: { key: TopNavKey; label: string }[] = [
+  { key: 'tenant_listings', label: '房源' },
+]
+
 export function MainLayout() {
   const navigate = useNavigate()
   const location = useLocation()
@@ -103,17 +108,25 @@ export function MainLayout() {
   const effectiveRole: UserRole = auth.user?.role ?? 'tenant'
 
   const menuItems: MenuProps['items'] = useMemo(() => {
+    // 未登录时只显示房源 + 登录 + 注册
+    if (!auth.user) {
+      const base = GUEST_MENU.map(({ key, label }) => ({
+        key,
+        label,
+        onClick: () => navigate(keyToPath(key)),
+      }))
+      base.push(
+        { key: 'auth_login', label: '登录', onClick: () => navigate('/login') },
+        { key: 'auth_register', label: '注册', onClick: () => navigate('/register') },
+      )
+      return base
+    }
+    // 登录后按用户角色显示菜单
     const base = ROLE_MENU[effectiveRole].map(({ key, label }) => ({
       key,
       label,
       onClick: () => navigate(keyToPath(key)),
     }))
-    if (!auth.user) {
-      base.push(
-        { key: 'auth_login', label: '登录', onClick: () => navigate('/login') },
-        { key: 'auth_register', label: '注册', onClick: () => navigate('/register') },
-      )
-    }
     return base
   }, [effectiveRole, auth.user, navigate])
 

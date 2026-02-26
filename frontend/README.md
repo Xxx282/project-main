@@ -88,14 +88,6 @@ VITE_API_BASE_URL=http://localhost:8080
 
 **前端文件**：`src/features/tenant/pages/TenantRecommendationsPage.tsx`
 
-## 测试账号
-
-| 角色   | 邮箱                    | 密码     |
-| ------ | ----------------------- | -------- |
-| 房东   | landlord001@example.com | password |
-| 租客   | tenant001@example.com   | password |
-| 管理员 | admin001@example.com    | password |
-
 ## 技术栈
 
 - React 18 + TypeScript
