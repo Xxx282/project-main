@@ -14,7 +14,21 @@ body {
   height: 100%;
 }
 
+html {
+  /* 略微放大全局基础字号，配合 antd token 的 fontSize=16 使用 */
+  font-size: 16px;
+}
+
 body {
   margin: 0;
-  background: #f5f5f5;
+  background: #f3f4f6;
+  color: #1f2933;
+}
+
+a {
+  color: #1677ff;
+}
+
+a:hover {
+  color: #1452b6;
 }

@@ -11,7 +11,19 @@ const queryClient = new QueryClient()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ConfigProvider>
+    <ConfigProvider
+      theme={{
+        token: {
+          // 提升全局基础字号，解决字体偏小问题
+          fontSize: 16,
+          // 统一主色和背景色，让整体配色更协调
+          colorPrimary: '#1677ff',
+          colorBgLayout: '#f3f4f6',
+          colorBgContainer: '#ffffff',
+          borderRadius: 8,
+        },
+      }}
+    >
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <BrowserRouter>

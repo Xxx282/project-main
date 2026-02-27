@@ -17,8 +17,17 @@ export function RegisterPage() {
       <PageHeader
         title="注册"
         subtitle="注册完成后跳转登录页（或由后端返回 token 自动登录）"
+        align="center"
       />
-      <Card style={{ maxWidth: 520 }}>
+      <Card
+        style={{
+          maxWidth: 520,
+          margin: '0 auto',
+          borderRadius: 16,
+          boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)',
+          border: '1px solid #f3f4f6',
+        }}
+      >
         <Form
           form={form}
           layout="vertical"

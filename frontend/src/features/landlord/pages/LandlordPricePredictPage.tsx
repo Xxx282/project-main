@@ -16,7 +16,7 @@ export function LandlordPricePredictPage() {
         title="房东-租金预测"
         subtitle="（占位页）后续接入 /pricing/predict 或 /ml/price-predict"
       />
-      <Card style={{ maxWidth: 720 }}>
+      <Card style={{ maxWidth: 720, margin: '0 auto' }}>
         <Form
           layout="vertical"
           initialValues={{ bedrooms: 2, bathrooms: 1, area: 60, region: '示例区域 A' }}

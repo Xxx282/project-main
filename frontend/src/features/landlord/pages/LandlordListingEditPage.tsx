@@ -48,7 +48,7 @@ export function LandlordListingEditPage(props: { mode: 'create' | 'edit' }) {
         title={`房东-${title}`}
         subtitle="（占位页）后续接入创建/更新接口与表单校验"
       />
-      <Card style={{ maxWidth: 800 }}>
+      <Card style={{ maxWidth: 800, margin: '0 auto' }}>
         <Form
           form={form}
           layout="vertical"
