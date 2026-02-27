@@ -180,3 +180,18 @@ ALTER TABLE lease_transactions ADD INDEX idx_property_tenant (property_id, tenan
 ALTER TABLE rent_predictions ADD INDEX idx_property_version (property_id, model_version);
 ALTER TABLE rent_predictions ADD INDEX idx_model_created (model_version, created_at);
 
+-- 收藏表 (favorites)
+CREATE TABLE IF NOT EXISTS favorites (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '收藏主键ID',
+    user_id BIGINT UNSIGNED NOT NULL COMMENT '用户ID，外键关联users.id',
+    property_id BIGINT UNSIGNED NOT NULL COMMENT '房源ID，外键关联properties.id',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '收藏时间',
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_user_property (user_id, property_id),
+    KEY idx_user_id (user_id),
+    KEY idx_property_id (property_id),
+    CONSTRAINT fk_favorites_user FOREIGN KEY (user_id)
+        REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_favorites_property FOREIGN KEY (property_id)
+        REFERENCES properties(id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户收藏表';

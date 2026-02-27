@@ -59,3 +59,64 @@ export async function createInquiry(req: { listingId: number; message: string })
   const { data } = await http.post<SingleResponse<Inquiry>>('/inquiries', req)
   return data.data
 }
+
+// ========== 收藏相关 API ==========
+
+export type Favorite = {
+  id: number
+  userId: number
+  propertyId: number
+  createdAt: string
+}
+
+type FavoritesResponse = {
+  code: number
+  message: string
+  data: {
+    favorites: Favorite[]
+    total: number
+  }
+  timestamp: number
+  success: boolean
+}
+
+type FavoriteCheckResponse = {
+  code: number
+  message: string
+  data: {
+    propertyId: number
+    favorited: boolean
+  }
+  timestamp: number
+  success: boolean
+}
+
+type FavoriteActionResponse = {
+  code: number
+  message: string
+  data: {
+    message: string
+    favorite?: Favorite
+  }
+  timestamp: number
+  success: boolean
+}
+
+export async function getMyFavorites(): Promise<{ favorites: Favorite[]; total: number }> {
+  const { data } = await http.get<FavoritesResponse>('/favorites')
+  return data.data
+}
+
+export async function addFavorite(propertyId: number): Promise<Favorite> {
+  const { data } = await http.post<FavoriteActionResponse>(`/favorites/${propertyId}`)
+  return data.data.favorite!
+}
+
+export async function removeFavorite(propertyId: number): Promise<void> {
+  await http.delete(`/favorites/${propertyId}`)
+}
+
+export async function checkFavorite(propertyId: number): Promise<boolean> {
+  const { data } = await http.get<FavoriteCheckResponse>(`/favorites/check/${propertyId}`)
+  return data.data.favorited
+}

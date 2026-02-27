@@ -1,3 +1,11 @@
+/*
+ * @Author: Mendax
+ * @Date: 2026-02-17 21:23:56
+ * @LastEditors: Mendax
+ * @LastEditTime: 2026-02-26 18:43:30
+ * @Description: 
+ * @FilePath: \project-main\frontend\src\features\landlord\pages\LandlordInquiriesPage.tsx
+ */
 import { Card, Space, Table, Tag, Typography } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import { useQuery } from '@tanstack/react-query'
@@ -47,11 +55,8 @@ export function LandlordInquiriesPage() {
 
   return (
     <Space orientation="vertical" size={16} style={{ width: '100%' }}>
-      <PageHeader title="房东-咨询管理" subtitle="（占位页）后续接入 /landlord/inquiries" />
+      <PageHeader title="房东-咨询管理"/>
       <Card>
-        <Typography.Paragraph type="secondary">
-          后续会支持：回复、关闭、按状态过滤、按房源筛选。
-        </Typography.Paragraph>
         <Table<InquiryRow>
           rowKey="id"
           loading={q.isLoading}

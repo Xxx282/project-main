@@ -46,7 +46,7 @@ export function LandlordListingEditPage(props: { mode: 'create' | 'edit' }) {
     <Space orientation="vertical" size={16} style={{ width: '100%' }}>
       <PageHeader
         title={`房东-${title}`}
-        subtitle="（占位页）后续接入创建/更新接口与表单校验"
+        subtitle={`房东-${title}`}
       />
       <Card style={{ maxWidth: 800 }}>
         <Form

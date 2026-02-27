@@ -1,4 +1,4 @@
-import { Button, Card, Form, Input, Radio, Space, Typography, message } from 'antd'
+import { Button, Card, Form, Input, Radio, Space, message } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import { PageHeader } from '../../../shared/ui/PageHeader'
 import { register } from '../api/authApi'
@@ -14,10 +14,7 @@ export function RegisterPage() {
 
   return (
     <Space orientation="vertical" size={16} style={{ width: '100%' }}>
-      <PageHeader
-        title="注册"
-        subtitle="注册完成后跳转登录页（或由后端返回 token 自动登录）"
-      />
+      <PageHeader title="注册" />
       <Card style={{ maxWidth: 520 }}>
         <Form
           form={form}
@@ -57,9 +54,6 @@ export function RegisterPage() {
           <Button type="primary" htmlType="submit" block>
             注册
           </Button>
-          <Typography.Paragraph type="secondary" style={{ marginTop: 12 }}>
-            如果后端设计为“注册后直接返回 token”，我会再补上自动登录逻辑。
-          </Typography.Paragraph>
         </Form>
       </Card>
     </Space>

@@ -68,10 +68,26 @@ export function AppRoutes() {
         <Route path="landlord">
           <Route index element={<Navigate to="listings" replace />} />
           <Route
+            path="all-listings"
+            element={
+              <RequireAuth roles={['landlord']}>
+                <TenantListingsPage />
+              </RequireAuth>
+            }
+          />
+          <Route
             path="listings"
             element={
               <RequireAuth roles={['landlord']}>
                 <LandlordListingsPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="favorites"
+            element={
+              <RequireAuth roles={['landlord']}>
+                <TenantComparePage />
               </RequireAuth>
             }
           />

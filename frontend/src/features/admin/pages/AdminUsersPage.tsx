@@ -71,7 +71,7 @@ export function AdminUsersPage() {
 
   return (
     <Space orientation="vertical" size={16} style={{ width: '100%' }}>
-      <PageHeader title="管理员-用户管理" subtitle="（占位页）后续接入 /admin/users" />
+      <PageHeader title="管理员-用户管理" />
       <Card>
         <Table<UserRow> rowKey="id" loading={q.isLoading} columns={columns} dataSource={data} pagination={false} />
       </Card>

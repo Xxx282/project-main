@@ -39,10 +39,10 @@ public class UserEntity {
     @Column(length = 20)
     private String phone;
 
-    @Column(length = 50)
+    @Column(name = "real_name", length = 50)
     private String realName;
 
-    @Column(nullable = false)
+    @Column(name = "is_active", nullable = false)
     @Builder.Default
     private Boolean isActive = true;
 

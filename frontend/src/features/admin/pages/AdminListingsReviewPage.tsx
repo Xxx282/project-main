@@ -86,11 +86,8 @@ export function AdminListingsReviewPage() {
 
   return (
     <Space orientation="vertical" size={16} style={{ width: '100%' }}>
-      <PageHeader title="管理员-房源审核" subtitle="（占位页）后续接入 /admin/listings" />
+      <PageHeader title="管理员-房源审核" />
       <Card>
-        <Typography.Paragraph type="secondary">
-          后续会支持：审核通过/拒绝、查看详情、按状态筛选。
-        </Typography.Paragraph>
         <Table<ListingRow>
           rowKey="id"
           loading={q.isLoading}

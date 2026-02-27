@@ -1,22 +1,79 @@
-import { Card, Descriptions, Space } from 'antd'
+import { Card, Descriptions, Space, Button, message } from 'antd'
+import { HeartOutlined, HeartFilled } from '@ant-design/icons'
 import { useParams } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { PageHeader } from '../../../shared/ui/PageHeader'
-import { getListing } from '../api/tenantApi'
+import { getListing, checkFavorite, addFavorite, removeFavorite } from '../api/tenantApi'
+import { useAuth } from '../../auth/context/AuthContext'
 
 export function TenantListingDetailPage() {
   const { id } = useParams()
+  const queryClient = useQueryClient()
+  const auth = useAuth()
+  const propertyId = Number(id)
+
   const listingQ = useQuery({
     queryKey: ['tenant', 'listing', id],
-    queryFn: () => getListing(id!),
+    queryFn: () => getListing(propertyId),
     enabled: Boolean(id),
   })
+
+  // 查询收藏状态（仅登录用户）
+  const favoriteQ = useQuery({
+    queryKey: ['tenant', 'favorite', id],
+    queryFn: () => checkFavorite(propertyId),
+    enabled: Boolean(id) && Boolean(auth.user),
+  })
+
+  // 添加收藏 mutation
+  const addFavoriteMutation = useMutation({
+    mutationFn: () => addFavorite(propertyId),
+    onSuccess: () => {
+      message.success('收藏成功')
+      queryClient.invalidateQueries({ queryKey: ['tenant', 'favorite', id] })
+    },
+    onError: () => {
+      message.error('收藏失败')
+    },
+  })
+
+  // 取消收藏 mutation
+  const removeFavoriteMutation = useMutation({
+    mutationFn: () => removeFavorite(propertyId),
+    onSuccess: () => {
+      message.success('取消收藏成功')
+      queryClient.invalidateQueries({ queryKey: ['tenant', 'favorite', id] })
+    },
+    onError: () => {
+      message.error('取消收藏失败')
+    },
+  })
+
+  const handleFavorite = () => {
+    if (favoriteQ.data) {
+      removeFavoriteMutation.mutate()
+    } else {
+      addFavoriteMutation.mutate()
+    }
+  }
 
   return (
     <Space orientation="vertical" size={16} style={{ width: '100%' }}>
       <PageHeader
-        title="租客-房源详情"
-        subtitle="支持查看房源详细信息"
+        title="房源详情"
+        extra={
+          auth.user ? (
+            <Button
+              type={favoriteQ.data ? 'primary' : 'default'}
+              danger={favoriteQ.data}
+              icon={favoriteQ.data ? <HeartFilled /> : <HeartOutlined />}
+              onClick={handleFavorite}
+              loading={favoriteQ.isLoading || addFavoriteMutation.isPending || removeFavoriteMutation.isPending}
+            >
+              {favoriteQ.data ? '已收藏' : '收藏'}
+            </Button>
+          ) : null
+        }
       />
       <Card>
         <Descriptions bordered size="small" column={2}>
@@ -57,4 +114,3 @@ export function TenantListingDetailPage() {
     </Space>
   )
 }
-

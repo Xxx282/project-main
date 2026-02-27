@@ -17,7 +17,7 @@ export function AdminDashboardPage() {
 
   return (
     <Space orientation="vertical" size={16} style={{ width: '100%' }}>
-      <PageHeader title="管理员-数据看板" subtitle="（占位页）后续接入 /admin/dashboard" />
+      <PageHeader title="管理员-数据看板" />
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={12} md={6}>
           <Card>

@@ -81,7 +81,6 @@ export function LandlordListingsPage() {
     <Space orientation="vertical" size={16} style={{ width: '100%' }}>
       <PageHeader
         title="房东-房源管理"
-        subtitle="（占位页）后续接入 /listings 的房东 CRUD"
         extra={
           <Link to="/landlord/listings/new">
             <Button type="primary">发布房源</Button>

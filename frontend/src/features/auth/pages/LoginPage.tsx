@@ -1,4 +1,4 @@
-import { Button, Card, Form, Input, Radio, Space, Typography, message } from 'antd'
+import { Button, Card, Form, Input, Radio, Space, message } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import { PageHeader } from '../../../shared/ui/PageHeader'
 import { login } from '../api/authApi'
@@ -18,10 +18,7 @@ export function LoginPage() {
 
   return (
     <Space orientation="vertical" size={16} style={{ width: '100%' }}>
-      <PageHeader
-        title="登录"
-        subtitle="输入账号密码后获取 JWT，并按角色跳转"
-      />
+      <PageHeader title="登录" />
       <Card style={{ maxWidth: 520 }}>
         <Form
           form={form}
@@ -74,9 +71,6 @@ export function LoginPage() {
           <Button type="primary" htmlType="submit" block>
             登录
           </Button>
-          <Typography.Paragraph type="secondary" style={{ marginTop: 12 }}>
-            若你还没启动后端，可以先浏览公开页（登录/注册）；受保护页面会自动跳回登录页。
-          </Typography.Paragraph>
         </Form>
       </Card>
     </Space>

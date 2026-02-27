@@ -14,8 +14,10 @@ type TopNavKey =
   | 'tenant_compare'
   | 'tenant_inquiries'
   | 'landlord_listings'
+  | 'landlord_all_listings'
   | 'landlord_predict'
   | 'landlord_inquiries'
+  | 'landlord_favorites'
   | 'admin_dashboard'
   | 'admin_users'
   | 'admin_listings'
@@ -36,10 +38,14 @@ function keyToPath(key: TopNavKey): string {
       return '/tenant/inquiries'
     case 'landlord_listings':
       return '/landlord/listings'
+    case 'landlord_all_listings':
+      return '/landlord/all-listings'
     case 'landlord_predict':
       return '/landlord/predict'
     case 'landlord_inquiries':
       return '/landlord/inquiries'
+    case 'landlord_favorites':
+      return '/landlord/favorites'
     case 'admin_dashboard':
       return '/admin/dashboard'
     case 'admin_users':
@@ -60,6 +66,8 @@ function pathToKey(pathname: string): TopNavKey {
   if (pathname.startsWith('/tenant/inquiries')) return 'tenant_inquiries'
   if (pathname.startsWith('/tenant')) return 'tenant_listings'
 
+  if (pathname.startsWith('/landlord/favorites')) return 'landlord_favorites'
+  if (pathname.startsWith('/landlord/all-listings')) return 'landlord_all_listings'
   if (pathname.startsWith('/landlord/predict')) return 'landlord_predict'
   if (pathname.startsWith('/landlord/inquiries')) return 'landlord_inquiries'
   if (pathname.startsWith('/landlord')) return 'landlord_listings'
@@ -78,13 +86,15 @@ const ROLE_MENU: Record<UserRole, { key: TopNavKey; label: string }[]> = {
     { key: 'tenant_listings', label: '房源' },
     { key: 'tenant_reco', label: '推荐' },
     { key: 'tenant_prefs', label: '偏好' },
-    { key: 'tenant_compare', label: '对比' },
+    { key: 'tenant_compare', label: '收藏' },
     { key: 'tenant_inquiries', label: '咨询' },
   ],
   landlord: [
-    { key: 'landlord_listings', label: '房源管理' },
-    { key: 'landlord_predict', label: '租金预测' },
-    { key: 'landlord_inquiries', label: '咨询管理' },
+    { key: 'landlord_all_listings', label: '房源' },
+    { key: 'landlord_listings', label: '我的' },
+    { key: 'landlord_favorites', label: '收藏' },
+    { key: 'landlord_predict', label: '预测' },
+    { key: 'landlord_inquiries', label: '咨询' },
   ],
   admin: [
     { key: 'admin_dashboard', label: '看板' },
@@ -147,9 +157,7 @@ export function MainLayout() {
           {auth.user ? (
             <>
               <Typography.Text style={{ color: 'rgba(255,255,255,0.85)' }}>
-                {auth.user.role === 'tenant' && '租客'}
-                {auth.user.role === 'landlord' && '房东'}
-                {auth.user.role === 'admin' && '管理员'}
+                {auth.user.username}
               </Typography.Text>
               <Button
                 size="small"

@@ -14,7 +14,6 @@ export function LandlordPricePredictPage() {
     <Space orientation="vertical" size={16} style={{ width: '100%' }}>
       <PageHeader
         title="房东-租金预测"
-        subtitle="（占位页）后续接入 /pricing/predict 或 /ml/price-predict"
       />
       <Card style={{ maxWidth: 720 }}>
         <Form
