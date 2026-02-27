@@ -41,7 +41,7 @@ export function TenantInquiriesPage() {
     <Space orientation="vertical" size={16} style={{ width: '100%' }}>
       <PageHeader title="租客-咨询" subtitle="支持提交与记录查看（无后端时自动 mock）" />
 
-      <Card title="发起咨询" style={{ maxWidth: 720 }}>
+      <Card title="发起咨询" style={{ maxWidth: 720, margin: '0 auto' }}>
         <Form
           form={form}
           layout="vertical"

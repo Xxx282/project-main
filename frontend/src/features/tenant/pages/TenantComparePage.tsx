@@ -13,8 +13,14 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { HeartFilled, DeleteOutlined, HomeOutlined, SettingOutlined } from '@ant-design/icons'
 import { useState, useMemo } from 'react'
 import { PageHeader } from '../../../shared/ui/PageHeader'
+<<<<<<< HEAD
 import { getMyFavorites, removeFavorite, type Favorite } from '../api/tenantApi'
 import { getListing } from '../api/tenantApi'
+=======
+import type { Listing } from '../../../shared/api/types'
+import { listListings } from '../api/tenantApi'
+import { useAuth } from '../../auth/context/AuthContext'
+>>>>>>> 525f37060275a5b973a7e3e6ca3a0cdd1bd4fb9f
 
 // 收藏的房源详情
 interface FavoriteProperty {
@@ -64,6 +70,7 @@ function saveColumnSettings(fields: FieldOption[]) {
 }
 
 export function TenantComparePage() {
+<<<<<<< HEAD
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [settingsModalOpen, setSettingsModalOpen] = useState(false)
@@ -89,6 +96,16 @@ export function TenantComparePage() {
       const results = await Promise.all(promises)
       return results as FavoriteProperty[]
     },
+=======
+  const auth = useAuth()
+  const isGuest = !auth.user
+  const cardMaxWidth = isGuest ? 1160 : 980
+
+  const ids = loadIds()
+  const listingsQ = useQuery({
+    queryKey: ['tenant', 'listings', 'compare'],
+    queryFn: () => listListings({}),
+>>>>>>> 525f37060275a5b973a7e3e6ca3a0cdd1bd4fb9f
   })
 
   // 取消收藏 mutation
@@ -228,6 +245,7 @@ export function TenantComparePage() {
   }
 
   return (
+<<<<<<< HEAD
     <Space orientation="vertical" size={16} style={{ width: '100%' }}>
       <PageHeader
         title="我的收藏"
@@ -263,6 +281,50 @@ export function TenantComparePage() {
             pagination={{ pageSize: 10 }}
           />
         )}
+=======
+    <Space orientation="vertical" size={24} style={{ width: '100%' }}>
+      <PageHeader title="租客-房源对比" subtitle="（占位页）后续实现对比表与收藏" />
+      <Card
+        style={{
+          maxWidth: cardMaxWidth,
+          margin: '0 auto',
+          borderRadius: 12,
+          boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)',
+          border: '1px solid #f3f4f6',
+        }}
+      >
+        <Typography.Paragraph>
+          目前先用本地 localStorage 存一份对比列表。你可以从房源列表页进入详情后再扩展"加入对比"按钮。
+        </Typography.Paragraph>
+        <Space style={{ marginBottom: 12 }}>
+          <Button
+            onClick={() => {
+              saveIds(['1', '2'])
+              window.location.reload()
+            }}
+          >
+            填充示例对比
+          </Button>
+          <Button
+            danger
+            onClick={() => {
+              saveIds([])
+              window.location.reload()
+            }}
+          >
+            清空
+          </Button>
+          <Link to="/tenant/listings">返回房源列表</Link>
+        </Space>
+        <Table<Listing>
+          rowKey="id"
+          columns={columns}
+          dataSource={data}
+          loading={listingsQ.isLoading}
+          size="middle"
+          pagination={false}
+        />
+>>>>>>> 525f37060275a5b973a7e3e6ca3a0cdd1bd4fb9f
       </Card>
 
       {/* 字段显示设置弹窗 */}

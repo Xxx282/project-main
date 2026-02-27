@@ -48,7 +48,7 @@ export function LandlordListingEditPage(props: { mode: 'create' | 'edit' }) {
         title={`房东-${title}`}
         subtitle={`房东-${title}`}
       />
-      <Card style={{ maxWidth: 800 }}>
+      <Card style={{ maxWidth: 800, margin: '0 auto' }}>
         <Form
           form={form}
           layout="vertical"
