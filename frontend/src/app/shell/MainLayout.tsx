@@ -103,7 +103,7 @@ const ROLE_MENU: Record<UserRole, { key: TopNavKey; label: string }[]> = {
   ],
 }
 
-// 未登录用户的菜单配置：只显示房源
+// 未登录用户的菜单配置：只显示大厅
 const GUEST_MENU: { key: TopNavKey; label: string }[] = [
   { key: 'tenant_listings', label: '房源' },
 ]

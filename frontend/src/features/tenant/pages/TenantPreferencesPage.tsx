@@ -2,7 +2,7 @@
  * @Author: Mendax
  * @Date: 2026-02-17 21:23:56
  * @LastEditors: Mendax
- * @LastEditTime: 2026-02-26 16:09:22
+ * @LastEditTime: 2026-02-27 23:39:22
  * @Description: 
  * @FilePath: \project-main\frontend\src\features\tenant\pages\TenantPreferencesPage.tsx
  */
@@ -28,7 +28,7 @@ export function TenantPreferencesPage() {
 
   return (
     <Space orientation="vertical" size={16} style={{ width: '100%' }}>
-      <PageHeader title="租客-偏好设置" subtitle="可保存（无后端时仅本地返回）" />
+      <PageHeader title="租客-偏好设置" />
       <Card style={{ maxWidth: 720, margin: '0 auto' }}>
         <Form
           form={form}

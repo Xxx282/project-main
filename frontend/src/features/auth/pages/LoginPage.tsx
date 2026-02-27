@@ -18,10 +18,6 @@ export function LoginPage() {
 
   return (
     <Space orientation="vertical" size={16} style={{ width: '100%' }}>
-<<<<<<< HEAD
-      <PageHeader title="登录" />
-      <Card style={{ maxWidth: 520 }}>
-=======
       <PageHeader
         title="登录"
         subtitle="输入账号密码后获取 JWT，并按角色跳转"
@@ -36,7 +32,6 @@ export function LoginPage() {
           border: '1px solid #f3f4f6',
         }}
       >
->>>>>>> 525f37060275a5b973a7e3e6ca3a0cdd1bd4fb9f
         <Form
           form={form}
           layout="vertical"

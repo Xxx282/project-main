@@ -14,10 +14,6 @@ export function RegisterPage() {
 
   return (
     <Space orientation="vertical" size={16} style={{ width: '100%' }}>
-<<<<<<< HEAD
-      <PageHeader title="注册" />
-      <Card style={{ maxWidth: 520 }}>
-=======
       <PageHeader
         title="注册"
         subtitle="注册完成后跳转登录页（或由后端返回 token 自动登录）"
@@ -32,7 +28,6 @@ export function RegisterPage() {
           border: '1px solid #f3f4f6',
         }}
       >
->>>>>>> 525f37060275a5b973a7e3e6ca3a0cdd1bd4fb9f
         <Form
           form={form}
           layout="vertical"

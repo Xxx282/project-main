@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import { Button, Card, Form, Space, Table, Tag, Modal, Checkbox } from 'antd'
-=======
-import { Button, Card, Form, Input, InputNumber, Select, Space, Table, Tag, Typography } from 'antd'
->>>>>>> 525f37060275a5b973a7e3e6ca3a0cdd1bd4fb9f
+import { Button, Card, Form, Input, InputNumber, Select, Space, Table, Tag, Modal, Checkbox, Typography } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -11,46 +7,22 @@ import { SettingOutlined } from '@ant-design/icons'
 import { PageHeader } from '../../../shared/ui/PageHeader'
 import { listListings } from '../api/tenantApi'
 import type { Listing } from '../../../shared/api/types'
+import { useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../auth/context/AuthContext'
 
-<<<<<<< HEAD
 // 字段设置相关
 interface FieldOption {
   key: string
   title: string
   visible: boolean
 }
-=======
+
 export function TenantListingsPage() {
   const [params, setParams] = useSearchParams()
   const auth = useAuth()
   const isGuest = !auth.user
   const cardMaxWidth = isGuest ? 1160 : 980
->>>>>>> 525f37060275a5b973a7e3e6ca3a0cdd1bd4fb9f
 
-const STORAGE_KEY = 'listings_columns'
-
-function loadColumnSettings(): FieldOption[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw) return JSON.parse(raw)
-  } catch {}
-  // 默认配置
-  return [
-    { key: 'id', title: 'ID', visible: true },
-    { key: 'title', title: '标题', visible: true },
-    { key: 'cityRegion', title: '城市/区域', visible: true },
-    { key: 'price', title: '租金', visible: true },
-    { key: 'layout', title: '户型', visible: true },
-    { key: 'decorationOrientation', title: '装修/朝向', visible: true },
-  ]
-}
-
-function saveColumnSettings(fields: FieldOption[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(fields))
-}
-
-export function TenantListingsPage() {
   const [settingsModalOpen, setSettingsModalOpen] = useState(false)
   const [form] = Form.useForm()
 
@@ -59,7 +31,28 @@ export function TenantListingsPage() {
     queryFn: () => listListings({}),
   })
 
-<<<<<<< HEAD
+  const STORAGE_KEY = 'listings_columns'
+
+  function loadColumnSettings(): FieldOption[] {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY)
+      if (raw) return JSON.parse(raw)
+    } catch {}
+    // 默认配置
+    return [
+      { key: 'id', title: 'ID', visible: true },
+      { key: 'title', title: '标题', visible: true },
+      { key: 'cityRegion', title: '城市/区域', visible: true },
+      { key: 'price', title: '租金', visible: true },
+      { key: 'layout', title: '户型', visible: true },
+      { key: 'decorationOrientation', title: '装修/朝向', visible: true },
+    ]
+  }
+
+  function saveColumnSettings(fields: FieldOption[]) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(fields))
+  }
+
   // 动态生成列配置
   const columns = useMemo(() => {
     const settings = loadColumnSettings()
@@ -85,14 +78,19 @@ export function TenantListingsPage() {
     }
 
     if (settings.find((s) => s.key === 'price' && s.visible)) {
-      cols.push({ title: '租金', dataIndex: 'price', render: (v) => `¥ ${v}` })
+      cols.push({
+        title: '租金',
+        dataIndex: 'price',
+        align: 'right',
+        render: (v) => <Typography.Text strong>¥ {v}</Typography.Text>,
+      })
     }
 
     if (settings.find((s) => s.key === 'layout' && s.visible)) {
       cols.push({
         title: '户型',
         render: (_, row) => (
-          <Tag>
+          <Tag color="blue">
             {(row.bedrooms ?? '-') + '室'} / {(row.bathrooms ?? '-') + '卫'}
           </Tag>
         ),
@@ -103,7 +101,7 @@ export function TenantListingsPage() {
       cols.push({
         title: '装修/朝向',
         render: (_, row) => (
-          <Tag>
+          <Tag color="geekblue">
             {row.decoration === 'rough' && '毛坯'}
             {row.decoration === 'simple' && '简装'}
             {row.decoration === 'fine' && '精装'}
@@ -121,51 +119,6 @@ export function TenantListingsPage() {
 
     // 操作列始终显示
     cols.push({
-=======
-  const columns: ColumnsType<Listing> = [
-    { title: 'ID', dataIndex: 'id', width: 60 },
-    { title: '标题', dataIndex: 'title' },
-    {
-      title: '城市/区域',
-      render: (_, row) => (
-        <span>
-          {row.city ?? '-'} {row.region ? `/ ${row.region}` : ''}
-        </span>
-      ),
-    },
-    {
-      title: '租金',
-      dataIndex: 'price',
-      align: 'right',
-      render: (v) => <Typography.Text strong>¥ {v}</Typography.Text>,
-    },
-    {
-      title: '户型',
-      render: (_, row) => (
-        <Tag color="blue">
-          {(row.bedrooms ?? '-') + '室'} / {(row.bathrooms ?? '-') + '卫'}
-        </Tag>
-      ),
-    },
-    {
-      title: '装修/朝向',
-      render: (_, row) => (
-        <Tag color="geekblue">
-          {row.decoration === 'rough' && '毛坯'}
-          {row.decoration === 'simple' && '简装'}
-          {row.decoration === 'fine' && '精装'}
-          {row.decoration === 'luxury' && '豪华'}
-          {row.decoration ? ' / ' : ''}
-          {row.orientation === 'east' && '东'}
-          {row.orientation === 'south' && '南'}
-          {row.orientation === 'west' && '西'}
-          {row.orientation === 'north' && '北'}
-          {!row.decoration && !row.orientation && '-'}
-        </Tag>
-      ),
-    },
-    {
->>>>>>> 525f37060275a5b973a7e3e6ca3a0cdd1bd4fb9f
       title: '操作',
       render: (_, row) => <Link to={`/tenant/listings/${row.id}`}>详情</Link>,
     })
@@ -197,21 +150,9 @@ export function TenantListingsPage() {
   }
 
   return (
-<<<<<<< HEAD
-    <Space orientation="vertical" size={16} style={{ width: '100%' }}>
-      <PageHeader
-        title="房源列表"
-        extra={
-          <Button icon={<SettingOutlined />} onClick={handleOpenSettings}>
-            显示字段
-          </Button>
-        }
-      />
-=======
     <Space orientation="vertical" size={24} style={{ width: '100%' }}>
       <PageHeader
-        title="租客-房源列表"
-        subtitle="支持搜索/筛选（无后端时自动使用 mock 数据）"
+        title="房源列表"
         align="center"
       />
 
@@ -234,7 +175,7 @@ export function TenantListingsPage() {
             rowGap: 8,
             alignItems: 'center',
           }}
-          initialValues={query}
+          initialValues={Object.fromEntries(params)}
           onFinish={(v) => {
             const next = new URLSearchParams()
             if (v.q) next.set('q', v.q)
@@ -300,10 +241,14 @@ export function TenantListingsPage() {
           </Form.Item>
         </Form>
       </Card>
->>>>>>> 525f37060275a5b973a7e3e6ca3a0cdd1bd4fb9f
 
       <Card
-        title="房源"
+        title="房源列表"
+        extra={
+          <Button icon={<SettingOutlined />} onClick={handleOpenSettings}>
+            显示字段
+          </Button>
+        }
         style={{
           maxWidth: cardMaxWidth,
           margin: '0 auto',
