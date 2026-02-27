@@ -32,3 +32,15 @@ a {
 a:hover {
   color: #1452b6;
 }
+
+/* 首页滚轮动画 */
+@keyframes scroll {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+}
