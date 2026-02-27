@@ -29,7 +29,7 @@ export function TenantPreferencesPage() {
   return (
     <Space orientation="vertical" size={16} style={{ width: '100%' }}>
       <PageHeader title="租客-偏好设置" subtitle="可保存（无后端时仅本地返回）" />
-      <Card style={{ maxWidth: 720 }}>
+      <Card style={{ maxWidth: 720, margin: '0 auto' }}>
         <Form
           form={form}
           layout="vertical"

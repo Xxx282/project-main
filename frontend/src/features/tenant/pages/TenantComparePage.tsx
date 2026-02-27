@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import { PageHeader } from '../../../shared/ui/PageHeader'
 import type { Listing } from '../../../shared/api/types'
 import { listListings } from '../api/tenantApi'
+import { useAuth } from '../../auth/context/AuthContext'
 
 const KEY = 'compareListingIds'
 
@@ -24,6 +25,10 @@ function saveIds(ids: string[]) {
 }
 
 export function TenantComparePage() {
+  const auth = useAuth()
+  const isGuest = !auth.user
+  const cardMaxWidth = isGuest ? 1160 : 980
+
   const ids = loadIds()
   const listingsQ = useQuery({
     queryKey: ['tenant', 'listings', 'compare'],
@@ -42,9 +47,17 @@ export function TenantComparePage() {
   ]
 
   return (
-    <Space orientation="vertical" size={16} style={{ width: '100%' }}>
+    <Space orientation="vertical" size={24} style={{ width: '100%' }}>
       <PageHeader title="租客-房源对比" subtitle="（占位页）后续实现对比表与收藏" />
-      <Card>
+      <Card
+        style={{
+          maxWidth: cardMaxWidth,
+          margin: '0 auto',
+          borderRadius: 12,
+          boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)',
+          border: '1px solid #f3f4f6',
+        }}
+      >
         <Typography.Paragraph>
           目前先用本地 localStorage 存一份对比列表。你可以从房源列表页进入详情后再扩展"加入对比"按钮。
         </Typography.Paragraph>
@@ -73,6 +86,7 @@ export function TenantComparePage() {
           columns={columns}
           dataSource={data}
           loading={listingsQ.isLoading}
+          size="middle"
           pagination={false}
         />
       </Card>

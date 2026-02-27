@@ -132,17 +132,33 @@ export function MainLayout() {
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <Header style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-        <Typography.Text style={{ color: '#fff', fontWeight: 600 }}>
+      <Header
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          paddingInline: 32,
+          background: '#001529',
+        }}
+      >
+        <Typography.Text style={{ color: '#fff', fontWeight: 600, marginRight: 32 }}>
           智能租房系统
         </Typography.Text>
-        <Menu
-          theme="dark"
-          mode="horizontal"
-          selectedKeys={[selectedKey]}
-          items={menuItems}
-          style={{ flex: 1, minWidth: 0 }}
-        />
+        {/* 中间区域：让顶栏菜单居中显示 */}
+        <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+          <Menu
+            theme="dark"
+            mode="horizontal"
+            selectedKeys={[selectedKey]}
+            items={menuItems}
+            overflowedIndicator="更多"
+            style={{
+              background: 'transparent',
+              borderBottom: 'none',
+              fontSize: 16,
+              fontWeight: 500,
+            }}
+          />
+        </div>
         <Space>
           {auth.user ? (
             <>
@@ -170,9 +186,62 @@ export function MainLayout() {
       </Header>
 
       <Content style={{ padding: 24 }}>
-        <Outlet />
+        <div
+          style={{
+            position: 'relative',
+            borderRadius: 24,
+            padding: 32,
+            minHeight: '70vh',
+            background:
+              'radial-gradient(circle at top left, #e0e7ff 0, #f1f5f9 35%, #ffffff 100%)',
+            overflow: 'hidden',
+            boxShadow: '0 22px 45px rgba(15, 23, 42, 0.15)',
+          }}
+        >
+          <div
+            style={{
+              position: 'absolute',
+              inset: -40,
+              backgroundImage: 'url(/pattern-grid.svg)',
+              backgroundSize: '140px 140px',
+              opacity: 0.55,
+              pointerEvents: 'none',
+            }}
+          />
+          {/* 彩色渐变光斑 */}
+          <div
+            style={{
+              position: 'absolute',
+              top: -80,
+              right: -60,
+              width: 260,
+              height: 260,
+              borderRadius: '999px',
+              background:
+                'radial-gradient(circle at 30% 20%, rgba(59,130,246,0.9), transparent 60%)',
+              filter: 'blur(6px)',
+              opacity: 0.85,
+            }}
+          />
+          <div
+            style={{
+              position: 'absolute',
+              bottom: -90,
+              left: -70,
+              width: 220,
+              height: 220,
+              borderRadius: '999px',
+              background:
+                'radial-gradient(circle at 70% 80%, rgba(236,72,153,0.9), transparent 60%)',
+              filter: 'blur(8px)',
+              opacity: 0.9,
+            }}
+          />
+          <div style={{ position: 'relative' }}>
+            <Outlet />
+          </div>
+        </div>
       </Content>
     </Layout>
   )
 }
-

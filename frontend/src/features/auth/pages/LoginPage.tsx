@@ -21,8 +21,17 @@ export function LoginPage() {
       <PageHeader
         title="登录"
         subtitle="输入账号密码后获取 JWT，并按角色跳转"
+        align="center"
       />
-      <Card style={{ maxWidth: 520 }}>
+      <Card
+        style={{
+          maxWidth: 520,
+          margin: '0 auto',
+          borderRadius: 16,
+          boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)',
+          border: '1px solid #f3f4f6',
+        }}
+      >
         <Form
           form={form}
           layout="vertical"
