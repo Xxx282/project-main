@@ -43,4 +43,6 @@ public interface PropertyService {
     long countByLandlordId(Long landlordId);
 
     long countByStatus(Property.PropertyStatus status);
+
+    List<Object[]> countByCityGroupByStatus(Property.PropertyStatus status);
 }

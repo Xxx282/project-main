@@ -118,4 +118,9 @@ public class PropertyServiceImpl implements PropertyService {
     public long countByStatus(Property.PropertyStatus status) {
         return propertyRepository.countByStatus(status);
     }
+
+    @Override
+    public List<Object[]> countByCityGroupByStatus(Property.PropertyStatus status) {
+        return propertyRepository.countByCityGroupByStatus(status);
+    }
 }

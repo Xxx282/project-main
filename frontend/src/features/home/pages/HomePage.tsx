@@ -1,12 +1,34 @@
 import { useEffect, useState } from 'react'
 import { Button, Typography } from 'antd'
 import { useNavigate } from 'react-router-dom'
+import { getCityStatistics, type CityStats } from '../../tenant/api/tenantApi'
 
 const { Title, Text } = Typography
+
+// 词云颜色配置 - 白色系带透明度
+const cloudColors = [
+  'rgba(255, 255, 255, 0.9)',
+  'rgba(255, 255, 255, 0.8)',
+  'rgba(255, 255, 255, 0.7)',
+  'rgba(240, 248, 255, 0.85)',
+  'rgba(245, 255, 250, 0.8)',
+  'rgba(255, 250, 240, 0.75)',
+  'rgba(255, 245, 238, 0.8)',
+  'rgba(240, 255, 240, 0.75)',
+  'rgba(230, 240, 255, 0.8)',
+  'rgba(255, 240, 245, 0.7)',
+]
+
+// 获取随机颜色
+const getRandomColor = () => {
+  return cloudColors[Math.floor(Math.random() * cloudColors.length)]
+}
 
 export function HomePage() {
   const navigate = useNavigate()
   const [scrollY, setScrollY] = useState(0)
+  const [cityStats, setCityStats] = useState<CityStats>([])
+  const [visibleTags, setVisibleTags] = useState(0) // 可见的标签数量
 
   useEffect(() => {
     const handleScroll = () => {
@@ -16,6 +38,31 @@ export function HomePage() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  // 获取城市统计数据
+  useEffect(() => {
+    getCityStatistics()
+      .then(setCityStats)
+      .catch(console.error)
+  }, [])
+
+  // 词云图动画：在标题遮罩层动画完成后（约scrollY=300）开始逐个显示
+  // 词云图只在 scrollY 在 300-1500px 范围内显示
+  const cloudInRange = scrollY >= 300 && scrollY <= 900
+  
+  useEffect(() => {
+    if (cloudInRange && visibleTags < cityStats.length) {
+      const delay = 600 // 每个词之间的延迟（毫秒）
+      const timer = setTimeout(() => {
+        setVisibleTags(prev => Math.min(prev + 1, cityStats.length))
+      }, delay)
+      return () => clearTimeout(timer)
+    }
+    // 当滚出范围时，重置可见标签
+    if (!cloudInRange && visibleTags > 0) {
+      setVisibleTags(0)
+    }
+  }, [scrollY, visibleTags, cityStats.length, cloudInRange])
+
   // 窗户层：初始最大，滚动时缩小并淡出
   const windowOpacity = Math.max(0, 1 - scrollY / 300)
   const windowScale = 1 + scrollY * 0.002
@@ -24,12 +71,16 @@ export function HomePage() {
   const skyScale = Math.max(1, 1.3 - scrollY * 0.001)
   const skyOpacity = scrollY < 400 ? 1 : Math.max(0.5, 1 - (scrollY - 400) / 200)
 
-  // 标题遮罩层：滚动到一定位置后出现
-  const titleOpacity = Math.min(1, Math.max(0, (scrollY - 300) / 200))
+  // 标题遮罩层：滚动到一定位置后出现（延迟到500px后）
+  const titleOpacity = Math.min(1, Math.max(0, (scrollY - 800) / 200))
   const titleTranslateY = (1 - titleOpacity) * 100
 
   // 城市层：滚动到最后才显示
-  const cityOpacity = Math.min(1, Math.max(0, (scrollY - 500) / 300))
+  const cityOpacity = Math.min(1, Math.max(0, (scrollY - 1000) / 300))
+
+  // 两侧文字块：滚动时向下移动并淡出
+  const sideTextOpacity = Math.max(0, 1 - scrollY / 200)
+  const sideTextTranslateY = scrollY * 0.5
 
   return (
     <div style={styles.container}>
@@ -43,6 +94,53 @@ export function HomePage() {
           zIndex: 1,
         }}
       />
+
+      {/* 词云图层 - 显示在天空上面 */}
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 5,
+          opacity: cloudInRange ? skyOpacity : 0,
+          transition: 'opacity 0.3s ease',
+          pointerEvents: 'none',
+        }}
+      >
+        {cityStats.length > 0 && (
+          <div style={styles.wordCloudContainer}>
+            {cityStats.slice(0, visibleTags).map(([city, count], index) => {
+              // 根据房源数量计算字体大小
+              const maxCount = Math.max(...cityStats.map(([, c]) => c))
+              const minCount = Math.min(...cityStats.map(([, c]) => c))
+              const fontSize = count === maxCount 
+                ? 42 
+                : count === minCount 
+                  ? 18 
+                  : 18 + (count - minCount) / (maxCount - minCount) * 24
+              
+              return (
+                <span
+                  key={city}
+                  style={{
+                    ...styles.cloudWord,
+                    fontSize: `${fontSize}px`,
+                    color: getRandomColor(),
+                    animationDelay: `${index * 0.1}s`,
+                  }}
+                >
+                  {city}
+                </span>
+              )
+            })}
+          </div>
+        )}
+      </div>
 
       {/* 中间层：窗户层 - 初始显示在天空前面 */}
       <div
@@ -60,6 +158,130 @@ export function HomePage() {
           zIndex: 10,
         }}
       />
+
+      {/* 窗户装饰文字 - 放在窗户上面 */}
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          paddingLeft: '5vw',
+          paddingRight: '5vw',
+          paddingBottom: '12vh',
+          pointerEvents: 'none',
+          zIndex: 15,
+        }}
+      >
+        {/* 左侧窗户文字 */}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            gap: '1.5vh',
+            marginTop: '40vh', // 调整上下位置
+            marginLeft: '-2vw', // 调整左右位置
+            marginRight: '0vw', // 调整左右位置
+            opacity: sideTextOpacity,
+            transform: `translateY(${sideTextTranslateY}px)`,
+          }}
+        >
+          <span
+            style={{
+              fontFamily: '"Noto Serif SC", serif',
+              fontSize: 'clamp(1.2rem, 2.2vw, 1.8rem)',
+              fontWeight: 600,
+              color: '#ffffff',
+              letterSpacing: '0.15em',
+              textAlign: 'left',
+              textShadow: '0 2px 12px rgba(0,0,0,0.9)',
+            }}
+          >
+            租房？
+          </span>
+          <span
+            style={{
+              fontFamily: '"Noto Sans SC", sans-serif',
+              fontSize: 'clamp(0.7rem, 1.1vw, 0.9rem)',
+              fontWeight: 400,
+              color: 'rgba(255,255,255,0.95)',
+              letterSpacing: '0.1em',
+              textShadow: '0 1px 10px rgba(0,0,0,0.8)',
+              whiteSpace: 'pre-line',
+              textAlign: 'left',
+              lineHeight: 1.6,
+            }}
+          >
+            {'个性化推荐\n找房不再是烦恼'}
+          </span>
+        </div>
+        {/* 中间大窗标题 */}
+        <span
+          style={{
+            fontFamily: '"Noto Serif SC", serif',
+            fontSize: 'clamp(4rem, 7vw, 6rem)',
+            fontWeight: 700,
+            color: '#ffffff',
+            letterSpacing: '0.25em',
+            textShadow: '0 4px 20px rgba(0,0,0,0.9), 0 0 60px rgba(255,255,255,0.2)',
+            marginTop: '-10vh', // 调整上下位置
+            marginLeft: '9vw', // 调整左右位置
+            marginRight: '10vw', // 调整左右位置
+            opacity: sideTextOpacity,
+            transform: `translateY(${sideTextTranslateY}px)`,
+          }}
+        >
+          智能租房
+        </span>
+        {/* 右侧窗户文字 */}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-end',
+            gap: '1.5vh',
+            marginTop: '-50vh', // 调整上下位置
+            marginLeft: '0vw', // 调整左右位置
+            marginRight: '16vw', // 调整左右位置
+            opacity: sideTextOpacity,
+            transform: `translateY(${sideTextTranslateY}px)`,
+          }}
+        >
+          <span
+            style={{
+              fontFamily: '"Noto Serif SC", serif',
+              fontSize: 'clamp(1.2rem, 2.2vw, 1.8rem)',
+              fontWeight: 600,
+              color: '#ffffff',
+              letterSpacing: '0.15em',
+              textAlign: 'right',
+              textShadow: '0 2px 12px rgba(0,0,0,0.9)',
+            }}
+          >
+            发布？
+          </span>
+          <span
+            style={{
+              fontFamily: '"Noto Sans SC", sans-serif',
+              fontSize: 'clamp(0.7rem, 1.1vw, 0.9rem)',
+              fontWeight: 400,
+              color: 'rgba(255,255,255,0.95)',
+              letterSpacing: '0.1em',
+              textShadow: '0 1px 10px rgba(0,0,0,0.8)',
+              whiteSpace: 'pre-line',
+              textAlign: 'right',
+              lineHeight: 1.6,
+            }}
+          >
+            {'实时咨询对比\n快人一步'}
+          </span>
+        </div>
+      </div>
 
       {/* 城市层 */}
       <div
@@ -135,7 +357,7 @@ const styles: Record<string, React.CSSProperties> = {
   container: {
     position: 'relative',
     width: '100%',
-    height: '250vh',
+    height: '350vh',
     overflow: 'hidden',
     background: '#0a1628',
   },
@@ -229,5 +451,24 @@ const styles: Record<string, React.CSSProperties> = {
     color: 'rgba(255,255,255,0.7)',
     fontSize: 12,
     marginTop: 8,
+  },
+  // 词云图容器样式
+  wordCloudContainer: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '1.5vw',
+    maxWidth: '80vw',
+    padding: '2rem',
+  },
+  // 词云文字样式
+  cloudWord: {
+    fontFamily: '"Noto Sans SC", sans-serif',
+    fontWeight: 600,
+    textShadow: '0 2px 8px rgba(0,0,0,0.6)',
+    whiteSpace: 'nowrap',
+    animation: 'fadeInWord 0.5s ease-out forwards',
+    opacity: 0,
   },
 }

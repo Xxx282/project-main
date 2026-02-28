@@ -217,6 +217,16 @@ public class PropertyController {
     }
 
     /**
+     * 获取城市统计（用于词云图）
+     */
+    @GetMapping("/cities")
+    @Operation(summary = "获取城市统计", description = "返回各城市的房源数量统计")
+    public ResponseEntity<Result<List<Object[]>>> getCityStatistics() {
+        List<Object[]> stats = propertyService.countByCityGroupByStatus(Property.PropertyStatus.available);
+        return ResponseEntity.ok(Result.success(stats));
+    }
+
+    /**
      * 请求类
      */
     @Data

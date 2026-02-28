@@ -93,7 +93,7 @@ function pathToKey(pathname: string): TopNavKey {
 
 const ROLE_MENU: Record<UserRole, { key: TopNavKey; label: string }[]> = {
   tenant: [
-    { key: 'home', label: '首页' },
+    // { key: 'home', label: '首页' },
     { key: 'tenant_listings', label: '房源' },
     { key: 'tenant_reco', label: '推荐' },
     { key: 'tenant_prefs', label: '偏好' },
@@ -101,7 +101,7 @@ const ROLE_MENU: Record<UserRole, { key: TopNavKey; label: string }[]> = {
     { key: 'tenant_inquiries', label: '咨询' },
   ],
   landlord: [
-    { key: 'home', label: '首页' },
+    // { key: 'home', label: '首页' },
     { key: 'landlord_all_listings', label: '房源' },
     { key: 'landlord_listings', label: '我的' },
     { key: 'landlord_favorites', label: '收藏' },
@@ -198,7 +198,7 @@ export function MainLayout() {
           智能租房系统
         </Typography.Text>
         {/* 中间区域：让顶栏菜单居中显示 */}
-        <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+        <div style={{ flex: 1, display: 'flex', justifyContent: 'center', minWidth: 0 }}>
           <Menu
             theme={isHomePage ? 'dark' : 'dark'}
             mode="horizontal"
@@ -211,6 +211,9 @@ export function MainLayout() {
               fontSize: 16,
               fontWeight: 500,
               color: navTextColor,
+              width: '100%',
+              maxWidth: 'none',
+              flexShrink: 0,
             }}
           />
         </div>
@@ -293,18 +296,6 @@ export function MainLayout() {
                 backgroundPosition: 'center bottom',
                 transform: `translateY(${-scrollY * 0.2}px) scale(${1 + scrollY * 0.0005})`,
                 opacity: Math.max(0, 1 - scrollY / 400),
-              }}
-            />
-            {/* 窗户层 - 最顶层 */}
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                backgroundImage: 'url(/window.png)',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                transform: `translateY(${-scrollY * 0.1}px)`,
-                opacity: Math.max(0, 1 - scrollY / 300),
               }}
             />
             {/* 遮罩层 */}

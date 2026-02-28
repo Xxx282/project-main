@@ -30,6 +30,25 @@ export async function listListings(query: ListingsQuery): Promise<Listing[]> {
   return data.data
 }
 
+// 城市统计类型
+export type CityStats = [string, number][]
+
+type CityStatsResponse = {
+  code: number
+  message: string
+  data: [string, number][]
+  timestamp: number
+  success: boolean
+}
+
+/**
+ * 获取城市统计（用于词云图）
+ */
+export async function getCityStatistics(): Promise<CityStats> {
+  const { data } = await http.get<CityStatsResponse>('/listings/cities')
+  return data.data
+}
+
 export async function getListing(id: number): Promise<Listing> {
   const { data } = await http.get<SingleResponse<Listing>>(`/listings/${id}`)
   return data.data

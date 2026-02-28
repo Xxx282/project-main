@@ -99,4 +99,10 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
      * 根据ID和房东ID查找（用于权限验证）
      */
     Optional<Property> findByIdAndLandlordId(Long id, Long landlordId);
+
+    /**
+     * 统计每个城市的房源数量
+     */
+    @Query("SELECT p.city, COUNT(p) FROM Property p WHERE p.status = :status GROUP BY p.city")
+    List<Object[]> countByCityGroupByStatus(@Param("status") Property.PropertyStatus status);
 }
