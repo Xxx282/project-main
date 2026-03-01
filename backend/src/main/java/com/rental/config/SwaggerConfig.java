@@ -21,7 +21,7 @@ public class SwaggerConfig {
         return new OpenAPI()
                 .info(new Info()
                         .title("智能房屋租赁系统 API")
-                        .version("1.0.0")
+                        .version("1.5.0")
                         .description("智能房屋租赁系统后端 API 文档，包含用户认证、房源管理、咨询管理等功能")
                         .contact(new Contact()
                                 .name("开发团队")

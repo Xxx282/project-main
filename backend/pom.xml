@@ -13,7 +13,7 @@
 
     <groupId>com.rental</groupId>
     <artifactId>house-rental-backend</artifactId>
-    <version>1.0.0</version>
+    <version>1.5.0</version>
     <name>house-rental-backend</name>
     <description>智能房屋租赁系统后端</description>
 
