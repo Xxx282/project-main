@@ -1,13 +1,15 @@
 import { Card, Descriptions, Space, Button, message } from 'antd'
-import { HeartOutlined, HeartFilled } from '@ant-design/icons'
-import { useParams } from 'react-router-dom'
+import { HeartOutlined, HeartFilled, ArrowLeftOutlined } from '@ant-design/icons'
+import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { PageHeader } from '../../../shared/ui/PageHeader'
-import { getListing, checkFavorite, addFavorite, removeFavorite } from '../api/tenantApi'
+import { getListing, checkFavorite, addFavorite, removeFavorite, getListingImages } from '../api/tenantApi'
 import { useAuth } from '../../auth/context/AuthContext'
+import { ImageGallery } from '../../../shared/components/ImageGallery'
 
 export function TenantListingDetailPage() {
   const { id } = useParams()
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
   const auth = useAuth()
   const propertyId = Number(id)
@@ -23,6 +25,13 @@ export function TenantListingDetailPage() {
     queryKey: ['tenant', 'favorite', id],
     queryFn: () => checkFavorite(propertyId),
     enabled: Boolean(id) && Boolean(auth.user),
+  })
+
+  // 获取房源图片
+  const imagesQ = useQuery({
+    queryKey: ['tenant', 'listing', id, 'images'],
+    queryFn: () => getListingImages(propertyId),
+    enabled: Boolean(id),
   })
 
   // 添加收藏 mutation
@@ -59,6 +68,14 @@ export function TenantListingDetailPage() {
 
   return (
     <Space orientation="vertical" size={16} style={{ width: '100%' }}>
+      {/* 返回按钮 */}
+      <Button
+        icon={<ArrowLeftOutlined />}
+        onClick={() => navigate(-1)}
+        style={{ marginBottom: 8 }}
+      >
+        返回
+      </Button>
       <PageHeader
         title="房源详情"
         extra={
@@ -76,6 +93,9 @@ export function TenantListingDetailPage() {
         }
       />
       <Card>
+        {/* 图片画廊 */}
+        <ImageGallery images={imagesQ.data ?? []} />
+
         <Descriptions bordered size="small" column={2}>
           <Descriptions.Item label="ID">{listingQ.data?.id ?? '-'}</Descriptions.Item>
           <Descriptions.Item label="标题">{listingQ.data?.title ?? '-'}</Descriptions.Item>

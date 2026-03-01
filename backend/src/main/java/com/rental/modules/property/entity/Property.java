@@ -51,7 +51,7 @@ public class Property {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     @Builder.Default
-    private PropertyStatus status = PropertyStatus.available;
+    private PropertyStatus status = PropertyStatus.pending;
     @Column(name = "view_count")
     @Builder.Default
     private Integer viewCount = 0;
@@ -61,13 +61,15 @@ public class Property {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
     /**
      * 房源状态枚举
      */
     public enum PropertyStatus {
         available,  // 可租
         rented,      // 已租
-        offline      // 下架
+        offline,     // 下架
+        pending      // 待审核
     }
 
     /**

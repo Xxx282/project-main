@@ -96,7 +96,6 @@ const ROLE_MENU: Record<UserRole, { key: TopNavKey; label: string }[]> = {
     // { key: 'home', label: '首页' },
     { key: 'tenant_listings', label: '房源' },
     { key: 'tenant_reco', label: '推荐' },
-    { key: 'tenant_prefs', label: '偏好' },
     { key: 'tenant_compare', label: '收藏' },
     { key: 'tenant_inquiries', label: '咨询' },
   ],

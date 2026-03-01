@@ -1,5 +1,5 @@
 import { http } from '../../../shared/api/http'
-import type { Inquiry, Listing, TenantPreferences } from '../../../shared/api/types'
+import type { Inquiry, Listing, PropertyImage, TenantPreferences } from '../../../shared/api/types'
 
 type ListResponse<T> = {
   code: number
@@ -19,10 +19,12 @@ type SingleResponse<T> = {
 
 export type ListingsQuery = {
   q?: string
+  city?: string
   region?: string
-  minRent?: number
-  maxRent?: number
+  minPrice?: number
+  maxPrice?: number
   bedrooms?: number
+  status?: string
 }
 
 export async function listListings(query: ListingsQuery): Promise<Listing[]> {
@@ -138,4 +140,19 @@ export async function removeFavorite(propertyId: number): Promise<void> {
 export async function checkFavorite(propertyId: number): Promise<boolean> {
   const { data } = await http.get<FavoriteCheckResponse>(`/favorites/check/${propertyId}`)
   return data.data.favorited
+}
+
+// ========== 房源图片 API ==========
+
+type PropertyImagesResponse = {
+  code: number
+  message: string
+  data: PropertyImage[]
+  timestamp: number
+  success: boolean
+}
+
+export async function getListingImages(propertyId: number): Promise<PropertyImage[]> {
+  const { data } = await http.get<PropertyImagesResponse>(`/listings/${propertyId}/images`)
+  return data.data
 }

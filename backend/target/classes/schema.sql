@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS properties (
     orientation VARCHAR(20) DEFAULT NULL COMMENT '朝向: east(东) / south(南) / west(西) / north(北)',
     decoration VARCHAR(50) DEFAULT NULL COMMENT '装修情况: rough(毛坯) / simple(简装) / fine(精装) / luxury(豪华)',
     description TEXT DEFAULT NULL COMMENT '房源描述',
-    status ENUM('available', 'rented', 'offline') NOT NULL DEFAULT 'available' COMMENT '房源状态: available(可租) / rented(已租) / offline(下架)',
+    status ENUM('available', 'rented', 'offline', 'pending') NOT NULL DEFAULT 'pending' COMMENT '房源状态: available(可租) / rented(已租) / offline(下架) / pending(待审核)',
     view_count INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '浏览次数',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '房源发布时间',
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '房源更新时间',
@@ -148,8 +148,16 @@ CREATE TABLE IF NOT EXISTS tenant_preferences (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键ID',
     user_id BIGINT UNSIGNED NOT NULL COMMENT '租客用户ID，外键关联users.id',
     budget INT UNSIGNED DEFAULT NULL COMMENT '预算（元/月）',
+    city VARCHAR(50) DEFAULT NULL COMMENT '偏好城市',
     region VARCHAR(100) DEFAULT NULL COMMENT '偏好区域',
     bedrooms TINYINT UNSIGNED DEFAULT NULL COMMENT '偏好卧室数量',
+    bathrooms TINYINT UNSIGNED DEFAULT NULL COMMENT '偏好卫生间数量',
+    min_area DECIMAL(10,2) DEFAULT NULL COMMENT '最小面积（平方米）',
+    max_area DECIMAL(10,2) DEFAULT NULL COMMENT '最大面积（平方米）',
+    min_floors TINYINT UNSIGNED DEFAULT NULL COMMENT '最低楼层',
+    max_floors TINYINT UNSIGNED DEFAULT NULL COMMENT '最高楼层',
+    orientation VARCHAR(10) DEFAULT NULL COMMENT '偏好朝向',
+    decoration VARCHAR(20) DEFAULT NULL COMMENT '偏好装修',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (id),
@@ -179,6 +187,23 @@ ALTER TABLE lease_transactions ADD INDEX idx_property_tenant (property_id, tenan
 -- 为租金预测表添加复合索引（模型评估场景）
 ALTER TABLE rent_predictions ADD INDEX idx_property_version (property_id, model_version);
 ALTER TABLE rent_predictions ADD INDEX idx_model_created (model_version, created_at);
+
+-- ============================================
+-- 8. 房源图片表 (property_images)
+-- 用途: 存储房源的多张图片
+-- ============================================
+CREATE TABLE IF NOT EXISTS property_images (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '图片主键ID',
+    property_id BIGINT UNSIGNED NOT NULL COMMENT '房源ID，外键关联properties.id',
+    image_url VARCHAR(500) NOT NULL COMMENT '图片URL地址',
+    sort_order INT NOT NULL DEFAULT 0 COMMENT '排序顺序，数字越小越靠前',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '上传时间',
+    PRIMARY KEY (id),
+    KEY idx_property_id (property_id),
+    KEY idx_sort_order (sort_order),
+    CONSTRAINT fk_property_images_property FOREIGN KEY (property_id)
+        REFERENCES properties(id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='房源图片表';
 
 -- 收藏表 (favorites)
 CREATE TABLE IF NOT EXISTS favorites (

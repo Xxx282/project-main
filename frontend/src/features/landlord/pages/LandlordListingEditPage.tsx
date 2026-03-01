@@ -1,11 +1,12 @@
-import { Button, Card, Form, Input, InputNumber, Select, Space, message } from 'antd'
+import { Button, Card, Form, Input, InputNumber, Select, Space, message, Divider } from 'antd'
 import { useQuery } from '@tanstack/react-query'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { PageHeader } from '../../../shared/ui/PageHeader'
-import type { Listing } from '../../../shared/api/types'
-import { createListing, updateListing } from '../api/landlordApi'
+import type { Listing, PropertyImage } from '../../../shared/api/types'
+import { createListing, updateListing, getPropertyImages } from '../api/landlordApi'
 import { getListing } from '../../tenant/api/tenantApi'
+import { ImageUploader } from '../../../shared/components/ImageUploader'
 
 const { TextArea } = Input
 
@@ -31,11 +32,27 @@ export function LandlordListingEditPage(props: { mode: 'create' | 'edit' }) {
   const navigate = useNavigate()
   const title = props.mode === 'create' ? '发布房源' : '编辑房源'
 
+  // 图片状态
+  const [images, setImages] = useState<PropertyImage[]>([])
+
   const listingQ = useQuery({
     queryKey: ['landlord', 'listing', numericId],
     queryFn: () => getListing(numericId!),
     enabled: props.mode === 'edit' && numericId !== undefined,
   })
+
+  // 编辑模式下加载图片
+  const imagesQ = useQuery({
+    queryKey: ['landlord', 'listing', numericId, 'images'],
+    queryFn: () => getPropertyImages(numericId!),
+    enabled: props.mode === 'edit' && numericId !== undefined,
+  })
+
+  useEffect(() => {
+    if (imagesQ.data) {
+      setImages(imagesQ.data)
+    }
+  }, [imagesQ.data])
 
   const [form] = Form.useForm<Partial<Listing>>()
   useEffect(() => {
@@ -104,6 +121,21 @@ export function LandlordListingEditPage(props: { mode: 'create' | 'edit' }) {
             {props.mode === 'create' ? '发布' : '保存'}
           </Button>
         </Form>
+
+        {/* 图片上传区域 - 仅在编辑模式或创建后显示 */}
+        {props.mode === 'edit' && numericId && (
+          <>
+            <Divider />
+            <div style={{ marginTop: 16 }}>
+              <h3 style={{ marginBottom: 16 }}>房源图片</h3>
+              <ImageUploader
+                propertyId={numericId}
+                images={images}
+                onImagesChange={setImages}
+              />
+            </div>
+          </>
+        )}
       </Card>
     </Space>
   )

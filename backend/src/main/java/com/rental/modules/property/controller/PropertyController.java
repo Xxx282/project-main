@@ -3,6 +3,8 @@ package com.rental.modules.property.controller;
 import com.rental.common.Result;
 import com.rental.common.ResultCode;
 import com.rental.modules.property.entity.Property;
+import com.rental.modules.property.entity.PropertyImage;
+import com.rental.modules.property.service.PropertyImageService;
 import com.rental.modules.property.service.PropertyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -33,13 +36,15 @@ import java.util.List;
 public class PropertyController {
 
     private final PropertyService propertyService;
+    private final PropertyImageService propertyImageService;
 
     /**
-     * 获取房源列表（支持筛选）
+     * 获取房源列表（支持筛选和关键词搜索）
      */
     @GetMapping
-    @Operation(summary = "获取房源列表", description = "支持城市、区域、价格、卧室数等条件筛选")
+    @Operation(summary = "获取房源列表", description = "支持关键词搜索、城市、区域、价格、卧室数等条件筛选")
     public ResponseEntity<Result<List<Property>>> getListings(
+            @RequestParam(required = false) String q,
             @RequestParam(required = false) String city,
             @RequestParam(required = false) String region,
             @RequestParam(required = false) BigDecimal minRent,
@@ -55,6 +60,13 @@ public class PropertyController {
             propertyStatus = Property.PropertyStatus.valueOf(status);
         }
 
+        // 如果有关键词搜索，优先使用关键词搜索
+        if (q != null && !q.trim().isEmpty()) {
+            Page<Property> listings = propertyService.searchByKeyword(q.trim(), propertyStatus, pageable);
+            return ResponseEntity.ok(Result.success(listings.getContent()));
+        }
+
+        // 否则使用原有筛选功能
         Page<Property> listings = propertyService.findByFilters(
                 city, region, minRent, maxRent, bedrooms, propertyStatus, pageable);
 
@@ -226,6 +238,88 @@ public class PropertyController {
         return ResponseEntity.ok(Result.success(stats));
     }
 
+    // ==================== 图片管理接口 ====================
+
+    /**
+     * 获取房源的图片列表
+     */
+    @GetMapping("/{propertyId}/images")
+    @Operation(summary = "获取房源图片列表")
+    public ResponseEntity<Result<List<PropertyImage>>> getPropertyImages(
+            @PathVariable Long propertyId) {
+        List<PropertyImage> images = propertyImageService.getImagesByPropertyId(propertyId);
+        return ResponseEntity.ok(Result.success(images));
+    }
+
+    /**
+     * 上传房源图片
+     */
+    @PostMapping("/{propertyId}/images")
+    @PreAuthorize("hasRole('LANDLORD')")
+    @Operation(summary = "上传房源图片")
+    public ResponseEntity<Result<List<PropertyImage>>> uploadImages(
+            @PathVariable Long propertyId,
+            @RequestParam("files") MultipartFile[] files,
+            HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
+
+        // 验证房源归属
+        Property property = propertyService.findByIdOrThrow(propertyId);
+        if (!property.getLandlordId().equals(userId)) {
+            return ResponseEntity.ok(Result.error("无权操作此房源"));
+        }
+
+        log.info("房东 {} 上传房源 {} 图片，数量: {}", userId, propertyId, files.length);
+        List<PropertyImage> images = propertyImageService.uploadImages(propertyId, files);
+        return ResponseEntity.ok(Result.success(images));
+    }
+
+    /**
+     * 删除房源图片
+     */
+    @DeleteMapping("/{propertyId}/images/{imageId}")
+    @PreAuthorize("hasRole('LANDLORD')")
+    @Operation(summary = "删除房源图片")
+    public ResponseEntity<Result<Void>> deleteImage(
+            @PathVariable Long propertyId,
+            @PathVariable Long imageId,
+            HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
+
+        // 验证房源归属
+        Property property = propertyService.findByIdOrThrow(propertyId);
+        if (!property.getLandlordId().equals(userId)) {
+            return ResponseEntity.ok(Result.error("无权操作此房源"));
+        }
+
+        log.info("房东 {} 删除房源 {} 图片: {}", userId, propertyId, imageId);
+        propertyImageService.deleteImage(imageId);
+        return ResponseEntity.ok(Result.success());
+    }
+
+    /**
+     * 更新房源图片排序
+     */
+    @PutMapping("/{propertyId}/images/reorder")
+    @PreAuthorize("hasRole('LANDLORD')")
+    @Operation(summary = "更新房源图片排序")
+    public ResponseEntity<Result<Void>> reorderImages(
+            @PathVariable Long propertyId,
+            @RequestBody ReorderImagesRequest request,
+            HttpServletRequest httpRequest) {
+        Long userId = (Long) httpRequest.getAttribute("userId");
+
+        // 验证房源归属
+        Property property = propertyService.findByIdOrThrow(propertyId);
+        if (!property.getLandlordId().equals(userId)) {
+            return ResponseEntity.ok(Result.error("无权操作此房源"));
+        }
+
+        log.info("房东 {} 更新房源 {} 图片排序", userId, propertyId);
+        propertyImageService.reorderImages(propertyId, request.getImageIds());
+        return ResponseEntity.ok(Result.success());
+    }
+
     /**
      * 请求类
      */
@@ -257,5 +351,13 @@ public class PropertyController {
         private String orientation;
         private String decoration;
         private String description;
+    }
+
+    /**
+     * 图片排序请求类
+     */
+    @Data
+    public static class ReorderImagesRequest {
+        private List<Long> imageIds;
     }
 }

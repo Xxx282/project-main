@@ -1,6 +1,5 @@
 import { http } from '../../../shared/api/http'
 import type { Listing } from '../../../shared/api/types'
-import type { AuthUser } from '../../auth/store/authStore'
 
 type ListResponse<T> = {
   code: number
@@ -18,9 +17,18 @@ type SingleResponse<T> = {
   success: boolean
 }
 
-export type AdminUser = AuthUser & { enabled?: boolean }
+export type AdminUser = {
+  id: number
+  username: string
+  email: string
+  role: 'tenant' | 'landlord' | 'admin'
+  phone?: string
+  realName?: string
+  isActive: boolean
+  createdAt: string
+}
 
-export type AdminListing = Listing & { status?: 'pending' | 'approved' | 'rejected' }
+export type AdminListing = Listing & { status?: 'pending' | 'approved' | 'rejected' | 'available' | 'rented' | 'offline' }
 
 export type Dashboard = {
   users: number
@@ -40,7 +48,7 @@ export async function listUsers(): Promise<AdminUser[]> {
 }
 
 export async function setUserEnabled(id: string, enabled: boolean): Promise<void> {
-  await http.patch(`/admin/users/${id}`, { enabled })
+  await http.patch(`/admin/users/${Number(id)}?enabled=${enabled}`)
 }
 
 export async function listListingsForReview(): Promise<AdminListing[]> {

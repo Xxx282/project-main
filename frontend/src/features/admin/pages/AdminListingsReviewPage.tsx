@@ -1,58 +1,89 @@
-import { Button, Card, Space, Table, Tag, Typography, message } from 'antd'
+import { Button, Card, Space, Table, Tag, message } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { PageHeader } from '../../../shared/ui/PageHeader'
 import { listListingsForReview, reviewListing } from '../api/adminApi'
 
 type ListingRow = {
   id: string
   title: string
-  status: 'pending' | 'approved' | 'rejected'
+  city: string
+  region: string
+  price: number
+  bedrooms: number
+  status: 'pending' | 'available' | 'rented' | 'offline'
 }
 
 export function AdminListingsReviewPage() {
+  const queryClient = useQueryClient()
+
   const q = useQuery({
     queryKey: ['admin', 'listings'],
     queryFn: async () => {
       try {
         return await listListingsForReview()
       } catch {
-        return [{ id: '2001', title: '示例房源', status: 'pending' as const }]
+        return []
       }
     },
   })
 
+  const reviewMutation = useMutation({
+    mutationFn: async ({ id, approved }: { id: string; approved: boolean }) => {
+      await reviewListing(id, approved ? 'approved' : 'rejected')
+    },
+    onSuccess: () => {
+      message.success('审核操作成功')
+      queryClient.invalidateQueries({ queryKey: ['admin', 'listings'] })
+    },
+    onError: () => {
+      message.error('审核操作失败')
+    },
+  })
+
   const columns: ColumnsType<ListingRow> = [
-    { title: 'ID', dataIndex: 'id' },
-    { title: '标题', dataIndex: 'title' },
+    { title: 'ID', dataIndex: 'id', width: 70 },
+    { title: '标题', dataIndex: 'title', ellipsis: true },
+    { title: '城市', dataIndex: 'city', width: 100 },
+    { title: '区域', dataIndex: 'region', width: 100 },
+    { 
+      title: '租金', 
+      dataIndex: 'price', 
+      width: 100,
+      render: (v: number) => v ? `¥ ${v}/月` : '-'
+    },
+    { 
+      title: '户型', 
+      dataIndex: 'bedrooms', 
+      width: 80,
+      render: (v: number) => v ? `${v}室` : '-'
+    },
     {
       title: '状态',
       dataIndex: 'status',
+      width: 100,
       render: (v: ListingRow['status']) => {
         const map: Record<ListingRow['status'], { color: string; text: string }> = {
           pending: { color: 'gold', text: '待审核' },
-          approved: { color: 'green', text: '已通过' },
-          rejected: { color: 'red', text: '已拒绝' },
+          available: { color: 'green', text: '可租' },
+          rented: { color: 'blue', text: '已租' },
+          offline: { color: 'red', text: '下架' },
         }
-        return <Tag color={map[v].color}>{map[v].text}</Tag>
+        return <Tag color={map[v]?.color || 'default'}>{map[v]?.text || v}</Tag>
       },
     },
     {
       title: '操作',
+      width: 150,
       render: (_, row) => (
         <Space>
           <Button
             size="small"
             type="primary"
             disabled={row.status !== 'pending'}
-            onClick={async () => {
-              try {
-                await reviewListing(row.id, 'approved')
-                void message.success('已通过')
-                void q.refetch()
-              } catch {
-                void message.error('操作失败（无后端时为 mock 行为）')
-              }
+            loading={reviewMutation.isPending}
+            onClick={() => {
+              reviewMutation.mutate({ id: row.id, approved: true })
             }}
           >
             通过
@@ -61,14 +92,9 @@ export function AdminListingsReviewPage() {
             size="small"
             danger
             disabled={row.status !== 'pending'}
-            onClick={async () => {
-              try {
-                await reviewListing(row.id, 'rejected')
-                void message.success('已拒绝')
-                void q.refetch()
-              } catch {
-                void message.error('操作失败（无后端时为 mock 行为）')
-              }
+            loading={reviewMutation.isPending}
+            onClick={() => {
+              reviewMutation.mutate({ id: row.id, approved: false })
             }}
           >
             拒绝
@@ -80,8 +106,12 @@ export function AdminListingsReviewPage() {
 
   const data: ListingRow[] = (q.data ?? []).map((x) => ({
     id: String(x.id),
-    title: (x as any).title ?? '-',
-    status: (((x as any).status ?? 'pending') as ListingRow['status']),
+    title: x.title ?? '-',
+    city: x.city ?? '-',
+    region: x.region ?? '-',
+    price: x.price ?? 0,
+    bedrooms: x.bedrooms ?? 0,
+    status: (x.status as ListingRow['status']) || 'pending',
   }))
 
   return (
@@ -93,10 +123,9 @@ export function AdminListingsReviewPage() {
           loading={q.isLoading}
           columns={columns}
           dataSource={data}
-          pagination={false}
+          pagination={{ pageSize: 10, showSizeChanger: true }}
         />
       </Card>
     </Space>
   )
 }
-

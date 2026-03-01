@@ -23,7 +23,7 @@ public class CorsConfig {
         // 允许携带认证信息
         configuration.setAllowCredentials(true);
         // 允许的方法
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         // 允许的头
         configuration.setAllowedHeaders(List.of("*"));
         // 暴露的头

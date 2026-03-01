@@ -46,6 +46,11 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
+    public List<Property> findAllAvailable() {
+        return propertyRepository.findByStatus(Property.PropertyStatus.available);
+    }
+
+    @Override
     public Page<Property> findByFilters(
             String city, String region,
             BigDecimal minPrice, BigDecimal maxPrice,
@@ -53,6 +58,11 @@ public class PropertyServiceImpl implements PropertyService {
             Pageable pageable) {
         return propertyRepository.findByFilters(
                 city, region, minPrice, maxPrice, bedrooms, status, pageable);
+    }
+
+    @Override
+    public Page<Property> searchByKeyword(String keyword, Property.PropertyStatus status, Pageable pageable) {
+        return propertyRepository.findByTitleContaining(keyword, status, pageable);
     }
 
     @Override
@@ -122,5 +132,22 @@ public class PropertyServiceImpl implements PropertyService {
     @Override
     public List<Object[]> countByCityGroupByStatus(Property.PropertyStatus status) {
         return propertyRepository.countByCityGroupByStatus(status);
+    }
+
+    @Override
+    public List<Property> findPendingListings() {
+        return propertyRepository.findByStatus(Property.PropertyStatus.pending);
+    }
+
+    @Override
+    public Property reviewListing(Long id, boolean approved) {
+        Property property = findByIdOrThrow(id);
+        if (property.getStatus() != Property.PropertyStatus.pending) {
+            throw new BusinessException("只能审核待审核状态的房源");
+        }
+        // 通过设置为 available（可租），拒绝设置为 offline（下架）
+        property.setStatus(approved ? Property.PropertyStatus.available : Property.PropertyStatus.offline);
+        log.info("审核房源: id={}, approved={}, newStatus={}", id, approved, property.getStatus());
+        return propertyRepository.save(property);
     }
 }

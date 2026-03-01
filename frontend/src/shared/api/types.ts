@@ -14,10 +14,26 @@ export type Listing = {
   status?: 'available' | 'rented' | 'offline'
 }
 
+export type PropertyImage = {
+  id: number
+  propertyId: number
+  imageUrl: string
+  sortOrder: number
+  createdAt?: string
+}
+
 export type TenantPreferences = {
   budget?: number
+  city?: string
   region?: string
   bedrooms?: number
+  bathrooms?: number
+  minArea?: number
+  maxArea?: number
+  minFloors?: number
+  maxFloors?: number
+  orientation?: 'east' | 'south' | 'west' | 'north'
+  decoration?: 'rough' | 'simple' | 'fine' | 'luxury'
 }
 
 export type InquiryStatus = 'pending' | 'replied' | 'closed'

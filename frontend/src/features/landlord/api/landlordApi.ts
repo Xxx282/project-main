@@ -1,5 +1,5 @@
 import { http } from '../../../shared/api/http'
-import type { Inquiry, Listing } from '../../../shared/api/types'
+import type { Inquiry, Listing, PropertyImage } from '../../../shared/api/types'
 
 type ListResponse<T> = {
   code: number
@@ -67,3 +67,26 @@ export async function listLandlordInquiries(): Promise<Inquiry[]> {
   return data.data
 }
 
+// ==================== 图片管理 API ====================
+
+export async function getPropertyImages(propertyId: number): Promise<PropertyImage[]> {
+  const { data } = await http.get<ListResponse<PropertyImage>>(`/listings/${propertyId}/images`)
+  return data.data
+}
+
+export async function uploadPropertyImages(propertyId: number, files: File[]): Promise<PropertyImage[]> {
+  const formData = new FormData()
+  files.forEach((file) => {
+    formData.append('files', file)
+  })
+  const { data } = await http.post<SingleResponse<PropertyImage[]>>(`/listings/${propertyId}/images`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  })
+  return data.data
+}
+
+export async function deletePropertyImage(propertyId: number, imageId: number): Promise<void> {
+  await http.delete(`/listings/${propertyId}/images/${imageId}`)
+}

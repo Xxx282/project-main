@@ -1,4 +1,5 @@
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\user\service\UserServiceImpl.java
+C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\property\service\PropertyImageService.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\config\CorsConfig.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\auth\controller\AuthController.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\favorite\service\FavoriteServiceImpl.java
@@ -11,6 +12,7 @@ C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\inq
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\RentalApplication.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\ml\dto\PricePredictionRequest.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\user\controller\UserController.java
+C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\admin\AdminController.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\auth\service\AuthService.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\auth\service\AuthServiceImpl.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\common\Result.java
@@ -21,6 +23,7 @@ C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\fav
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\favorite\controller\FavoriteController.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\inquiry\service\InquiryServiceImpl.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\tenant\controller\TenantPreferenceController.java
+C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\property\service\PropertyImageServiceImpl.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\inquiry\controller\InquiryController.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\common\exception\GlobalExceptionHandler.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\tenant\service\TenantPreferenceService.java
@@ -28,13 +31,17 @@ C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\use
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\ml\exception\MlServiceException.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\ml\dto\PricePredictionResponse.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\security\JwtAuthenticationFilter.java
+C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\config\WebConfig.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\auth\dto\LoginRequest.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\property\repository\PropertyRepository.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\security\UserDetailsServiceImpl.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\config\SecurityConfig.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\tenant\repository\TenantPreferenceRepository.java
+C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\tenant\controller\TenantController.java
+C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\property\repository\PropertyImageRepository.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\tenant\entity\TenantPreference.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\user\repository\UserRepository.java
+C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\property\entity\PropertyImage.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\property\entity\Property.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\inquiry\repository\InquiryRepository.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\ml\service\MlService.java
@@ -45,6 +52,7 @@ C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\aut
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\property\controller\PropertyController.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\ml\client\MlServiceClientImpl.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\property\service\PropertyServiceImpl.java
+C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\common\service\ImageStorageService.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\favorite\entity\Favorite.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\common\exception\BusinessException.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\favorite\service\FavoriteService.java

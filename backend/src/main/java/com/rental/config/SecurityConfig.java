@@ -50,6 +50,9 @@ public class SecurityConfig {
                         .requestMatchers("/ml/status").permitAll()
                         // 健康检查
                         .requestMatchers("/actuator/health").permitAll()
+                        // 静态资源（图片等）公开访问
+                        .requestMatchers("/uploads/**").permitAll()
+                        .requestMatchers("/api/uploads/**").permitAll()
                         // 房源列表和详情公开访问（未登录用户可查看）
                         .requestMatchers(HttpMethod.GET, "/listings/**").permitAll()
                         // 其他请求需要认证

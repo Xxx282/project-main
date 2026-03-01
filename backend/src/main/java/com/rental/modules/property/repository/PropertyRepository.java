@@ -72,6 +72,17 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
             Pageable pageable);
 
     /**
+     * 根据关键词搜索房源标题（模糊匹配）
+     */
+    @Query("SELECT p FROM Property p WHERE " +
+           "(:keyword IS NULL OR LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND " +
+           "(:status IS NULL OR p.status = :status)")
+    Page<Property> findByTitleContaining(
+            @Param("keyword") String keyword,
+            @Param("status") Property.PropertyStatus status,
+            Pageable pageable);
+
+    /**
      * 增加浏览次数
      */
     @Modifying
