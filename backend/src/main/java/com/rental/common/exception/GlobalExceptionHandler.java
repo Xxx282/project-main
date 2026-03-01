@@ -13,6 +13,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -82,6 +83,16 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.joining(", "));
         log.error("参数绑定失败: {}", message);
         return Result.error(400, message);
+    }
+
+    /**
+     * 文件上传大小超限异常
+     */
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Result<Void> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException e) {
+        log.error("文件上传大小超限: {}", e.getMessage());
+        return Result.error(400, "上传文件大小超过限制，单个文件最大5MB，总大小最大20MB");
     }
 
     /**

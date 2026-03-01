@@ -23,7 +23,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('admin')")
     @Operation(summary = "获取所有用户列表")
     public ResponseEntity<Result<List<UserEntity>>> getAllUsers() {
         List<UserEntity> users = userService.findAll();
@@ -39,7 +39,7 @@ public class UserController {
     }
 
     @GetMapping("/role/{role}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('admin')")
     @Operation(summary = "根据角色获取用户列表")
     public ResponseEntity<Result<List<UserEntity>>> getUsersByRole(
             @PathVariable String role) {
@@ -49,7 +49,7 @@ public class UserController {
     }
 
     @GetMapping("/active")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('admin')")
     @Operation(summary = "获取已激活的用户列表")
     public ResponseEntity<Result<List<UserEntity>>> getActiveUsers() {
         List<UserEntity> users = userService.findByIsActive(true);
@@ -57,7 +57,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}/disable")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('admin')")
     @Operation(summary = "禁用用户")
     public ResponseEntity<Result<UserEntity>> disableUser(
             @PathVariable Long id,
@@ -71,7 +71,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}/enable")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('admin')")
     @Operation(summary = "启用用户")
     public ResponseEntity<Result<UserEntity>> enableUser(@PathVariable Long id) {
         UserEntity user = userService.enableUser(id);

@@ -1,13 +1,17 @@
 import { Button, Card, Form, Input, Radio, Space, message } from 'antd'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { PageHeader } from '../../../shared/ui/PageHeader'
 import { login } from '../api/authApi'
 import { authStore, type UserRole } from '../store/authStore'
 import { useAuth } from '../context/AuthContext'
+import { useAuthModal } from '../context/AuthModalContext'
 
 export function LoginPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const auth = useAuth()
+  const { closeAuthModal } = useAuthModal()
+  const isInModal = location.pathname === '/' // 在首页时，说明是在模态框中
 
   const [form] = Form.useForm<{
     role: UserRole
@@ -29,7 +33,8 @@ export function LoginPage() {
           margin: '0 auto',
           borderRadius: 16,
           boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)',
-          border: '1px solid #f3f4f6',
+          border: '1px solid rgba(243, 244, 246, 0.5)',
+          background: 'transparent',
         }}
       >
         <Form
@@ -46,10 +51,16 @@ export function LoginPage() {
               authStore.setToken(res.accessToken, values.remember)
               await auth.refresh()
 
-              const role = res.user.role
-              if (role === 'tenant') navigate('/tenant/listings', { replace: true })
-              else if (role === 'landlord') navigate('/landlord/listings', { replace: true })
-              else navigate('/admin/dashboard', { replace: true })
+              if (isInModal) {
+                // 在模态框中，登录成功后关闭模态框
+                closeAuthModal()
+              } else {
+                // 不在模态框中，按角色跳转
+                const role = res.user.role
+                if (role === 'tenant') navigate('/tenant/listings', { replace: true })
+                else if (role === 'landlord') navigate('/landlord/listings', { replace: true })
+                else navigate('/admin/dashboard', { replace: true })
+              }
             } catch (e) {
               void message.error('登录失败：请检查后端是否已启动以及账号密码是否正确')
             }

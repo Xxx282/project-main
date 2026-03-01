@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Button, Typography } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import { getCityStatistics, type CityStats } from '../../tenant/api/tenantApi'
+import { useAuthModal } from '../../auth/context/AuthModalContext'
 
 const { Title, Text } = Typography
 
@@ -26,6 +27,7 @@ const getRandomColor = () => {
 
 export function HomePage() {
   const navigate = useNavigate()
+  const { openAuthModal } = useAuthModal()
   const [scrollY, setScrollY] = useState(0)
   const [cityStats, setCityStats] = useState<CityStats>([])
   const [visibleTags, setVisibleTags] = useState(0) // 可见的标签数量
@@ -330,7 +332,7 @@ export function HomePage() {
           <Button
             size="large"
             style={styles.secondaryBtn}
-            onClick={() => navigate('/register')}
+            onClick={() => openAuthModal('register')}
           >
             立即注册
           </Button>

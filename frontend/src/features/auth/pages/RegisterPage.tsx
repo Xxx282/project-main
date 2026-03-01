@@ -1,10 +1,17 @@
 import { Button, Card, Form, Input, Radio, Space, message } from 'antd'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { PageHeader } from '../../../shared/ui/PageHeader'
 import { register } from '../api/authApi'
+import { useAuthModal } from '../context/AuthModalContext'
+import { useAuth } from '../context/AuthContext'
+import { authStore } from '../store/authStore'
 
 export function RegisterPage() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const { closeAuthModal, openAuthModal } = useAuthModal()
+  const auth = useAuth()
+  const isInModal = location.pathname === '/' // 在首页时，说明是在模态框中
   const [form] = Form.useForm<{
     username: string
     email: string
@@ -25,7 +32,8 @@ export function RegisterPage() {
           margin: '0 auto',
           borderRadius: 16,
           boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)',
-          border: '1px solid #f3f4f6',
+          border: '1px solid rgba(243, 244, 246, 0.5)',
+          background: 'transparent',
         }}
       >
         <Form
@@ -36,11 +44,27 @@ export function RegisterPage() {
             try {
               const res = await register(values)
               if ('accessToken' in (res as any)) {
-                void message.success('注册成功（后端已返回 token）')
+                // 如果后端返回了 token，自动登录
+                authStore.setToken((res as any).accessToken, true)
+                await auth.refresh()
+                void message.success('注册成功，已自动登录')
+                if (isInModal) {
+                  closeAuthModal()
+                } else {
+                  const role = (res as any).user?.role || 'tenant'
+                  if (role === 'tenant') navigate('/tenant/listings', { replace: true })
+                  else if (role === 'landlord') navigate('/landlord/listings', { replace: true })
+                  else navigate('/admin/dashboard', { replace: true })
+                }
               } else {
                 void message.success('注册成功，请登录')
+                if (isInModal) {
+                  // 在模态框中，切换到登录模式
+                  openAuthModal('login')
+                } else {
+                  navigate('/login', { replace: true })
+                }
               }
-              navigate('/login', { replace: true })
             } catch {
               void message.error('注册失败：请检查后端是否已启动，或该邮箱是否已被注册')
             }

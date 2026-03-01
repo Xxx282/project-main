@@ -21,13 +21,13 @@ import java.util.UUID;
 @Component
 public class ImageStorageService {
 
-    @Value("${upload.path:./uploads/properties}")
+    @Value("${app.upload.path:./uploads/properties}")
     private String uploadPath;
 
-    @Value("${upload.allowed-extensions:jpg,jpeg,png,webp}")
+    @Value("${app.upload.allowed-extensions:jpg,jpeg,png,webp}")
     private String allowedExtensions;
 
-    @Value("${upload.max-size:5242880}")
+    @Value("${app.upload.max-size:5242880}")
     private long maxSize; // 默认 5MB
 
     private static final List<String> DEFAULT_ALLOWED_EXTENSIONS = Arrays.asList("jpg", "jpeg", "png", "webp");

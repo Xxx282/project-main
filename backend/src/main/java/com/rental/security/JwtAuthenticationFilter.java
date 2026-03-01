@@ -51,11 +51,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 log.debug("JWT 认证成功: userId={}, username={}, role={}", userId, username, role);
 
-                // 创建 UserDetails
+                // 创建 UserDetails（与数据库枚举/方法安全的角色大小写保持一致: tenant/landlord/admin）
+                String normalizedRole = role == null ? "" : role.toLowerCase();
                 UserDetails userDetails = User.builder()
                         .username(username)
                         .password("")
-                        .authorities(Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase())))
+                        .authorities(Collections.singletonList(
+                                new SimpleGrantedAuthority("ROLE_" + normalizedRole)))
                         .build();
 
                 // 创建认证令牌

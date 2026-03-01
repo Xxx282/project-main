@@ -6,6 +6,7 @@ import { BrowserRouter } from 'react-router-dom'
 import './index.css'
 import App from './App.tsx'
 import { AuthProvider } from './features/auth/context/AuthContext'
+import { AuthModalProvider } from './features/auth/context/AuthModalContext'
 
 const queryClient = new QueryClient()
 
@@ -26,9 +27,11 @@ createRoot(document.getElementById('root')!).render(
     >
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
+          <AuthModalProvider>
+            <BrowserRouter>
+              <App />
+            </BrowserRouter>
+          </AuthModalProvider>
         </AuthProvider>
       </QueryClientProvider>
     </ConfigProvider>

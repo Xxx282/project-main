@@ -1,10 +1,10 @@
-import { Button, Card, Form, Input, InputNumber, Select, Space, message, Divider } from 'antd'
+import { Button, Card, Form, Input, InputNumber, Select, Space, message, Divider, Upload } from 'antd'
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { PageHeader } from '../../../shared/ui/PageHeader'
 import type { Listing, PropertyImage } from '../../../shared/api/types'
-import { createListing, updateListing, getPropertyImages } from '../api/landlordApi'
+import { createListing, updateListing, getPropertyImages, uploadPropertyImages } from '../api/landlordApi'
 import { getListing } from '../../tenant/api/tenantApi'
 import { ImageUploader } from '../../../shared/components/ImageUploader'
 
@@ -34,6 +34,8 @@ export function LandlordListingEditPage(props: { mode: 'create' | 'edit' }) {
 
   // 图片状态
   const [images, setImages] = useState<PropertyImage[]>([])
+  // 创建房源时暂存待上传的图片文件（房源创建成功后再统一上传）
+  const [pendingFiles, setPendingFiles] = useState<File[]>([])
 
   const listingQ = useQuery({
     queryKey: ['landlord', 'listing', numericId],
@@ -73,7 +75,21 @@ export function LandlordListingEditPage(props: { mode: 'create' | 'edit' }) {
             try {
               if (props.mode === 'create') {
                 const created = await createListing(v)
-                void message.success('已发布')
+
+                // 如果创建时已选择图片，则在房源创建成功后自动上传
+                if (pendingFiles.length > 0) {
+                  try {
+                    await uploadPropertyImages(created.id, pendingFiles)
+                    void message.success('房源已发布，图片已上传')
+                  } catch {
+                    void message.error('房源已发布，但图片上传失败，请稍后在编辑页面重试')
+                  } finally {
+                    setPendingFiles([])
+                  }
+                } else {
+                  void message.success('已发布')
+                }
+
                 navigate(`/landlord/listings/${created.id}/edit`, { replace: true })
               } else {
                 await updateListing(numericId!, v)
@@ -117,6 +133,28 @@ export function LandlordListingEditPage(props: { mode: 'create' | 'edit' }) {
           <Form.Item name="description" label="房源描述">
             <TextArea rows={4} placeholder="请输入房源描述" />
           </Form.Item>
+
+          {/* 创建房源时的图片选择区域（先选图，发布成功后自动上传） */}
+          {props.mode === 'create' && (
+            <Form.Item label="房源图片（可选）">
+              <Upload
+                listType="picture-card"
+                beforeUpload={(file) => {
+                  setPendingFiles((prev) => [...prev, file])
+                  return false // 阻止 Upload 组件自动上传，改为在表单提交后统一上传
+                }}
+                multiple
+                accept="image/*"
+              >
+                <div style={{ padding: '12px 0', textAlign: 'center' }}>
+                  <div style={{ fontSize: 24, lineHeight: 1 }}>+</div>
+                  <div style={{ marginTop: 8 }}>选择图片</div>
+                </div>
+              </Upload>
+              <div style={{ color: '#999', marginTop: 8 }}>图片会在发布成功后自动上传，之后可在编辑页面继续管理</div>
+            </Form.Item>
+          )}
+
           <Button type="primary" htmlType="submit" loading={listingQ.isLoading}>
             {props.mode === 'create' ? '发布' : '保存'}
           </Button>
