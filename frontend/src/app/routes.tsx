@@ -8,6 +8,7 @@ import { RequireAuth } from '../features/auth/components/RequireAuth'
 import { LoginPage } from '../features/auth/pages/LoginPage'
 import { RegisterPage } from '../features/auth/pages/RegisterPage'
 import { LandlordInquiriesPage } from '../features/landlord/pages/LandlordInquiriesPage'
+import { LandlordInquiryPage } from '../features/landlord/pages/LandlordInquiryPage'
 import { LandlordListingEditPage } from '../features/landlord/pages/LandlordListingEditPage'
 import { LandlordListingsPage } from '../features/landlord/pages/LandlordListingsPage'
 import { LandlordPricePredictPage } from '../features/landlord/pages/LandlordPricePredictPage'
@@ -138,6 +139,14 @@ export function AppRoutes() {
             element={
               <RequireAuth roles={['landlord']}>
                 <LandlordInquiriesPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="inquiries/:id"
+            element={
+              <RequireAuth roles={['landlord']}>
+                <LandlordInquiryPage />
               </RequireAuth>
             }
           />

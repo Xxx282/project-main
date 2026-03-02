@@ -9,6 +9,20 @@ type ListResponse<T> = {
   success: boolean
 }
 
+type PageResponse<T> = {
+  code: number
+  message: string
+  data: {
+    content: T[]
+    totalElements: number
+    totalPages: number
+    size: number
+    number: number
+  }
+  timestamp: number
+  success: boolean
+}
+
 type SingleResponse<T> = {
   code: number
   message: string
@@ -62,9 +76,9 @@ export async function pricePredict(req: PricePredictRequest): Promise<PricePredi
   }
 }
 
-export async function listLandlordInquiries(): Promise<Inquiry[]> {
-  const { data } = await http.get<ListResponse<Inquiry>>('/inquiries/landlord')
-  return data.data
+export async function listLandlordInquiries(): Promise<any[]> {
+  const { data } = await http.get<PageResponse<any>>('/conversations/landlord', { params: { size: 100 } })
+  return data.data.content
 }
 
 // ==================== 图片管理 API ====================

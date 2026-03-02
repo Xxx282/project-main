@@ -37,6 +37,11 @@ public enum ResultCode {
     INQUIRY_CREATE_ERROR(4002, "咨询提交失败"),
     INQUIRY_REPLY_ERROR(4003, "咨询回复失败"),
 
+    // 对话相关 4021-4040
+    CONVERSATION_NOT_FOUND(4021, "对话不存在"),
+    CONVERSATION_CREATE_ERROR(4022, "创建对话失败"),
+    MESSAGE_SEND_ERROR(4023, "发送消息失败"),
+
     // ML 服务相关 5001-5010
     ML_SERVICE_UNAVAILABLE(5001, "ML服务不可用"),
     ML_PREDICTION_ERROR(5002, "预测服务异常");

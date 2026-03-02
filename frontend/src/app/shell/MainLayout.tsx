@@ -73,6 +73,7 @@ function keyToPath(key: TopNavKey): string {
 
 function pathToKey(pathname: string): TopNavKey {
   if (pathname === '/') return 'home'
+  if (pathname.startsWith('/tenant/chats')) return 'tenant_inquiries'
   if (pathname.startsWith('/tenant/recommendations')) return 'tenant_reco'
   if (pathname.startsWith('/tenant/preferences')) return 'tenant_prefs'
   if (pathname.startsWith('/tenant/compare')) return 'tenant_compare'
@@ -105,7 +106,7 @@ const ROLE_MENU: Record<UserRole, { key: TopNavKey; label: string }[]> = {
   landlord: [
     // { key: 'home', label: '首页' },
     { key: 'landlord_all_listings', label: '房源' },
-    { key: 'landlord_listings', label: '我的' },
+    { key: 'landlord_listings', label: '发布' },
     { key: 'landlord_favorites', label: '收藏' },
     { key: 'landlord_predict', label: '预测' },
     { key: 'landlord_inquiries', label: '咨询' },
@@ -391,12 +392,12 @@ export function MainLayout() {
             onCancel={closeAuthModal}
             centered
             width={520}
-            destroyOnClose
-            maskStyle={{
-              backgroundColor: 'rgba(0,0,0,0.1)',
-              backdropFilter: 'blur(2px)',
-            }}
+            destroyOnHidden
             styles={{
+              mask: {
+                backgroundColor: 'rgba(0,0,0,0.1)',
+                backdropFilter: 'blur(2px)',
+              },
               body: {
                 padding: 0,
                 borderRadius: 16,

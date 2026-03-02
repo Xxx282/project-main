@@ -55,6 +55,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/uploads/**").permitAll()
                         // 房源列表和详情公开访问（未登录用户可查看）
                         .requestMatchers(HttpMethod.GET, "/listings/**").permitAll()
+                        // 用户信息公开访问（用于聊天等场景）
+                        .requestMatchers(HttpMethod.GET, "/users/**").permitAll()
                         // 其他请求需要认证
                         .anyRequest().authenticated())
                 // 添加 JWT 过滤器

@@ -3,7 +3,7 @@ import { HeartOutlined, HeartFilled, ArrowLeftOutlined, MessageOutlined } from '
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { PageHeader } from '../../../shared/ui/PageHeader'
-import { getListing, checkFavorite, addFavorite, removeFavorite, getListingImages } from '../api/tenantApi'
+import { getListing, checkFavorite, addFavorite, removeFavorite, getListingImages, getOrCreateConversation } from '../api/tenantApi'
 import { useAuth } from '../../auth/context/AuthContext'
 import { ImageGallery } from '../../../shared/components/ImageGallery'
 
@@ -84,7 +84,17 @@ export function TenantListingDetailPage() {
               <Button
                 type="primary"
                 icon={<MessageOutlined />}
-                onClick={() => navigate('/tenant/inquiries', { state: { listingId: propertyId } })}
+                onClick={async () => {
+                  if (!listingQ.data) return
+                  try {
+                    // 获取或创建对话（如果有已有对话则返回，没有则创建）
+                    const conversation = await getOrCreateConversation(propertyId, listingQ.data.landlordId)
+                    // 跳转到对话页面
+                    navigate(`/tenant/chats/${conversation.id}`)
+                  } catch (error) {
+                    message.error('发起咨询失败')
+                  }
+                }}
               >
                 咨询房东
               </Button>

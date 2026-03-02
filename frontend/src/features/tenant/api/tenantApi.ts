@@ -9,6 +9,20 @@ type ListResponse<T> = {
   success: boolean
 }
 
+type PageResponse<T> = {
+  code: number
+  message: string
+  data: {
+    content: T[]
+    totalElements: number
+    totalPages: number
+    size: number
+    number: number
+  }
+  timestamp: number
+  success: boolean
+}
+
 type SingleResponse<T> = {
   code: number
   message: string
@@ -71,13 +85,23 @@ export async function savePreferences(p: TenantPreferences): Promise<TenantPrefe
   return data.data
 }
 
-export async function listMyInquiries(): Promise<Inquiry[]> {
-  const { data } = await http.get<ListResponse<Inquiry>>('/inquiries/my')
+export async function listMyInquiries(): Promise<any[]> {
+  const { data } = await http.get<PageResponse<any>>('/conversations/tenant', { params: { size: 100 } })
+  return data.data.content
+}
+
+export async function createInquiry(req: { propertyId: number; landlordId: number; message: string }): Promise<any> {
+  const { data } = await http.post<SingleResponse<any>>('/conversations', req)
   return data.data
 }
 
-export async function createInquiry(req: { listingId: number; message: string }): Promise<Inquiry> {
-  const { data } = await http.post<SingleResponse<Inquiry>>('/inquiries', req)
+// 获取或创建对话（如果有已有对话则返回，没有则创建）
+export async function getOrCreateConversation(propertyId: number, landlordId: number): Promise<any> {
+  const { data } = await http.post<SingleResponse<any>>('/conversations', {
+    propertyId,
+    landlordId,
+    message: '您好，我想咨询一下这套房源'
+  })
   return data.data
 }
 
@@ -177,5 +201,28 @@ type LandlordInfoResponse = {
 
 export async function getLandlordInfo(propertyId: number): Promise<LandlordInfo> {
   const { data } = await http.get<LandlordInfoResponse>(`/listings/${propertyId}/landlord`)
+  return data.data
+}
+
+// ========== 租客信息 API ==========
+
+export type TenantInfo = {
+  id: number
+  username: string
+  realName?: string
+  phone?: string
+  email?: string
+}
+
+type TenantInfoResponse = {
+  code: number
+  message: string
+  data: TenantInfo
+  timestamp: number
+  success: boolean
+}
+
+export async function getTenantInfo(tenantId: number): Promise<TenantInfo> {
+  const { data } = await http.get<TenantInfoResponse>(`/users/${tenantId}`)
   return data.data
 }
