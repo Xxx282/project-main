@@ -156,3 +156,26 @@ export async function getListingImages(propertyId: number): Promise<PropertyImag
   const { data } = await http.get<PropertyImagesResponse>(`/listings/${propertyId}/images`)
   return data.data
 }
+
+// ========== 房东信息 API ==========
+
+export type LandlordInfo = {
+  id: number
+  username: string
+  realName?: string
+  phone?: string
+  email?: string
+}
+
+type LandlordInfoResponse = {
+  code: number
+  message: string
+  data: LandlordInfo
+  timestamp: number
+  success: boolean
+}
+
+export async function getLandlordInfo(propertyId: number): Promise<LandlordInfo> {
+  const { data } = await http.get<LandlordInfoResponse>(`/listings/${propertyId}/landlord`)
+  return data.data
+}

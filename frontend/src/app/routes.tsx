@@ -14,6 +14,7 @@ import { LandlordPricePredictPage } from '../features/landlord/pages/LandlordPri
 import { TenantComparePage } from '../features/tenant/pages/TenantComparePage'
 import { TenantInquiriesPage } from '../features/tenant/pages/TenantInquiriesPage'
 import { TenantListingDetailPage } from '../features/tenant/pages/TenantListingDetailPage'
+import { TenantInquiryPage } from '../features/tenant/pages/TenantInquiryPage'
 import { TenantListingsPage } from '../features/tenant/pages/TenantListingsPage'
 import { TenantPreferencesPage } from '../features/tenant/pages/TenantPreferencesPage'
 import { TenantRecommendationsPage } from '../features/tenant/pages/TenantRecommendationsPage'
@@ -32,6 +33,22 @@ export function AppRoutes() {
           {/* 未登录默认租户界面：房源列表与详情可匿名访问 */}
           <Route path="listings" element={<TenantListingsPage />} />
           <Route path="listings/:id" element={<TenantListingDetailPage />} />
+          <Route
+            path="inquiries"
+            element={
+              <RequireAuth roles={['tenant']}>
+                <TenantInquiriesPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="chats/:id"
+            element={
+              <RequireAuth roles={['tenant']}>
+                <TenantInquiryPage />
+              </RequireAuth>
+            }
+          />
           <Route
             path="recommendations"
             element={

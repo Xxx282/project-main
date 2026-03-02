@@ -1,5 +1,5 @@
 import { Card, Descriptions, Space, Button, message } from 'antd'
-import { HeartOutlined, HeartFilled, ArrowLeftOutlined } from '@ant-design/icons'
+import { HeartOutlined, HeartFilled, ArrowLeftOutlined, MessageOutlined } from '@ant-design/icons'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { PageHeader } from '../../../shared/ui/PageHeader'
@@ -79,17 +79,28 @@ export function TenantListingDetailPage() {
       <PageHeader
         title="房源详情"
         extra={
-          auth.user ? (
-            <Button
-              type={favoriteQ.data ? 'primary' : 'default'}
-              danger={favoriteQ.data}
-              icon={favoriteQ.data ? <HeartFilled /> : <HeartOutlined />}
-              onClick={handleFavorite}
-              loading={favoriteQ.isLoading || addFavoriteMutation.isPending || removeFavoriteMutation.isPending}
-            >
-              {favoriteQ.data ? '已收藏' : '收藏'}
-            </Button>
-          ) : null
+          <Space>
+            {auth.user && (
+              <Button
+                type="primary"
+                icon={<MessageOutlined />}
+                onClick={() => navigate('/tenant/inquiries', { state: { listingId: propertyId } })}
+              >
+                咨询房东
+              </Button>
+            )}
+            {auth.user ? (
+              <Button
+                type={favoriteQ.data ? 'primary' : 'default'}
+                danger={favoriteQ.data}
+                icon={favoriteQ.data ? <HeartFilled /> : <HeartOutlined />}
+                onClick={handleFavorite}
+                loading={favoriteQ.isLoading || addFavoriteMutation.isPending || removeFavoriteMutation.isPending}
+              >
+                {favoriteQ.data ? '已收藏' : '收藏'}
+              </Button>
+            ) : null}
+          </Space>
         }
       />
       <Card>

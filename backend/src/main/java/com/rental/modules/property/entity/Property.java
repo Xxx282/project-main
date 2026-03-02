@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.UpdateTimestamp;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -24,6 +25,12 @@ public class Property {
     private Long id;
     @Column(name = "landlord_id", nullable = false)
     private Long landlordId;
+
+    /**
+     * 房东用户名，通过 SQL 子查询直接获取
+     */
+    @Formula("(SELECT u.username FROM users u WHERE u.id = landlord_id)")
+    private String landlordUsername;
     @Column(nullable = false, length = 200)
     private String title;
     @Column(nullable = false, length = 50)

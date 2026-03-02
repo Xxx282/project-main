@@ -22,8 +22,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.rental.modules.user.entity.UserEntity;
+import com.rental.modules.user.service.UserService;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 房源控制器
@@ -37,6 +41,7 @@ public class PropertyController {
 
     private final PropertyService propertyService;
     private final PropertyImageService propertyImageService;
+    private final UserService userService;
 
     /**
      * 获取房源列表（支持筛选和关键词搜索）
@@ -87,6 +92,28 @@ public class PropertyController {
         return propertyService.findById(id)
                 .map(property -> ResponseEntity.ok(Result.success(property)))
                 .orElseGet(() -> ResponseEntity.ok(Result.error(ResultCode.PROPERTY_NOT_FOUND)));
+    }
+
+    /**
+     * 获取房东信息
+     */
+    @GetMapping("/{id}/landlord")
+    @Operation(summary = "获取房源房东信息")
+    public ResponseEntity<Result<Map<String, Object>>> getLandlordInfo(@PathVariable Long id) {
+        Property property = propertyService.findByIdOrThrow(id);
+        UserEntity landlord = userService.findById(property.getLandlordId())
+                .orElse(null);
+
+        Map<String, Object> landlordInfo = new HashMap<>();
+        landlordInfo.put("id", property.getLandlordId());
+        if (landlord != null) {
+            landlordInfo.put("username", landlord.getUsername());
+            landlordInfo.put("realName", landlord.getRealName());
+            landlordInfo.put("phone", landlord.getPhone());
+            landlordInfo.put("email", landlord.getEmail());
+        }
+
+        return ResponseEntity.ok(Result.success(landlordInfo));
     }
 
     /**

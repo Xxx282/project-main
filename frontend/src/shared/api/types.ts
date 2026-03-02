@@ -12,6 +12,8 @@ export type Listing = {
   decoration?: 'rough' | 'simple' | 'fine' | 'luxury'
   description?: string
   status?: 'available' | 'rented' | 'offline'
+  landlordId?: number
+  landlordUsername?: string
 }
 
 export type PropertyImage = {
