@@ -89,4 +89,9 @@ public class UserServiceImpl implements UserService {
     public boolean existsByUsername(String username) {
         return userRepository.existsByUsername(username);
     }
+
+    @Override
+    public long count() {
+        return userRepository.count();
+    }
 }

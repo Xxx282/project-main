@@ -24,10 +24,47 @@ const getRandomColor = () => {
   return cloudColors[Math.floor(Math.random() * cloudColors.length)]
 }
 
+// 扩展城市列表：如果数据不够，重复填充以达到目标数量
+const expandCityList = (cityStats: CityStats, minCount: number = 30): CityStats => {
+  if (cityStats.length === 0) return []
+  const result: CityStats = []
+  let index = 0
+  while (result.length < minCount) {
+    result.push(cityStats[index % cityStats.length])
+    index++
+  }
+  return result
+}
+
+// 判断是否应该竖排（随机约30%概率）
+const shouldBeVertical = () => Math.random() < 0.3
+
+// 生成随机位置（围绕中心分布）
+interface WordPosition {
+  x: number  // 距离中心的水平偏移 (-1 到 1)
+  y: number  // 距离中心的垂直偏移 (-1 到 1)
+  rotation: number  // 旋转角度
+}
+
+const generateRandomPosition = (index: number, total: number): WordPosition => {
+  // 使用环形分布，确保词语围绕中心均匀分布
+  const angle = (index / total) * Math.PI * 2 + Math.random() * 0.5
+  const radius = 0.2 + Math.random() * 0.6  // 距离中心 20%-80% 的范围
+
+  return {
+    x: Math.cos(angle) * radius,
+    y: Math.sin(angle) * radius,
+    rotation: -30 + Math.random() * 60,  // -30 到 30 度之间
+  }
+}
+
 export function HomePage() {
   const navigate = useNavigate()
   const [scrollY, setScrollY] = useState(0)
   const [cityStats, setCityStats] = useState<CityStats>([])
+  const [expandedCityStats, setExpandedCityStats] = useState<CityStats>([])
+  const [verticalFlags, setVerticalFlags] = useState<boolean[]>([])
+  const [wordPositions, setWordPositions] = useState<WordPosition[]>([])
   const [visibleTags, setVisibleTags] = useState(0) // 可见的标签数量
 
   useEffect(() => {
@@ -41,19 +78,27 @@ export function HomePage() {
   // 获取城市统计数据
   useEffect(() => {
     getCityStatistics()
-      .then(setCityStats)
+      .then((data) => {
+        setCityStats(data)
+        // 扩展城市列表并生成竖排标记
+        const expanded = expandCityList(data, 30)
+        setExpandedCityStats(expanded)
+        setVerticalFlags(expanded.map(() => shouldBeVertical()))
+        // 生成每个词的位置
+        setWordPositions(expanded.map((_, i) => generateRandomPosition(i, expanded.length)))
+      })
       .catch(console.error)
   }, [])
 
   // 词云图动画：在标题遮罩层动画完成后（约scrollY=300）开始逐个显示
   // 词云图只在 scrollY 在 300-1500px 范围内显示
   const cloudInRange = scrollY >= 300 && scrollY <= 900
-  
+
   useEffect(() => {
-    if (cloudInRange && visibleTags < cityStats.length) {
-      const delay = 600 // 每个词之间的延迟（毫秒）
+    if (cloudInRange && visibleTags < expandedCityStats.length) {
+      const delay = 400 // 每个词之间的延迟（毫秒），加快显示速度
       const timer = setTimeout(() => {
-        setVisibleTags(prev => Math.min(prev + 1, cityStats.length))
+        setVisibleTags(prev => Math.min(prev + 1, expandedCityStats.length))
       }, delay)
       return () => clearTimeout(timer)
     }
@@ -61,7 +106,7 @@ export function HomePage() {
     if (!cloudInRange && visibleTags > 0) {
       setVisibleTags(0)
     }
-  }, [scrollY, visibleTags, cityStats.length, cloudInRange])
+  }, [scrollY, visibleTags, expandedCityStats.length, cloudInRange])
 
   // 窗户层：初始最大，滚动时缩小并淡出
   const windowOpacity = Math.max(0, 1 - scrollY / 300)
@@ -104,6 +149,7 @@ export function HomePage() {
           right: 0,
           bottom: 0,
           display: 'flex',
+          flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
           zIndex: 5,
@@ -112,34 +158,50 @@ export function HomePage() {
           pointerEvents: 'none',
         }}
       >
-        {cityStats.length > 0 && (
-          <div style={styles.wordCloudContainer}>
-            {cityStats.slice(0, visibleTags).map(([city, count], index) => {
-              // 根据房源数量计算字体大小
-              const maxCount = Math.max(...cityStats.map(([, c]) => c))
-              const minCount = Math.min(...cityStats.map(([, c]) => c))
-              const fontSize = count === maxCount 
-                ? 42 
-                : count === minCount 
-                  ? 18 
-                  : 18 + (count - minCount) / (maxCount - minCount) * 24
-              
-              return (
-                <span
-                  key={city}
-                  style={{
-                    ...styles.cloudWord,
-                    fontSize: `${fontSize}px`,
-                    color: getRandomColor(),
-                    animationDelay: `${index * 0.1}s`,
-                  }}
-                >
-                  {city}
-                </span>
-              )
-            })}
-          </div>
-        )}
+        {/* 词云图标题 */}
+        <div style={styles.cloudTitle}>
+          探索 · 发现 · 咨询
+        </div>
+        {/* 词云词语文本容器 - 词语围绕中心随机分布 */}
+        <div style={styles.wordCloudWrapper}>
+          {expandedCityStats.slice(0, visibleTags).map(([city, count], index) => {
+            // 根据原始房源数量计算字体大小
+            const originalCounts = cityStats.map(([, c]) => c)
+            const maxCount = Math.max(...originalCounts)
+            const minCount = Math.min(...originalCounts)
+            const fontSize = count === maxCount
+              ? 42
+              : count === minCount
+                ? 18
+                : 18 + (count - minCount) / (maxCount - minCount) * 24
+
+            // 获取该位置的竖排标记和位置
+            const isVertical = verticalFlags[index] || false
+            const pos = wordPositions[index] || { x: 0, y: 0, rotation: 0 }
+
+            return (
+              <span
+                key={`${city}-${index}`}
+                style={{
+                  ...styles.cloudWord,
+                  fontSize: `${fontSize}px`,
+                  color: getRandomColor(),
+                  animationDelay: `${index * 0.05}s`,
+                  writingMode: isVertical ? 'vertical-rl' : 'horizontal-tb',
+                  textOrientation: isVertical ? 'upright' : 'mixed',
+                  // 使用绝对定位围绕中心分布
+                  position: 'absolute',
+                  left: `calc(50% + ${pos.x * 35}vw)`,
+                  top: `calc(50% + ${pos.y * 15}vh)`,
+                  transform: `translate(-50%, -50%) rotate(${pos.rotation}deg)`,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {city}
+              </span>
+            )
+          })}
+        </div>
       </div>
 
       {/* 中间层：窗户层 - 初始显示在天空前面 */}
@@ -458,17 +520,41 @@ const styles: Record<string, React.CSSProperties> = {
     flexWrap: 'wrap',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: '1.5vw',
-    maxWidth: '80vw',
-    padding: '2rem',
+    gap: '0.5vw',
+    maxWidth: '85vw',
+    minHeight: '40vh',
+    padding: '1.5rem',
+  },
+  // 词云词语容器 - 使用绝对定位
+  wordCloudWrapper: {
+    position: 'relative',
+    width: '100%',
+    height: '50vh',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  // 词云图标题样式
+  cloudTitle: {
+    fontFamily: '"Noto Serif SC", serif',
+    fontSize: 'clamp(1.8rem, 4vw, 3rem)',
+    fontWeight: 700,
+    color: 'rgba(255, 255, 255, 0.95)',
+    letterSpacing: '0.3em',
+    textShadow: '0 2px 20px rgba(0,0,0,0.7), 0 0 40px rgba(255,255,255,0.3)',
+    marginBottom: '1vh',
+    animation: 'fadeInWord 0.8s ease-out forwards',
+    position: 'absolute',
+    top: '18%',
+    zIndex: 10,
   },
   // 词云文字样式
   cloudWord: {
     fontFamily: '"Noto Sans SC", sans-serif',
     fontWeight: 600,
     textShadow: '0 2px 8px rgba(0,0,0,0.6)',
-    whiteSpace: 'nowrap',
     animation: 'fadeInWord 0.5s ease-out forwards',
     opacity: 0,
+    lineHeight: 1.4,
   },
 }

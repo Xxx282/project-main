@@ -1,6 +1,8 @@
 package com.rental.modules.admin;
 
 import com.rental.common.Result;
+import com.rental.modules.admin.dto.Dashboard;
+import com.rental.modules.inquiry.service.InquiryService;
 import com.rental.modules.property.entity.Property;
 import com.rental.modules.property.service.PropertyService;
 import com.rental.modules.user.entity.UserEntity;
@@ -11,12 +13,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-import org.springframework.security.access.prepost.PreAuthorize;
 
 /**
  * 管理员控制器
@@ -31,6 +30,23 @@ public class AdminController {
 
     private final PropertyService propertyService;
     private final UserService userService;
+    private final InquiryService inquiryService;
+
+    /**
+     * 获取数据看板统计信息
+     */
+    @GetMapping("/dashboard")
+    @Operation(summary = "获取数据看板统计")
+    public ResponseEntity<Result<Dashboard>> getDashboard() {
+        log.info("获取数据看板统计");
+        Dashboard dashboard = Dashboard.builder()
+                .users(userService.count())
+                .listings(propertyService.countAll())
+                .inquiriesToday(inquiryService.countTodayInquiries())
+                .pendingListings(propertyService.countPending())
+                .build();
+        return ResponseEntity.ok(Result.success(dashboard));
+    }
 
     /**
      * 获取待审核的房源列表

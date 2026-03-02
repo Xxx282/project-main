@@ -15,4 +15,5 @@ public interface InquiryService {
     List<Inquiry> findByListingId(Long listingId);
     Inquiry findById(Long id);
     List<Inquiry> findByLandlordIdAndStatus(Long landlordId, Inquiry.InquiryStatus status);
+    long countTodayInquiries();
 }

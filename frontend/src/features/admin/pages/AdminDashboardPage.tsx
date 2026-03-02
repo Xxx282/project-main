@@ -6,13 +6,7 @@ import { getDashboard } from '../api/adminApi'
 export function AdminDashboardPage() {
   const q = useQuery({
     queryKey: ['admin', 'dashboard'],
-    queryFn: async () => {
-      try {
-        return await getDashboard()
-      } catch {
-        return { users: 1234, listings: 567, inquiriesToday: 42, pendingListings: 9 }
-      }
-    },
+    queryFn: getDashboard,
   })
 
   return (

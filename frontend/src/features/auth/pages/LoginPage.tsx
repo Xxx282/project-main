@@ -20,7 +20,6 @@ export function LoginPage() {
     <Space orientation="vertical" size={16} style={{ width: '100%' }}>
       <PageHeader
         title="登录"
-        subtitle="输入账号密码后获取 JWT，并按角色跳转"
         align="center"
       />
       <Card

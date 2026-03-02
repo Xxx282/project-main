@@ -48,6 +48,7 @@ C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\ml\
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\ml\controller\MlController.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\config\SwaggerConfig.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\common\ResultCode.java
+C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\admin\dto\Dashboard.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\auth\dto\LoginResponse.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\property\controller\PropertyController.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\ml\client\MlServiceClientImpl.java

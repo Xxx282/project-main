@@ -65,4 +65,14 @@ public interface PropertyService {
      * 审核房源：通过设置为可租，拒绝设置为下架
      */
     Property reviewListing(Long id, boolean approved);
+
+    /**
+     * 统计所有房源数量
+     */
+    long countAll();
+
+    /**
+     * 统计待审核房源数量
+     */
+    long countPending();
 }

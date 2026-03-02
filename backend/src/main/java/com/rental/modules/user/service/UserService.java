@@ -19,4 +19,5 @@ public interface UserService {
     UserEntity enableUser(Long id);
     boolean existsByEmail(String email);
     boolean existsByUsername(String username);
+    long count();
 }

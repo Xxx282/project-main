@@ -150,4 +150,14 @@ public class PropertyServiceImpl implements PropertyService {
         log.info("审核房源: id={}, approved={}, newStatus={}", id, approved, property.getStatus());
         return propertyRepository.save(property);
     }
+
+    @Override
+    public long countAll() {
+        return propertyRepository.count();
+    }
+
+    @Override
+    public long countPending() {
+        return propertyRepository.countByStatus(Property.PropertyStatus.pending);
+    }
 }
