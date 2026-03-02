@@ -56,3 +56,23 @@ a:hover {
     transform: translateY(0) scale(1);
   }
 }
+
+/* 透明Modal样式 */
+.transparent-modal .ant-modal-content {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.transparent-modal .ant-modal-body {
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+.transparent-modal .ant-modal-mask {
+  background-color: rgba(0, 0, 0, 0.1) !important;
+  backdrop-filter: blur(2px) !important;
+}
+
+.transparent-modal .ant-modal-wrap {
+  background-color: transparent !important;
+}

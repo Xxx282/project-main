@@ -93,7 +93,7 @@ public class PropertyController {
      * 获取当前房东的房源列表
      */
     @GetMapping("/mine")
-    @PreAuthorize("hasRole('LANDLORD')")
+    @PreAuthorize("hasRole('landlord')")
     @Operation(summary = "获取我的房源列表")
     public ResponseEntity<Result<List<Property>>> getMyListings(HttpServletRequest request) {
         Long userId = (Long) request.getAttribute("userId");
@@ -105,7 +105,7 @@ public class PropertyController {
      * 创建房源
      */
     @PostMapping
-    @PreAuthorize("hasRole('LANDLORD')")
+    @PreAuthorize("hasRole('landlord')")
     @Operation(summary = "创建房源")
     public ResponseEntity<Result<Property>> createListing(
             @Valid @RequestBody CreatePropertyRequest request,
@@ -118,6 +118,7 @@ public class PropertyController {
                 .title(request.getTitle())
                 .city(request.getCity())
                 .region(request.getRegion())
+                .address(request.getAddress() != null ? request.getAddress() : "")
                 .bedrooms(request.getBedrooms())
                 .bathrooms(request.getBathrooms())
                 .area(request.getArea())
@@ -137,7 +138,7 @@ public class PropertyController {
      * 更新房源
      */
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('LANDLORD')")
+    @PreAuthorize("hasRole('landlord')")
     @Operation(summary = "更新房源")
     public ResponseEntity<Result<Property>> updateListing(
             @PathVariable Long id,
@@ -155,6 +156,9 @@ public class PropertyController {
         existing.setTitle(request.getTitle());
         existing.setCity(request.getCity());
         existing.setRegion(request.getRegion());
+        if (request.getAddress() != null) {
+            existing.setAddress(request.getAddress());
+        }
         existing.setBedrooms(request.getBedrooms());
         existing.setBathrooms(request.getBathrooms());
         existing.setArea(request.getArea());
@@ -176,7 +180,7 @@ public class PropertyController {
      * 删除房源
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('LANDLORD')")
+    @PreAuthorize("hasRole('landlord')")
     @Operation(summary = "删除房源")
     public ResponseEntity<Result<Void>> deleteListing(
             @PathVariable Long id,
@@ -197,7 +201,7 @@ public class PropertyController {
      * 更新房源状态
      */
     @PatchMapping("/{id}/status")
-    @PreAuthorize("hasRole('LANDLORD')")
+    @PreAuthorize("hasRole('landlord')")
     @Operation(summary = "更新房源状态")
     public ResponseEntity<Result<Property>> updateListingStatus(
             @PathVariable Long id,
@@ -255,7 +259,7 @@ public class PropertyController {
      * 上传房源图片
      */
     @PostMapping("/{propertyId}/images")
-    @PreAuthorize("hasRole('LANDLORD')")
+    @PreAuthorize("hasRole('landlord')")
     @Operation(summary = "上传房源图片")
     public ResponseEntity<Result<List<PropertyImage>>> uploadImages(
             @PathVariable Long propertyId,
@@ -278,7 +282,7 @@ public class PropertyController {
      * 删除房源图片
      */
     @DeleteMapping("/{propertyId}/images/{imageId}")
-    @PreAuthorize("hasRole('LANDLORD')")
+    @PreAuthorize("hasRole('landlord')")
     @Operation(summary = "删除房源图片")
     public ResponseEntity<Result<Void>> deleteImage(
             @PathVariable Long propertyId,
@@ -301,7 +305,7 @@ public class PropertyController {
      * 更新房源图片排序
      */
     @PutMapping("/{propertyId}/images/reorder")
-    @PreAuthorize("hasRole('LANDLORD')")
+    @PreAuthorize("hasRole('landlord')")
     @Operation(summary = "更新房源图片排序")
     public ResponseEntity<Result<Void>> reorderImages(
             @PathVariable Long propertyId,
@@ -328,6 +332,7 @@ public class PropertyController {
         private String title;
         private String city;
         private String region;
+        private String address;
         private Integer bedrooms;
         private Double bathrooms;
         private BigDecimal area;
@@ -343,6 +348,7 @@ public class PropertyController {
         private String title;
         private String city;
         private String region;
+        private String address;
         private Integer bedrooms;
         private Double bathrooms;
         private BigDecimal area;

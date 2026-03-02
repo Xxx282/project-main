@@ -25,7 +25,7 @@ import java.util.List;
 @RequestMapping("/admin")
 @RequiredArgsConstructor
 @Tag(name = "管理员", description = "管理员操作")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasRole('admin')")
 public class AdminController {
 
     private final PropertyService propertyService;

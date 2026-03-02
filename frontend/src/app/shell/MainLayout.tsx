@@ -1,9 +1,12 @@
-import { Button, Layout, Menu, Space, Typography } from 'antd'
+import { Button, Layout, Menu, Space, Typography, Modal } from 'antd'
 import type { MenuProps } from 'antd'
 import { useEffect, useMemo, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../features/auth/context/AuthContext'
+import { useAuthModal } from '../../features/auth/context/AuthModalContext'
 import type { UserRole } from '../../features/auth/store/authStore'
+import { LoginPage } from '../../features/auth/pages/LoginPage'
+import { RegisterPage } from '../../features/auth/pages/RegisterPage'
 
 const { Header, Content } = Layout
 
@@ -125,6 +128,7 @@ export function MainLayout() {
   const navigate = useNavigate()
   const location = useLocation()
   const auth = useAuth()
+  const { authModal, openAuthModal, closeAuthModal } = useAuthModal()
   const selectedKey = pathToKey(location.pathname)
   const [scrollY, setScrollY] = useState(0)
 
@@ -176,8 +180,16 @@ export function MainLayout() {
         onClick: () => navigate(keyToPath(key)),
       }))
       base.push(
-        { key: 'rent_house', label: '租房', onClick: () => navigate('/login') },
-        { key: 'publish', label: '发布', onClick: () => navigate('/login') },
+        {
+          key: 'rent_house',
+          label: '租房',
+          onClick: () => openAuthModal('login'),
+        },
+        {
+          key: 'publish',
+          label: '发布',
+          onClick: () => openAuthModal('login'),
+        },
       )
       return base
     }
@@ -239,7 +251,7 @@ export function MainLayout() {
           ) : (
             <>
               <Button
-                onClick={() => navigate('/login')}
+                onClick={() => openAuthModal('login')}
                 style={{
                   background: 'transparent',
                   border: '1px solid rgba(255,255,255,0.5)',
@@ -250,7 +262,7 @@ export function MainLayout() {
               </Button>
               <Button
                 type="primary"
-                onClick={() => navigate('/register')}
+                onClick={() => openAuthModal('register')}
               >
                 注册
               </Button>
@@ -370,6 +382,47 @@ export function MainLayout() {
             <Outlet />
           </div>
         </div>
+
+        {/* 首页上的登录/注册弹窗：只在未登录时可见 */}
+        {!auth.user && (
+          <Modal
+            open={authModal.visible}
+            footer={null}
+            onCancel={closeAuthModal}
+            centered
+            width={520}
+            destroyOnClose
+            maskStyle={{
+              backgroundColor: 'rgba(0,0,0,0.1)',
+              backdropFilter: 'blur(2px)',
+            }}
+            styles={{
+              body: {
+                padding: 0,
+                borderRadius: 16,
+                overflow: 'hidden',
+                background: 'transparent !important',
+              },
+              content: {
+                background: 'transparent !important',
+                boxShadow: 'none',
+              },
+            }}
+            className="transparent-modal"
+          >
+            <div
+              style={{
+                padding: 24,
+                background: 'rgba(255, 255, 255, 0.15)',
+                backdropFilter: 'blur(20px)',
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                borderRadius: 16,
+              }}
+            >
+              {authModal.mode === 'login' ? <LoginPage /> : <RegisterPage />}
+            </div>
+          </Modal>
+        )}
       </Content>
     </Layout>
   )

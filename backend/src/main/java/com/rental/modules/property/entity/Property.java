@@ -30,6 +30,8 @@ public class Property {
     private String city;
     @Column(nullable = false, length = 100)
     private String region;
+    @Column(nullable = false, length = 255)
+    private String address;
     @Column(name = "bedrooms", nullable = false)
     private Integer bedrooms;
     @Column(name = "bathrooms", nullable = false)

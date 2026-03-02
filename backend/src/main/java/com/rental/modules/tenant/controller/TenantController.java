@@ -68,9 +68,29 @@ public class TenantController {
      * 1. 房源租金不超过预算
      * 2. 城市、区域、户型（卧室数）、卫生间、朝向、装修相同
      * 3. 面积范围和楼层范围
+     * 
+     * 如果偏好对象存在但所有字段都是 null/空，则返回所有房源
      */
     private List<Property> filterByPreferences(List<Property> listings, TenantPreference preferences) {
         if (preferences == null) {
+            return listings;
+        }
+
+        // 检查是否有任何有效的筛选条件
+        boolean hasAnyFilter = preferences.getBudget() != null
+                || (preferences.getCity() != null && !preferences.getCity().isEmpty())
+                || (preferences.getRegion() != null && !preferences.getRegion().isEmpty())
+                || preferences.getBedrooms() != null
+                || preferences.getBathrooms() != null
+                || preferences.getMinArea() != null
+                || preferences.getMaxArea() != null
+                || preferences.getMinFloors() != null
+                || preferences.getMaxFloors() != null
+                || (preferences.getOrientation() != null && !preferences.getOrientation().isEmpty())
+                || (preferences.getDecoration() != null && !preferences.getDecoration().isEmpty());
+
+        // 如果没有任何筛选条件，返回所有房源
+        if (!hasAnyFilter) {
             return listings;
         }
 
@@ -142,6 +162,7 @@ public class TenantController {
             }
 
             // 8. 朝向匹配：必须相同
+            // 注意：如果偏好中朝向为 null 或空（即设为"无"），则不进行朝向过滤，返回所有朝向的房源
             if (matches && preferences.getOrientation() != null && !preferences.getOrientation().isEmpty()) {
                 if (property.getOrientation() == null ||
                     !property.getOrientation().name().equals(preferences.getOrientation())) {
@@ -150,6 +171,7 @@ public class TenantController {
             }
 
             // 9. 装修匹配：必须相同
+            // 注意：如果偏好中装修为 null 或空（即设为"无"），则不进行装修过滤，返回所有装修的房源
             if (matches && preferences.getDecoration() != null && !preferences.getDecoration().isEmpty()) {
                 if (property.getDecoration() == null ||
                     !property.getDecoration().name().equals(preferences.getDecoration())) {

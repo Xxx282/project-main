@@ -32,7 +32,7 @@ public class InquiryController {
      * 创建咨询
      */
     @PostMapping
-    @PreAuthorize("hasRole('TENANT')")
+    @PreAuthorize("hasRole('tenant')")
     @Operation(summary = "提交咨询")
     public ResponseEntity<Result<Inquiry>> createInquiry(
             @Valid @RequestBody CreateInquiryRequest request,
@@ -51,7 +51,7 @@ public class InquiryController {
      * 回复咨询
      */
     @PostMapping("/{id}/reply")
-    @PreAuthorize("hasRole('LANDLORD')")
+    @PreAuthorize("hasRole('landlord')")
     @Operation(summary = "回复咨询")
     public ResponseEntity<Result<Inquiry>> replyToInquiry(
             @PathVariable Long id,
@@ -69,7 +69,7 @@ public class InquiryController {
      * 关闭咨询
      */
     @PostMapping("/{id}/close")
-    @PreAuthorize("hasAnyRole('LANDLORD', 'TENANT')")
+    @PreAuthorize("hasAnyRole('landlord', 'tenant')")
     @Operation(summary = "关闭咨询")
     public ResponseEntity<Result<Inquiry>> closeInquiry(@PathVariable Long id) {
         Inquiry inquiry = inquiryService.closeInquiry(id);
@@ -80,7 +80,7 @@ public class InquiryController {
      * 获取当前用户的咨询（租客视角）
      */
     @GetMapping("/my")
-    @PreAuthorize("hasRole('TENANT')")
+    @PreAuthorize("hasRole('tenant')")
     @Operation(summary = "获取我的咨询列表")
     public ResponseEntity<Result<List<Inquiry>>> getMyInquiries(HttpServletRequest request) {
         Long userId = (Long) request.getAttribute("userId");
@@ -92,7 +92,7 @@ public class InquiryController {
      * 获取房东的咨询列表
      */
     @GetMapping("/landlord")
-    @PreAuthorize("hasRole('LANDLORD')")
+    @PreAuthorize("hasRole('landlord')")
     @Operation(summary = "获取收到的咨询列表")
     public ResponseEntity<Result<List<Inquiry>>> getLandlordInquiries(
             HttpServletRequest request,

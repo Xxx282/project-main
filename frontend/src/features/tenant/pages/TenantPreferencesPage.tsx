@@ -67,7 +67,23 @@ export function TenantPreferencesPage() {
 
   const handleSave = async (v: TenantPreferences) => {
     try {
-      await savePreferences(v)
+      // 确保所有字段都被发送，将 undefined 转换为 null，以便后端能够清空字段
+      const preferencesToSave: TenantPreferences = {
+        budget: v.budget ?? null,
+        city: v.city ?? null,
+        region: v.region ?? null,
+        bedrooms: v.bedrooms ?? null,
+        bathrooms: v.bathrooms ?? null,
+        minArea: v.minArea ?? null,
+        maxArea: v.maxArea ?? null,
+        minFloors: v.minFloors ?? null,
+        maxFloors: v.maxFloors ?? null,
+        orientation: v.orientation ?? null,
+        decoration: v.decoration ?? null,
+      }
+      await savePreferences(preferencesToSave)
+      // 刷新偏好设置查询，确保缓存更新
+      await queryClient.invalidateQueries({ queryKey: ['tenant', 'preferences'] })
       void message.success('保存成功，正在刷新推荐...')
       // 直接清除推荐缓存，强制重新获取
       queryClient.removeQueries({ queryKey: ['tenant', 'recommendations'] })
@@ -76,6 +92,39 @@ export function TenantPreferencesPage() {
       navigate('/tenant/recommendations')
     } catch {
       void message.error('保存失败')
+    }
+  }
+
+  const handleReset = async () => {
+    try {
+      // 将所有字段设置为 null
+      const emptyPreferences: TenantPreferences = {
+        budget: null,
+        city: null,
+        region: null,
+        bedrooms: null,
+        bathrooms: null,
+        minArea: null,
+        maxArea: null,
+        minFloors: null,
+        maxFloors: null,
+        orientation: null,
+        decoration: null,
+      }
+      await savePreferences(emptyPreferences)
+      // 立即设置表单字段值为空值，确保表单状态同步
+      form.setFieldsValue(emptyPreferences)
+      // 重置表单的初始值，防止后续保存时使用旧值
+      form.resetFields()
+      void message.success('已重置所有偏好设置')
+      // 清除推荐缓存
+      queryClient.removeQueries({ queryKey: ['tenant', 'recommendations'] })
+      // 刷新偏好设置查询，确保缓存更新
+      await queryClient.invalidateQueries({ queryKey: ['tenant', 'preferences'] })
+      // 等待查询刷新完成后再更新表单，确保使用最新的空值
+      await queryClient.refetchQueries({ queryKey: ['tenant', 'preferences'] })
+    } catch {
+      void message.error('重置失败')
     }
   }
 
@@ -214,6 +263,9 @@ export function TenantPreferencesPage() {
             <Space>
               <Button type="primary" htmlType="submit" loading={prefsQ.isLoading}>
                 保存偏好设置
+              </Button>
+              <Button onClick={handleReset} loading={prefsQ.isLoading}>
+                重置所有偏好
               </Button>
               <Button onClick={() => navigate('/tenant/recommendations')}>
                 返回推荐页面

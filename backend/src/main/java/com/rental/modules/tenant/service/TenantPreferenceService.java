@@ -25,56 +25,31 @@ public class TenantPreferenceService {
 
     /**
      * 保存用户偏好设置
+     * 如果请求中包含某个字段（即使是 null），就更新它，允许清空字段
+     * 前端会发送完整的偏好对象，包括要清空的字段（null值）
      */
     @Transactional
     public TenantPreference savePreferences(Long userId, TenantPreference preferences) {
+        if (preferences == null) {
+            throw new IllegalArgumentException("偏好设置不能为空");
+        }
+
         TenantPreference existing = repository.findByUserId(userId)
                 .orElseGet(() -> TenantPreference.builder().userId(userId).build());
 
-        // 预算
-        if (preferences.getBudget() != null) {
-            existing.setBudget(preferences.getBudget());
-        }
-        // 城市
-        if (preferences.getCity() != null) {
-            existing.setCity(preferences.getCity());
-        }
-        // 区域
-        if (preferences.getRegion() != null) {
-            existing.setRegion(preferences.getRegion());
-        }
-        // 卧室数
-        if (preferences.getBedrooms() != null) {
-            existing.setBedrooms(preferences.getBedrooms());
-        }
-        // 卫生间数
-        if (preferences.getBathrooms() != null) {
-            existing.setBathrooms(preferences.getBathrooms());
-        }
-        // 最小面积
-        if (preferences.getMinArea() != null) {
-            existing.setMinArea(preferences.getMinArea());
-        }
-        // 最大面积
-        if (preferences.getMaxArea() != null) {
-            existing.setMaxArea(preferences.getMaxArea());
-        }
-        // 最低楼层
-        if (preferences.getMinFloors() != null) {
-            existing.setMinFloors(preferences.getMinFloors());
-        }
-        // 最高楼层
-        if (preferences.getMaxFloors() != null) {
-            existing.setMaxFloors(preferences.getMaxFloors());
-        }
-        // 朝向
-        if (preferences.getOrientation() != null) {
-            existing.setOrientation(preferences.getOrientation());
-        }
-        // 装修
-        if (preferences.getDecoration() != null) {
-            existing.setDecoration(preferences.getDecoration());
-        }
+        // 直接更新所有字段，允许设置为 null 来清空偏好
+        // 前端会确保发送完整的偏好对象，包括要清空的字段（null值）
+        existing.setBudget(preferences.getBudget());
+        existing.setCity(preferences.getCity());
+        existing.setRegion(preferences.getRegion());
+        existing.setBedrooms(preferences.getBedrooms());
+        existing.setBathrooms(preferences.getBathrooms());
+        existing.setMinArea(preferences.getMinArea());
+        existing.setMaxArea(preferences.getMaxArea());
+        existing.setMinFloors(preferences.getMinFloors());
+        existing.setMaxFloors(preferences.getMaxFloors());
+        existing.setOrientation(preferences.getOrientation());
+        existing.setDecoration(preferences.getDecoration());
 
         return repository.save(existing);
     }
