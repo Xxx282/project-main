@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
-import type { WheelEvent } from 'react'
-import { Button, Card, Space, Typography, Empty, Image } from 'antd'
+import type { MouseEvent } from 'react'
+import { Button, Card, Space, Typography, Empty, Image, Slider } from 'antd'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { SettingOutlined } from '@ant-design/icons'
@@ -17,7 +17,12 @@ export function TenantRecommendationsPage() {
   const isGuest = !auth.user
 
   const [currentIndex, setCurrentIndex] = useState(0)
-  const lastWheelTimeRef = useRef(0)
+  const dragStartXRef = useRef<number | null>(null)
+  const isDraggingRef = useRef(false)
+  // 用于防止拖动过程中的误点击
+  const dragPreventClickRef = useRef(false)
+  const dragClickResetTimeoutRef = useRef<number | null>(null)
+  const lastSwipeTimeRef = useRef(0)
   const scrollbarRef = useRef<HTMLDivElement>(null)
 
   const recoQ = useQuery({
@@ -28,29 +33,78 @@ export function TenantRecommendationsPage() {
   const listings = recoQ.data ?? []
 
   // 当房源切换时，进度条会自动更新（通过 CSS 动画）
-  // 如果房源数量很多，可以添加横向滚动逻辑
+  // 鼠标左右拖动切换当前房源
+  const SWIPE_THRESHOLD = 80 // 触发切换的最小水平位移（像素）
+  const SWIPE_COOLDOWN = 300 // 连续切换的最小时间间隔（毫秒）
+  const DRAG_MOVE_THRESHOLD = 10 // 认为是拖动而不是点击的最小位移（像素）
 
-  // 处理滚轮一次切换一条房源
-  const handleWheel = (event: WheelEvent<HTMLDivElement>) => {
+  const handleMouseDown = (event: MouseEvent<HTMLDivElement>) => {
+    if (listings.length <= 1) return
+    // 如果上一次还有未清理的防点击延迟，先清掉
+    if (dragClickResetTimeoutRef.current !== null) {
+      window.clearTimeout(dragClickResetTimeoutRef.current)
+      dragClickResetTimeoutRef.current = null
+    }
+    dragStartXRef.current = event.clientX
+    isDraggingRef.current = true
+    dragPreventClickRef.current = false
+  }
+
+  const handleMouseUpOrLeave = () => {
+    isDraggingRef.current = false
+    dragStartXRef.current = null
+
+    // 如果本次操作被认为是拖动，则稍微延迟清除防点击标记，避免刚结束拖动时的误触
+    if (dragPreventClickRef.current) {
+      dragClickResetTimeoutRef.current = window.setTimeout(() => {
+        dragPreventClickRef.current = false
+        dragClickResetTimeoutRef.current = null
+      }, 80)
+    } else {
+      dragPreventClickRef.current = false
+    }
+  }
+
+  const handleMouseMove = (event: MouseEvent<HTMLDivElement>) => {
+    if (!isDraggingRef.current || dragStartXRef.current === null) return
     if (listings.length <= 1) return
 
     const now = Date.now()
-    // 简单节流，避免一次快速滚动跳太多条
-    if (now - lastWheelTimeRef.current < 400) {
+    if (now - lastSwipeTimeRef.current < SWIPE_COOLDOWN) {
       return
     }
 
-    if (event.deltaY > 0 && currentIndex < listings.length - 1) {
+    const deltaX = event.clientX - dragStartXRef.current
+
+    // 只要移动超过一定距离，就认为是拖动，后续点击应被屏蔽
+    if (Math.abs(deltaX) > DRAG_MOVE_THRESHOLD) {
+      dragPreventClickRef.current = true
+    }
+
+    // 向左拖动（deltaX 为负数） -> 下一套
+    if (deltaX < -SWIPE_THRESHOLD && currentIndex < listings.length - 1) {
       setCurrentIndex((prev) => Math.min(prev + 1, listings.length - 1))
-      lastWheelTimeRef.current = now
-    } else if (event.deltaY < 0 && currentIndex > 0) {
+      lastSwipeTimeRef.current = now
+      handleMouseUpOrLeave()
+    }
+
+    // 向右拖动（deltaX 为正数） -> 上一套
+    if (deltaX > SWIPE_THRESHOLD && currentIndex > 0) {
       setCurrentIndex((prev) => Math.max(prev - 1, 0))
-      lastWheelTimeRef.current = now
+      lastSwipeTimeRef.current = now
+      handleMouseUpOrLeave()
     }
   }
 
   const handlePreferences = () => {
     navigate('/tenant/preferences')
+  }
+
+  const handleSliderChange = (value: number | [number, number]) => {
+    if (listings.length <= 0) return
+    const v = Array.isArray(value) ? value[0] : value
+    const targetIndex = Math.min(Math.max(v - 1, 0), listings.length - 1)
+    setCurrentIndex(targetIndex)
   }
 
   // 渲染单个房源卡片（左侧封面图 + 右侧展示标题和价格）
@@ -65,7 +119,11 @@ export function TenantRecommendationsPage() {
         transition: 'all 0.3s ease',
       }}
       bodyStyle={{ padding: 24 }}
-      onClick={() => navigate(`/tenant/listings/${listing.id}`)}
+      onClick={() => {
+        // 拖动过程中（包括刚结束的极短时间内）不响应点击，避免误进详情
+        if (dragPreventClickRef.current) return
+        navigate(`/tenant/listings/${listing.id}`)
+      }}
     >
       <div
         style={{
@@ -178,19 +236,43 @@ export function TenantRecommendationsPage() {
             {/* 浏览说明 */}
             <div style={{ marginBottom: 24, textAlign: 'center' }}>
               <Text type="secondary" style={{ fontSize: 14 }}>
-                使用鼠标滚轮每次切换上一/下一套推荐房源，点击卡片查看详情
+                支持轮播浏览：按住鼠标左键左右拖动或使用下方滑动条，在推荐房源之间平滑切换，点击卡片查看详情
               </Text>
             </div>
 
-            {/* 单个房源展示 - 滚轮一次切换一个 */}
+            {/* 轮播式房源展示 - translateX 平滑横向切换 */}
             <div
               style={{
                 maxHeight: 600,
                 padding: '0 24px 16px',
+                overflow: 'hidden',
               }}
-              onWheel={handleWheel}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUpOrLeave}
+              onMouseLeave={handleMouseUpOrLeave}
             >
-              {renderListingCard(listings[currentIndex])}
+              <div
+                style={{
+                  display: 'flex',
+                  transition: 'transform 0.45s ease-in-out',
+                  transform: `translateX(-${currentIndex * 100}%)`,
+                }}
+              >
+                {listings.map((listing) => (
+                  <div
+                    key={listing.id}
+                    style={{
+                      flex: '0 0 100%',
+                      display: 'flex',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {renderListingCard(listing)}
+                  </div>
+                ))}
+              </div>
+
               <div style={{ marginTop: 20, textAlign: 'center' }}>
                 <Text type="secondary" style={{ fontSize: 15 }}>
                   {currentIndex + 1} / {listings.length}
@@ -199,7 +281,7 @@ export function TenantRecommendationsPage() {
             </div>
           </Card>
 
-          {/* 底部横向进度条导航 - 图形化显示 */}
+          {/* 底部横向滑动条导航 - 可拖动切换 */}
           <Card
             style={{
               maxWidth: 1040,
@@ -208,96 +290,15 @@ export function TenantRecommendationsPage() {
               padding: '24px 32px',
             }}
           >
-            <div
-              ref={scrollbarRef}
-              style={{
-                position: 'relative',
-                width: '100%',
-                padding: '20px 0',
-              }}
-            >
-              {/* 背景进度条线 */}
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '50%',
-                  left: 0,
-                  right: 0,
-                  height: 4,
-                  backgroundColor: '#e5e7eb',
-                  borderRadius: 2,
-                  transform: 'translateY(-50%)',
-                }}
+            <div style={{ padding: '8px 16px 0' }}>
+              <Slider
+                min={1}
+                max={listings.length}
+                step={1}
+                value={currentIndex + 1}
+                onChange={handleSliderChange}
+                tooltip={{ formatter: (value) => `第 ${value} 套` }}
               />
-              
-              {/* 已完成的进度条 */}
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '50%',
-                  left: 0,
-                  height: 4,
-                  backgroundColor: '#1890ff',
-                  borderRadius: 2,
-                  transform: 'translateY(-50%)',
-                  width: listings.length > 1 
-                    ? `${(currentIndex / (listings.length - 1)) * 100}%` 
-                    : '0%',
-                  transition: 'width 0.3s ease',
-                }}
-              />
-              
-              {/* 刻度点 */}
-              <div
-                style={{
-                  position: 'relative',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}
-              >
-                {listings.map((listing, index) => (
-                  <div
-                    key={listing.id}
-                    onClick={() => setCurrentIndex(index)}
-                    style={{
-                      position: 'relative',
-                      cursor: 'pointer',
-                      zIndex: 2,
-                    }}
-                  >
-                    {/* 刻度点 */}
-                    <div
-                      style={{
-                        width: index === currentIndex ? 20 : 12,
-                        height: index === currentIndex ? 20 : 12,
-                        borderRadius: '50%',
-                        backgroundColor: index === currentIndex ? '#1890ff' : '#d9d9d9',
-                        border: index === currentIndex ? '3px solid #fff' : '2px solid #fff',
-                        boxShadow: index === currentIndex ? '0 0 0 3px rgba(24, 144, 255, 0.3)' : '0 2px 4px rgba(0, 0, 0, 0.1)',
-                        transition: 'all 0.3s ease',
-                        transform: index === currentIndex ? 'scale(1.2)' : 'scale(1)',
-                      }}
-                    />
-                    {/* 数字标签 */}
-                    <div
-                      style={{
-                        position: 'absolute',
-                        top: index === currentIndex ? -32 : -28,
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        fontSize: index === currentIndex ? 14 : 12,
-                        fontWeight: index === currentIndex ? 'bold' : 'normal',
-                        color: index === currentIndex ? '#1890ff' : '#666',
-                        whiteSpace: 'nowrap',
-                        transition: 'all 0.3s ease',
-                      }}
-                    >
-                      {index + 1}
-                    </div>
-                  </div>
-                ))}
-              </div>
             </div>
           </Card>
         </>
