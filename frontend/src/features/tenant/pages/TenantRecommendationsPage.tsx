@@ -1,37 +1,15 @@
-import { useState } from 'react'
-import { Button, Card, Descriptions, Space, Typography, Empty, Carousel, message } from 'antd'
+import { useState, useRef, useEffect } from 'react'
+import type { WheelEvent } from 'react'
+import { Button, Card, Space, Typography, Empty, Image } from 'antd'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import { SettingOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons'
+import { SettingOutlined } from '@ant-design/icons'
 import { PageHeader } from '../../../shared/ui/PageHeader'
 import type { Listing } from '../../../shared/api/types'
-import { getRecommendations } from '../api/tenantApi'
+import { getRecommendations, getListingImages } from '../api/tenantApi'
 import { useAuth } from '../../auth/context/AuthContext'
 
 const { Text } = Typography
-
-// 朝向映射
-const orientationMap: Record<string, string> = {
-  east: '东',
-  south: '南',
-  west: '西',
-  north: '北',
-}
-
-// 装修映射
-const decorationMap: Record<string, string> = {
-  rough: '毛坯',
-  simple: '简装',
-  fine: '精装',
-  luxury: '豪华',
-}
-
-// 状态映射
-const statusMap: Record<string, string> = {
-  available: '可租',
-  rented: '已租',
-  offline: '下架',
-}
 
 export function TenantRecommendationsPage() {
   const navigate = useNavigate()
@@ -39,6 +17,8 @@ export function TenantRecommendationsPage() {
   const isGuest = !auth.user
 
   const [currentIndex, setCurrentIndex] = useState(0)
+  const lastWheelTimeRef = useRef(0)
+  const scrollbarRef = useRef<HTMLDivElement>(null)
 
   const recoQ = useQuery({
     queryKey: ['tenant', 'recommendations'],
@@ -47,58 +27,103 @@ export function TenantRecommendationsPage() {
 
   const listings = recoQ.data ?? []
 
+  // 当房源切换时，进度条会自动更新（通过 CSS 动画）
+  // 如果房源数量很多，可以添加横向滚动逻辑
+
+  // 处理滚轮一次切换一条房源
+  const handleWheel = (event: WheelEvent<HTMLDivElement>) => {
+    if (listings.length <= 1) return
+
+    const now = Date.now()
+    // 简单节流，避免一次快速滚动跳太多条
+    if (now - lastWheelTimeRef.current < 400) {
+      return
+    }
+
+    if (event.deltaY > 0 && currentIndex < listings.length - 1) {
+      setCurrentIndex((prev) => Math.min(prev + 1, listings.length - 1))
+      lastWheelTimeRef.current = now
+    } else if (event.deltaY < 0 && currentIndex > 0) {
+      setCurrentIndex((prev) => Math.max(prev - 1, 0))
+      lastWheelTimeRef.current = now
+    }
+  }
+
   const handlePreferences = () => {
     navigate('/tenant/preferences')
   }
 
-  // 渲染单个房源卡片
+  // 渲染单个房源卡片（左侧封面图 + 右侧展示标题和价格）
   const renderListingCard = (listing: Listing) => (
     <Card
       hoverable
-      style={{ maxWidth: 800, margin: '0 auto' }}
+      style={{
+        maxWidth: 1000,
+        margin: '0 auto',
+        borderRadius: 16,
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+        transition: 'all 0.3s ease',
+      }}
+      bodyStyle={{ padding: 24 }}
       onClick={() => navigate(`/tenant/listings/${listing.id}`)}
     >
-      <Descriptions bordered size="small" column={2}>
-        <Descriptions.Item label="ID">{listing.id}</Descriptions.Item>
-        <Descriptions.Item label="标题">{listing.title}</Descriptions.Item>
-        <Descriptions.Item label="城市">{listing.city ?? '-'}</Descriptions.Item>
-        <Descriptions.Item label="区域">{listing.region ?? '-'}</Descriptions.Item>
-        <Descriptions.Item label="租金">
-          {listing.price ? `¥ ${listing.price} / 月` : '-'}
-        </Descriptions.Item>
-        <Descriptions.Item label="状态">
-          {listing.status ? statusMap[listing.status] : '-'}
-        </Descriptions.Item>
-        <Descriptions.Item label="卧室数">{listing.bedrooms ?? '-'}</Descriptions.Item>
-        <Descriptions.Item label="卫生间数">{listing.bathrooms ?? '-'}</Descriptions.Item>
-        <Descriptions.Item label="面积">{listing.area ? `${listing.area} m²` : '-'}</Descriptions.Item>
-        <Descriptions.Item label="总楼层">{listing.totalFloors ?? '-'}</Descriptions.Item>
-        <Descriptions.Item label="朝向">
-          {listing.orientation ? orientationMap[listing.orientation] : '-'}
-        </Descriptions.Item>
-        <Descriptions.Item label="装修">
-          {listing.decoration ? decorationMap[listing.decoration] : '-'}
-        </Descriptions.Item>
-        <Descriptions.Item label="描述" span={2}>
-          {listing.description ?? '-'}
-        </Descriptions.Item>
-      </Descriptions>
+      <div
+        style={{
+          display: 'flex',
+          gap: 24,
+          alignItems: 'stretch',
+        }}
+      >
+        {/* 左侧封面图 */}
+        <div>
+          <ListingThumbnail propertyId={listing.id} />
+        </div>
+
+        {/* 右侧展示标题和价格 */}
+        <div
+          style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            padding: '12px 0',
+          }}
+        >
+          <Typography.Title
+            level={3}
+            style={{
+              margin: '0 0 16px 0',
+              fontSize: 24,
+              fontWeight: 600,
+              color: '#1f2937',
+              lineHeight: 1.4,
+            }}
+            ellipsis={{ rows: 2 }}
+          >
+            {listing.title || '暂无标题'}
+          </Typography.Title>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+            <Text strong style={{ fontSize: 32, color: '#f97316', fontWeight: 700 }}>
+              {listing.price ? `¥${listing.price}` : '价格待定'}
+            </Text>
+            {listing.price && (
+              <Text style={{ fontSize: 16, color: '#6b7280', marginLeft: 4 }}>元 / 月</Text>
+            )}
+          </div>
+          <Text
+            style={{
+              fontSize: 14,
+              color: '#3b82f6',
+              marginTop: 16,
+              cursor: 'pointer',
+            }}
+          >
+            点击查看详情 →
+          </Text>
+        </div>
+      </div>
     </Card>
   )
-
-  // 处理上一个
-  const handlePrev = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1)
-    }
-  }
-
-  // 处理下一个
-  const handleNext = () => {
-    if (currentIndex < listings.length - 1) {
-      setCurrentIndex(currentIndex + 1)
-    }
-  }
 
   return (
     <Space orientation="vertical" size={24} style={{ width: '100%' }}>
@@ -131,94 +156,204 @@ export function TenantRecommendationsPage() {
         <>
           <Card
             style={{
-              maxWidth: 840,
+              maxWidth: 1040,
               margin: '0 auto',
-              borderRadius: 12,
-              boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)',
-              border: '1px solid #f3f4f6',
+              borderRadius: 16,
+              boxShadow: '0 18px 45px rgba(15, 23, 42, 0.08)',
+              border: '1px solid #e5e7eb',
             }}
+            bodyStyle={{ padding: 32 }}
           >
-            {/* 卡片切换导航 */}
-            <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Space>
-                <Button
-                  icon={<LeftOutlined />}
-                  onClick={handlePrev}
-                  disabled={currentIndex === 0}
-                >
-                  上一条
-                </Button>
-                <Text>
-                  {currentIndex + 1} / {listings.length}
-                </Text>
-                <Button
-                  onClick={handleNext}
-                  disabled={currentIndex === listings.length - 1}
-                >
-                  下一条 <RightOutlined />
-                </Button>
-              </Space>
-              <Text type="secondary">
-                点击卡片查看详情
+            {/* 结果统计说明 */}
+            <div style={{ marginBottom: 16, textAlign: 'center' }}>
+              <Text style={{ fontSize: 24, fontWeight: 500 }}>
+                本次根据您的偏好共为您筛选出{' '}
+                <Text strong style={{ fontSize: 32, color: '#f97316', fontWeight: 700 }}>
+                  {listings.length}
+                </Text>{' '}
+                套推荐房源
               </Text>
             </div>
 
-            {/* 房源卡片展示 */}
-            <div style={{ padding: '0 20px' }}>
+            {/* 浏览说明 */}
+            <div style={{ marginBottom: 24, textAlign: 'center' }}>
+              <Text type="secondary" style={{ fontSize: 14 }}>
+                使用鼠标滚轮每次切换上一/下一套推荐房源，点击卡片查看详情
+              </Text>
+            </div>
+
+            {/* 单个房源展示 - 滚轮一次切换一个 */}
+            <div
+              style={{
+                maxHeight: 600,
+                padding: '0 24px 16px',
+              }}
+              onWheel={handleWheel}
+            >
               {renderListingCard(listings[currentIndex])}
+              <div style={{ marginTop: 20, textAlign: 'center' }}>
+                <Text type="secondary" style={{ fontSize: 15 }}>
+                  {currentIndex + 1} / {listings.length}
+                </Text>
+              </div>
             </div>
           </Card>
 
-          {/* 底部缩略图导航 */}
+          {/* 底部横向进度条导航 - 图形化显示 */}
           <Card
             style={{
-              maxWidth: 840,
+              maxWidth: 1040,
               margin: '0 auto',
-              borderRadius: 12,
+              borderRadius: 16,
+              padding: '24px 32px',
             }}
           >
-            <div style={{
-              display: 'flex',
-              gap: 8,
-              overflowX: 'auto',
-              paddingBottom: 8,
-            }}>
-              {listings.map((listing, index) => (
-                <Card
-                  key={listing.id}
-                  size="small"
-                  hoverable
-                  onClick={() => setCurrentIndex(index)}
-                  style={{
-                    minWidth: 120,
-                    maxWidth: 150,
-                    cursor: 'pointer',
-                    border: index === currentIndex ? '2px solid #1890ff' : '1px solid #d9d9d9',
-                    opacity: index === currentIndex ? 1 : 0.7,
-                    transition: 'all 0.3s',
-                  }}
-                >
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{
-                      fontWeight: index === currentIndex ? 600 : 400,
-                      color: index === currentIndex ? '#1890ff' : '#666',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                    }}>
-                      {listing.title?.substring(0, 8) ?? '无标题'}
-                    </div>
-                    <div style={{ fontSize: 12, color: '#999', marginTop: 4 }}>
-                      ¥{listing.price}
+            <div
+              ref={scrollbarRef}
+              style={{
+                position: 'relative',
+                width: '100%',
+                padding: '20px 0',
+              }}
+            >
+              {/* 背景进度条线 */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: 0,
+                  right: 0,
+                  height: 4,
+                  backgroundColor: '#e5e7eb',
+                  borderRadius: 2,
+                  transform: 'translateY(-50%)',
+                }}
+              />
+              
+              {/* 已完成的进度条 */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: 0,
+                  height: 4,
+                  backgroundColor: '#1890ff',
+                  borderRadius: 2,
+                  transform: 'translateY(-50%)',
+                  width: listings.length > 1 
+                    ? `${(currentIndex / (listings.length - 1)) * 100}%` 
+                    : '0%',
+                  transition: 'width 0.3s ease',
+                }}
+              />
+              
+              {/* 刻度点 */}
+              <div
+                style={{
+                  position: 'relative',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+              >
+                {listings.map((listing, index) => (
+                  <div
+                    key={listing.id}
+                    onClick={() => setCurrentIndex(index)}
+                    style={{
+                      position: 'relative',
+                      cursor: 'pointer',
+                      zIndex: 2,
+                    }}
+                  >
+                    {/* 刻度点 */}
+                    <div
+                      style={{
+                        width: index === currentIndex ? 20 : 12,
+                        height: index === currentIndex ? 20 : 12,
+                        borderRadius: '50%',
+                        backgroundColor: index === currentIndex ? '#1890ff' : '#d9d9d9',
+                        border: index === currentIndex ? '3px solid #fff' : '2px solid #fff',
+                        boxShadow: index === currentIndex ? '0 0 0 3px rgba(24, 144, 255, 0.3)' : '0 2px 4px rgba(0, 0, 0, 0.1)',
+                        transition: 'all 0.3s ease',
+                        transform: index === currentIndex ? 'scale(1.2)' : 'scale(1)',
+                      }}
+                    />
+                    {/* 数字标签 */}
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: index === currentIndex ? -32 : -28,
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        fontSize: index === currentIndex ? 14 : 12,
+                        fontWeight: index === currentIndex ? 'bold' : 'normal',
+                        color: index === currentIndex ? '#1890ff' : '#666',
+                        whiteSpace: 'nowrap',
+                        transition: 'all 0.3s ease',
+                      }}
+                    >
+                      {index + 1}
                     </div>
                   </div>
-                </Card>
-              ))}
+                ))}
+              </div>
             </div>
           </Card>
         </>
       )}
     </Space>
+  )
+}
+
+// 构建图片 URL（与列表页保持一致逻辑）
+const buildImageUrl = (imageUrl: string) => {
+  if (!imageUrl) return ''
+  if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+    return imageUrl
+  }
+  return imageUrl
+}
+
+// 推荐卡片左侧封面图组件
+function ListingThumbnail({ propertyId }: { propertyId: number }) {
+  const imagesQ = useQuery({
+    queryKey: ['tenant', 'listing', propertyId, 'thumbnail'],
+    queryFn: () => getListingImages(propertyId),
+  })
+
+  const images = imagesQ.data ?? []
+  const hasImage = images.length > 0
+  const cover = hasImage ? images[0] : null
+
+  return (
+    <div
+      style={{
+        width: 320,
+        height: 240,
+        overflow: 'hidden',
+        borderRadius: 12,
+        boxShadow: '0 12px 30px rgba(15, 23, 42, 0.15)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: hasImage ? '#f9fafb' : '#f3f4f6',
+        transition: 'transform 0.3s ease',
+      }}
+    >
+      {hasImage ? (
+        <Image
+          src={buildImageUrl(cover!.imageUrl)}
+          alt="房源封面"
+          width={320}
+          height={240}
+          style={{ objectFit: 'cover' }}
+          preview={false}
+        />
+      ) : (
+        <span style={{ color: '#9ca3af', fontSize: 14 }}>暂无图片</span>
+      )}
+    </div>
   )
 }
 

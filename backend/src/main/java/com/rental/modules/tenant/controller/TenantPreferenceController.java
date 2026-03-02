@@ -30,13 +30,20 @@ public class TenantPreferenceController {
     }
 
     @PutMapping("/preferences")
-    @Operation(summary = "保存租客偏好设置")
+    @Operation(summary = "保存租客偏好设置", description = "保存或更新租客偏好设置，支持将字段设置为 null 来清空偏好")
     public ResponseEntity<Result<TenantPreference>> savePreferences(
             @RequestBody TenantPreference preferences,
             HttpServletRequest request) {
         Long userId = (Long) request.getAttribute("userId");
         log.info("保存用户 {} 的偏好设置: {}", userId, preferences);
-        TenantPreference saved = preferenceService.savePreferences(userId, preferences);
-        return ResponseEntity.ok(Result.success(saved));
+        try {
+            TenantPreference saved = preferenceService.savePreferences(userId, preferences);
+            log.info("用户 {} 的偏好设置保存成功", userId);
+            return ResponseEntity.ok(Result.success(saved));
+        } catch (IllegalArgumentException e) {
+            log.warn("保存用户 {} 的偏好设置失败: {}", userId, e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(Result.error(400, e.getMessage()));
+        }
     }
 }

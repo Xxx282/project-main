@@ -29,18 +29,31 @@ mysql -u root -p house_rental_system < src/main/resources/schema.sql
 
 ## 配置（可选）
 
-复制 `application.yml` 并修改以下配置项：
+推荐优先使用**环境变量**注入敏感配置（如数据库密码、JWT 密钥），避免把真实密码提交到仓库。
+
+### 方式一（推荐）：环境变量
+
+PowerShell 示例：
+
+```powershell
+$env:DB_PASSWORD="你的MySQL密码"
+mvn spring-boot:run
+```
+
+### 方式二：修改配置文件
 
 ```yaml
 spring:
   datasource:
     url: jdbc:mysql://localhost:3306/house_rental_system
     username: root
-    password: your_password  # 修改为你的 MySQL 密码
+    # 不建议硬编码真实密码；更推荐使用 DB_PASSWORD 环境变量
+    password: ${DB_PASSWORD:root}
 
 app:
   jwt:
-    secret: your_jwt_secret_key  # 修改为更安全的密钥（至少256位）
+    # 更推荐通过 JWT_SECRET 环境变量注入（至少256位）
+    secret: ${JWT_SECRET:your_jwt_secret_key}
 ```
 
 ## API 文档

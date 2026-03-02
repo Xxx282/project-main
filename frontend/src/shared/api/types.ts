@@ -23,17 +23,17 @@ export type PropertyImage = {
 }
 
 export type TenantPreferences = {
-  budget?: number
-  city?: string
-  region?: string
-  bedrooms?: number
-  bathrooms?: number
-  minArea?: number
-  maxArea?: number
-  minFloors?: number
-  maxFloors?: number
-  orientation?: 'east' | 'south' | 'west' | 'north'
-  decoration?: 'rough' | 'simple' | 'fine' | 'luxury'
+  budget?: number | null
+  city?: string | null
+  region?: string | null
+  bedrooms?: number | null
+  bathrooms?: number | null
+  minArea?: number | null
+  maxArea?: number | null
+  minFloors?: number | null
+  maxFloors?: number | null
+  orientation?: 'east' | 'south' | 'west' | 'north' | null
+  decoration?: 'rough' | 'simple' | 'fine' | 'luxury' | null
 }
 
 export type InquiryStatus = 'pending' | 'replied' | 'closed'
