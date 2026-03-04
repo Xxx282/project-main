@@ -32,16 +32,25 @@ type SingleResponse<T> = {
 }
 
 export type PricePredictRequest = {
-  bedrooms?: number
-  bathrooms?: number
-  area?: number
+  // 必填
+  bedrooms: number
+  area: number
+  city: string
+  // 选填
   region?: string
+  bathrooms?: number
+  propertyType?: string
+  decoration?: string
+  floor?: number
+  totalFloors?: number
 }
 
 export type PricePredictResponse = {
   predictedPrice: number
   currency?: string
   confidence?: number
+  lowerBound?: number
+  upperBound?: number
 }
 
 export async function listMyListings(): Promise<Listing[]> {
