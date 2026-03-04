@@ -16,6 +16,7 @@ export function RegisterPage() {
     username: string
     email: string
     password: string
+    phone: string
     role: 'tenant' | 'landlord'
   }>()
 
@@ -83,6 +84,9 @@ export function RegisterPage() {
           </Form.Item>
           <Form.Item name="email" label="邮箱" rules={[{ required: true, type: 'email' }]}>
             <Input placeholder="name@example.com" autoComplete="email" />
+          </Form.Item>
+          <Form.Item name="phone" label="手机号" rules={[{ required: true, pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号' }]}>
+            <Input placeholder="11位手机号" autoComplete="tel" />
           </Form.Item>
           <Form.Item name="password" label="密码" rules={[{ required: true, min: 6 }]}>
             <Input.Password placeholder="至少 6 位" autoComplete="new-password" />

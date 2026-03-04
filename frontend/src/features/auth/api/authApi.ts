@@ -24,6 +24,7 @@ export type RegisterRequest = {
   username: string
   email: string
   password: string
+  phone: string
   role: Exclude<UserRole, 'admin'>
 }
 
