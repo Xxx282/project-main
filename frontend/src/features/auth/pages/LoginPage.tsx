@@ -10,11 +10,10 @@ export function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const auth = useAuth()
-  const { closeAuthModal } = useAuthModal()
+  const { closeAuthModal, authModal } = useAuthModal()
   const isInModal = location.pathname === '/' // 在首页时，说明是在模态框中
 
   const [form] = Form.useForm<{
-    role: UserRole
     email: string
     password: string
     remember: boolean
@@ -39,13 +38,12 @@ export function LoginPage() {
         <Form
           form={form}
           layout="vertical"
-          initialValues={{ role: 'tenant', remember: true }}
+          initialValues={{ remember: true, email: authModal.email }}
           onFinish={async (values) => {
             try {
               const res = await login({
                 usernameOrEmail: values.email,
                 password: values.password,
-                role: values.role,
               })
               authStore.setToken(res.accessToken, values.remember)
               await auth.refresh()
@@ -65,15 +63,6 @@ export function LoginPage() {
             }
           }}
         >
-          <Form.Item name="role" label="角色" rules={[{ required: true }]}>
-            <Radio.Group
-              options={[
-                { label: '租客', value: 'tenant' },
-                { label: '房东', value: 'landlord' },
-                { label: '管理员', value: 'admin' },
-              ]}
-            />
-          </Form.Item>
           <Form.Item name="email" label="用户名 / 邮箱" rules={[{ required: true }]}>
             <Input placeholder="请输入用户名或邮箱" autoComplete="username" />
           </Form.Item>

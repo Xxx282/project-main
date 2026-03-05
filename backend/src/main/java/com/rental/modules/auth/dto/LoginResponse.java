@@ -18,6 +18,7 @@ public class LoginResponse {
     private String tokenType;
     private Long expiresIn;
     private UserInfo user;
+    private String message;  // 用于注册成功但需邮箱验证时的提示信息
 
     @Data
     @Builder

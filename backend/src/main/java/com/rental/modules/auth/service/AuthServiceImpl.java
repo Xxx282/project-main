@@ -1,6 +1,7 @@
 package com.rental.modules.auth.service;
 
 import com.rental.common.exception.BusinessException;
+import com.rental.common.service.EmailService;
 import com.rental.common.util.JwtUtil;
 import com.rental.modules.auth.dto.LoginRequest;
 import com.rental.modules.auth.dto.LoginResponse;
@@ -18,6 +19,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.Random;
+
 /**
  * 认证服务实现
  */
@@ -30,6 +34,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final EmailService emailService;
 
     @Value("${app.jwt.expiration}")
     private Long jwtExpiration;
@@ -102,7 +107,10 @@ public class AuthServiceImpl implements AuthService {
         // 验证角色
         String role = validateAndNormalizeRole(request.getRole());
 
-        // 创建用户
+        // 生成验证码
+        String verificationCode = generateVerificationCode();
+
+        // 创建用户（默认未激活，需要邮箱验证）
         UserEntity userEntity = UserEntity.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
@@ -110,19 +118,30 @@ public class AuthServiceImpl implements AuthService {
                 .role(UserEntity.UserRole.valueOf(role))
                 .phone(request.getPhone())
                 .realName(request.getRealName())
-                .isActive(true)
+                .isActive(false)  // 需要邮箱验证后才能登录
+                .emailVerified(false)
+                .verificationCode(verificationCode)
+                .verificationCodeExpiredAt(LocalDateTime.now().plusMinutes(10))
                 .build();
 
         userEntity = userRepository.save(userEntity);
-        log.info("用户注册成功: userId={}", userEntity.getId());
+        log.info("用户注册成功(待验证): userId={}", userEntity.getId());
 
-        // 生成 JWT Token
-        String token = jwtUtil.generateToken(userEntity.getId(), userEntity.getUsername(), userEntity.getRole().name());
+        // 发送验证邮件
+        try {
+            emailService.sendVerificationEmail(
+                userEntity.getEmail(), 
+                userEntity.getUsername(), 
+                verificationCode
+            );
+            log.info("验证邮件已发送: email={}", userEntity.getEmail());
+        } catch (Exception e) {
+            log.warn("发送验证邮件失败，但用户已创建: userId={}, error={}", userEntity.getId(), e.getMessage());
+        }
 
+        // 返回注册成功信息（不返回 token，需要先验证邮箱）
         return LoginResponse.builder()
-                .accessToken(token)
-                .tokenType("Bearer")
-                .expiresIn(jwtExpiration / 1000)
+                .message("注册成功，请前往邮箱验证后登录")
                 .user(LoginResponse.UserInfo.builder()
                         .id(userEntity.getId())
                         .username(userEntity.getUsername())
@@ -130,6 +149,13 @@ public class AuthServiceImpl implements AuthService {
                         .role(userEntity.getRole().name())
                         .build())
                 .build();
+    }
+
+    /**
+     * 生成6位数字验证码
+     */
+    private String generateVerificationCode() {
+        return String.format("%06d", new Random().nextInt(999999));
     }
 
     @Override

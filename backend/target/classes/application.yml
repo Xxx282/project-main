@@ -7,9 +7,22 @@ spring:
   application:
     name: house-rental-backend
 
+  # 邮件配置
+  mail:
+    host: smtp.qq.com
+    port: 587
+    username: 1820020367@qq.com
+    password: krgkuwhmmqdbbdfc
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
   # 数据库配置
   datasource:
-    url: jdbc:mysql://localhost:3306/house_rental_system?useUnicode=true&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3306/house_rental_system?useUnicode=true&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false
     username: root
     # 推荐用环境变量注入，避免把真实密码提交到仓库
     # Windows PowerShell 启动前设置：$env:DB_PASSWORD="你的密码"
@@ -49,6 +62,7 @@ spring:
 
 # 应用自定义配置
 app:
+  base-url: http://localhost:5173
   jwt:
     secret: ${JWT_SECRET:YourSuperSecretKeyForJWTTokenGenerationMustBeAtLeast256Bits!}
     expiration: 86400000  # 24小时过期

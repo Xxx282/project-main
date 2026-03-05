@@ -24,15 +24,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private final UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserEntity userEntity = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("用户不存在: " + username));
+    public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
+        // 先按用户名查找，再按邮箱查找
+        UserEntity userEntity = userRepository.findByUsername(usernameOrEmail)
+                .orElseGet(() -> userRepository.findByEmail(usernameOrEmail)
+                        .orElseThrow(() -> new UsernameNotFoundException("用户不存在: " + usernameOrEmail)));
 
         if (!userEntity.getIsActive()) {
-            throw new UsernameNotFoundException("用户已被禁用: " + username);
+            throw new UsernameNotFoundException("用户已被禁用: " + usernameOrEmail);
         }
 
-        log.debug("加载用户详情成功: username={}, role={}", username, userEntity.getRole());
+        log.debug("加载用户详情成功: username={}, role={}", userEntity.getUsername(), userEntity.getRole());
 
         return User.builder()
                 .username(userEntity.getUsername())

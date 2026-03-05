@@ -1,5 +1,5 @@
 import { Card, Descriptions, Space, Button, message } from 'antd'
-import { HeartOutlined, HeartFilled, ArrowLeftOutlined, MessageOutlined } from '@ant-design/icons'
+import { HeartOutlined, HeartFilled, ArrowLeftOutlined, MessageOutlined, DollarOutlined } from '@ant-design/icons'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { PageHeader } from '../../../shared/ui/PageHeader'
@@ -81,23 +81,35 @@ export function TenantListingDetailPage() {
         extra={
           <Space>
             {auth.user && (
-              <Button
-                type="primary"
-                icon={<MessageOutlined />}
-                onClick={async () => {
-                  if (!listingQ.data) return
-                  try {
-                    // 获取或创建对话（如果有已有对话则返回，没有则创建）
-                    const conversation = await getOrCreateConversation(propertyId, listingQ.data.landlordId)
-                    // 跳转到对话页面
-                    navigate(`/tenant/chats/${conversation.id}`)
-                  } catch (error) {
-                    message.error('发起咨询失败')
-                  }
-                }}
-              >
-                咨询房东
-              </Button>
+              <>
+                <Button
+                  type="primary"
+                  icon={<DollarOutlined />}
+                  onClick={() => {
+                    if (!listingQ.data) return
+                    navigate(`/tenant/payments/create?propertyId=${propertyId}&payeeId=${listingQ.data.landlordId}`)
+                  }}
+                >
+                  支付
+                </Button>
+                <Button
+                  type="primary"
+                  icon={<MessageOutlined />}
+                  onClick={async () => {
+                    if (!listingQ.data) return
+                    try {
+                      // 获取或创建对话（如果有已有对话则返回，没有则创建）
+                      const conversation = await getOrCreateConversation(propertyId, listingQ.data!.landlordId!)
+                      // 跳转到对话页面
+                      navigate(`/tenant/chats/${conversation.id}`)
+                    } catch (error) {
+                      message.error('发起咨询失败')
+                    }
+                  }}
+                >
+                  咨询房东
+                </Button>
+              </>
             )}
             {auth.user ? (
               <Button

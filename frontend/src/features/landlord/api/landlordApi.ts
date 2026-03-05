@@ -1,5 +1,5 @@
 import { http } from '../../../shared/api/http'
-import type { Inquiry, Listing, PropertyImage } from '../../../shared/api/types'
+import type { Listing, PropertyImage } from '../../../shared/api/types'
 
 type ListResponse<T> = {
   code: number
@@ -74,7 +74,7 @@ export async function deleteListing(id: number): Promise<void> {
 
 export async function pricePredict(req: PricePredictRequest): Promise<PricePredictResponse> {
   try {
-    const { data } = await http.post<PricePredictResponse>('/pricing/predict', req)
+    const { data } = await http.post<PricePredictResponse>('/ml/predict', req)
     return data
   } catch {
     const base = 1500

@@ -1,5 +1,5 @@
 import { http } from '../../../shared/api/http'
-import type { Inquiry, Listing, PropertyImage, TenantPreferences } from '../../../shared/api/types'
+import type { Listing, PropertyImage, TenantPreferences } from '../../../shared/api/types'
 
 type ListResponse<T> = {
   code: number

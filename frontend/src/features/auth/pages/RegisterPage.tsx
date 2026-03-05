@@ -1,5 +1,5 @@
 import { Button, Card, Form, Input, Radio, Space, message } from 'antd'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { PageHeader } from '../../../shared/ui/PageHeader'
 import { register } from '../api/authApi'
 import { useAuthModal } from '../context/AuthModalContext'
@@ -24,7 +24,7 @@ export function RegisterPage() {
     <Space orientation="vertical" size={16} style={{ width: '100%' }}>
       <PageHeader
         title="注册"
-        subtitle="注册完成后跳转登录页（或由后端返回 token 自动登录）"
+        subtitle="注册完成后需要邮箱验证"
         align="center"
       />
       <Card
@@ -43,24 +43,30 @@ export function RegisterPage() {
           initialValues={{ role: 'tenant' }}
           onFinish={async (values) => {
             try {
-              const res = await register(values)
-              if ('accessToken' in (res as any)) {
-                // 如果后端返回了 token，自动登录
-                authStore.setToken((res as any).accessToken, true)
+              const res = await register(values) as any
+              if (res.accessToken) {
+                // 如果后端返回了 token，自动登录（兼容旧逻辑）
+                authStore.setToken(res.accessToken, true)
                 await auth.refresh()
                 void message.success('注册成功，已自动登录')
                 if (isInModal) {
                   closeAuthModal()
                 } else {
-                  const role = (res as any).user?.role || 'tenant'
+                  const role = res.user?.role || 'tenant'
                   if (role === 'tenant') navigate('/tenant/listings', { replace: true })
                   else if (role === 'landlord') navigate('/landlord/listings', { replace: true })
                   else navigate('/admin/dashboard', { replace: true })
                 }
+              } else if (res.message) {
+                // 需要邮箱验证
+                void message.success(res.message)
+                // 保存密码到 localStorage，验证成功后自动登录
+                localStorage.setItem('pending_password', values.password)
+                // 打开邮箱验证弹窗
+                openAuthModal('verify-email', values.email)
               } else {
                 void message.success('注册成功，请登录')
                 if (isInModal) {
-                  // 在模态框中，切换到登录模式
                   openAuthModal('login')
                 } else {
                   navigate('/login', { replace: true })
@@ -79,22 +85,47 @@ export function RegisterPage() {
               ]}
             />
           </Form.Item>
-          <Form.Item name="username" label="用户名" rules={[{ required: true, min: 3, max: 20 }]}>
-            <Input placeholder="3-20 位字符" autoComplete="username" />
+          <Form.Item name="username" label="用户名" rules={[
+            { required: true, message: '请输入用户名' },
+            { min: 3, max: 20, message: '用户名长度必须在3-20之间' },
+            { pattern: /^[a-zA-Z0-9_]+$/, message: '用户名只能包含字母、数字和下划线' }
+          ]}>
+            <Input placeholder="3-20 位字母、数字、下划线" autoComplete="username" />
           </Form.Item>
-          <Form.Item name="email" label="邮箱" rules={[{ required: true, type: 'email' }]}>
-            <Input placeholder="name@example.com" autoComplete="email" />
+          <Form.Item name="email" label="邮箱" rules={[
+            { required: true, message: '请输入邮箱地址' },
+            { type: 'email', message: '请输入有效的邮箱格式，如：name@example.com' }
+          ]}>
+            <Input 
+              placeholder="name@example.com" 
+              autoComplete="email"
+              onBlur={(e) => {
+                const value = e.target.value
+                if (value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+                  message.warning('邮箱格式似乎不太对哦~')
+                }
+              }}
+            />
           </Form.Item>
-          <Form.Item name="phone" label="手机号" rules={[{ required: true, pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号' }]}>
+          <Form.Item name="phone" label="手机号" rules={[
+            { required: true, message: '请输入手机号' },
+            { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的11位手机号' }
+          ]}>
             <Input placeholder="11位手机号" autoComplete="tel" />
           </Form.Item>
-          <Form.Item name="password" label="密码" rules={[{ required: true, min: 6 }]}>
+          <Form.Item name="password" label="密码" rules={[
+            { required: true, message: '请输入密码' },
+            { min: 6, message: '密码至少6位' }
+          ]}>
             <Input.Password placeholder="至少 6 位" autoComplete="new-password" />
           </Form.Item>
           <Button type="primary" htmlType="submit" block>
             注册
           </Button>
         </Form>
+        <div style={{ textAlign: 'center', marginTop: 16 }}>
+          已有账号？<Link to="/login">立即登录</Link>
+        </div>
       </Card>
     </Space>
   )

@@ -22,10 +22,7 @@ mvn spring-boot:run
 CREATE DATABASE house_rental_system DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-初始化数据表：
-```bash
-mysql -u root -p house_rental_system < src/main/resources/schema.sql
-```
+应用启动时会自动创建表（如果使用 JPA 自动建表）。
 
 ## 配置（可选）
 
@@ -37,6 +34,7 @@ PowerShell 示例：
 
 ```powershell
 $env:DB_PASSWORD="你的MySQL密码"
+$env:JWT_SECRET="你的JWT密钥（至少256位）"
 mvn spring-boot:run
 ```
 
@@ -62,7 +60,6 @@ app:
 - Swagger UI：`http://localhost:8080/swagger-ui.html`
 - OpenAPI JSON：`http://localhost:8080/v3/api-docs`
 
-
 ## 联调前端
 
 前端请求后端地址配置：
@@ -71,6 +68,20 @@ app:
 cp .env.example .env.local
 # 修改 VITE_API_BASE_URL=http://localhost:8080
 ```
+
+---
+
+## 认证流程
+
+### 注册流程
+1. 用户注册时填写用户名、邮箱、密码、手机号、角色
+2. 系统发送邮箱验证码（有效期10分钟）
+3. 用户输入验证码后，账户激活（`isActive=true`）
+4. 用户可使用用户名或邮箱登录
+
+### 登录方式
+- 支持**用户名**或**邮箱**登录
+- 密码使用 BCrypt 加密存储
 
 ---
 
@@ -322,6 +333,8 @@ backend/
 | POST | `/api/auth/login`    | 用户登录     | 公开   |
 | POST | `/api/auth/register` | 用户注册     | 公开   |
 | GET  | `/api/auth/me`       | 获取当前用户 | 已登录 |
+| POST | `/api/auth/verify-email` | 邮箱验证码验证 | 公开 |
+| POST | `/api/auth/resend-code` | 重新发送验证码 | 公开 |
 
 ### 用户模块
 | 方法 | 端点                      | 描述                 | 权限   |
@@ -364,10 +377,10 @@ backend/
 | GET  | `/api/ml/status`    | ML 服务状态 | 已登录            |
 
 ### 租客模块
-|| 方法 | 端点                   | 描述                 | 权限     |
-|| ---- | ---------------------- | -------------------- | -------- |
-|| GET  | `/api/tenant/preferences` | 获取偏好设置      | TENANT   |
-|| PUT  | `/api/tenant/preferences` | 保存偏好设置      | TENANT   |
+| 方法 | 端点                   | 描述                 | 权限     |
+| ---- | ---------------------- | -------------------- | -------- |
+| GET  | `/api/tenant/preferences` | 获取偏好设置      | TENANT   |
+| PUT  | `/api/tenant/preferences` | 保存偏好设置      | TENANT   |
 
 ## 角色说明
 

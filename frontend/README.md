@@ -28,9 +28,11 @@ VITE_API_BASE_URL=http://localhost:8080
 - `/landlord/*`：房东（需要 `landlord` 角色）
 - `/admin/*`：管理员（需要 `admin` 角色）
 
-## 当前实现说明
-- 未启动后端时：Tenant/Landlord/Admin 页面会尝试请求接口，失败则自动使用 mock 数据，方便先做 UI。
-- 启动后端后：按接口返回值自动切换为真实数据。
+## 认证流程
+1. 用户注册 → 填写用户名、邮箱、密码、手机号、角色
+2. 系统发送邮箱验证码（有效期10分钟）
+3. 用户输入验证码 → 验证成功后自动打开登录弹窗
+4. 用户输入密码登录 → 进入对应角色页面
 
 ---
 
@@ -87,6 +89,8 @@ VITE_API_BASE_URL=http://localhost:8080
 - 显示推荐理由
 
 **前端文件**：`src/features/tenant/pages/TenantRecommendationsPage.tsx`
+
+---
 
 ## 技术栈
 

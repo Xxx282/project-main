@@ -46,6 +46,18 @@ public class UserEntity {
     @Builder.Default
     private Boolean isActive = true;
 
+    // ========== 邮箱验证字段 ==========
+    @Column(name = "email_verified", nullable = false)
+    @Builder.Default
+    private Boolean emailVerified = false;
+
+    @Column(name = "verification_code", length = 10)
+    private String verificationCode;
+
+    @Column(name = "verification_code_expired_at")
+    private LocalDateTime verificationCodeExpiredAt;
+    // ========== 邮箱验证字段 ==========
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

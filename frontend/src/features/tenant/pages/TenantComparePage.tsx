@@ -69,9 +69,6 @@ export function TenantComparePage() {
   const [settingsModalOpen, setSettingsModalOpen] = useState(false)
   const [form] = Form.useForm()
 
-  // 加载字段设置
-  const columnSettings = useState<FieldOption[]>(loadColumnSettings())[0]
-
   // 获取收藏列表
   const favoritesQ = useQuery({
     queryKey: ['tenant', 'favorites'],

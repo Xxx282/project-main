@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from app.model import predict_one
+from model import predict_one
 import time
 import uvicorn
 
@@ -100,7 +100,7 @@ def api_v1_predict(payload: NewPredictRequest):
 
 @app.post("/predict")
 def predict(payload: RentFeatures):
-    # 把字段名映射回原始列名（因为 Pydantic 不喜欢带空格的字段）
+    # 把字段名映射回原始列名
     record = {
         "Posted On": payload.Posted_On,
         "BHK": payload.BHK,

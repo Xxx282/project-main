@@ -1,15 +1,16 @@
 import React, { createContext, useContext, useState, useCallback } from 'react'
 
-type AuthModalMode = 'login' | 'register'
+type AuthModalMode = 'login' | 'register' | 'verify-email'
 
 type AuthModalState = {
   visible: boolean
   mode: AuthModalMode
+  email?: string
 }
 
 type AuthModalContextType = {
   authModal: AuthModalState
-  openAuthModal: (mode: AuthModalMode) => void
+  openAuthModal: (mode: AuthModalMode, email?: string) => void
   closeAuthModal: () => void
 }
 
@@ -29,8 +30,8 @@ export function AuthModalProvider({ children }: { children: React.ReactNode }) {
     mode: 'login',
   })
 
-  const openAuthModal = useCallback((mode: AuthModalMode) => {
-    setAuthModal({ visible: true, mode })
+  const openAuthModal = useCallback((mode: AuthModalMode, email?: string) => {
+    setAuthModal({ visible: true, mode, email })
   }, [])
 
   const closeAuthModal = useCallback(() => {

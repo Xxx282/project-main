@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import type { MouseEvent } from 'react'
 import { Button, Card, Space, Typography, Empty, Image, Slider } from 'antd'
 import { useQuery } from '@tanstack/react-query'
@@ -23,7 +23,6 @@ export function TenantRecommendationsPage() {
   const dragPreventClickRef = useRef(false)
   const dragClickResetTimeoutRef = useRef<number | null>(null)
   const lastSwipeTimeRef = useRef(0)
-  const scrollbarRef = useRef<HTMLDivElement>(null)
 
   const recoQ = useQuery({
     queryKey: ['tenant', 'recommendations'],

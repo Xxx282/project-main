@@ -4,9 +4,11 @@ import { HomePage } from '../features/home/pages/HomePage'
 import { AdminDashboardPage } from '../features/admin/pages/AdminDashboardPage'
 import { AdminListingsReviewPage } from '../features/admin/pages/AdminListingsReviewPage'
 import { AdminUsersPage } from '../features/admin/pages/AdminUsersPage'
+import { AdminPaymentsPage } from '../features/admin/pages/AdminPaymentsPage'
 import { RequireAuth } from '../features/auth/components/RequireAuth'
 import { LoginPage } from '../features/auth/pages/LoginPage'
 import { RegisterPage } from '../features/auth/pages/RegisterPage'
+import { EmailVerifyPage } from '../features/auth/pages/EmailVerifyPage'
 import { LandlordInquiriesPage } from '../features/landlord/pages/LandlordInquiriesPage'
 import { LandlordInquiryPage } from '../features/landlord/pages/LandlordInquiryPage'
 import { LandlordListingEditPage } from '../features/landlord/pages/LandlordListingEditPage'
@@ -19,6 +21,8 @@ import { TenantInquiryPage } from '../features/tenant/pages/TenantInquiryPage'
 import { TenantListingsPage } from '../features/tenant/pages/TenantListingsPage'
 import { TenantPreferencesPage } from '../features/tenant/pages/TenantPreferencesPage'
 import { TenantRecommendationsPage } from '../features/tenant/pages/TenantRecommendationsPage'
+import { TenantPaymentPage } from '../features/tenant/pages/TenantPaymentPage'
+import { TenantPaymentsPage } from '../features/tenant/pages/TenantPaymentsPage'
 
 export function AppRoutes() {
   return (
@@ -28,6 +32,7 @@ export function AppRoutes() {
 
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
+        <Route path="verify-email" element={<EmailVerifyPage />} />
 
         <Route path="tenant">
           <Route index element={<Navigate to="listings" replace />} />
@@ -71,6 +76,22 @@ export function AppRoutes() {
             element={
               <RequireAuth roles={['tenant']}>
                 <TenantPreferencesPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="payments"
+            element={
+              <RequireAuth roles={['tenant']}>
+                <TenantPaymentsPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="payments/create"
+            element={
+              <RequireAuth roles={['tenant']}>
+                <TenantPaymentPage />
               </RequireAuth>
             }
           />
@@ -175,6 +196,14 @@ export function AppRoutes() {
             element={
               <RequireAuth roles={['admin']}>
                 <AdminListingsReviewPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="payments"
+            element={
+              <RequireAuth roles={['admin']}>
+                <AdminPaymentsPage />
               </RequireAuth>
             }
           />

@@ -7,6 +7,7 @@ import { useAuthModal } from '../../features/auth/context/AuthModalContext'
 import type { UserRole } from '../../features/auth/store/authStore'
 import { LoginPage } from '../../features/auth/pages/LoginPage'
 import { RegisterPage } from '../../features/auth/pages/RegisterPage'
+import { EmailVerifyModal } from '../../features/auth/components/EmailVerifyModal'
 
 const { Header, Content } = Layout
 
@@ -17,6 +18,7 @@ type TopNavKey =
   | 'tenant_prefs'
   | 'tenant_compare'
   | 'tenant_inquiries'
+  | 'tenant_payments'
   | 'landlord_listings'
   | 'landlord_all_listings'
   | 'landlord_predict'
@@ -25,6 +27,7 @@ type TopNavKey =
   | 'admin_dashboard'
   | 'admin_users'
   | 'admin_listings'
+  | 'admin_payments'
   | 'auth_login'
   | 'auth_register'
   | 'rent_house'
@@ -44,6 +47,8 @@ function keyToPath(key: TopNavKey): string {
       return '/tenant/compare'
     case 'tenant_inquiries':
       return '/tenant/inquiries'
+    case 'tenant_payments':
+      return '/tenant/payments'
     case 'landlord_listings':
       return '/landlord/listings'
     case 'landlord_all_listings':
@@ -60,6 +65,8 @@ function keyToPath(key: TopNavKey): string {
       return '/admin/users'
     case 'admin_listings':
       return '/admin/listings'
+    case 'admin_payments':
+      return '/admin/payments'
     case 'auth_login':
       return '/login'
     case 'auth_register':
@@ -78,6 +85,7 @@ function pathToKey(pathname: string): TopNavKey {
   if (pathname.startsWith('/tenant/preferences')) return 'tenant_prefs'
   if (pathname.startsWith('/tenant/compare')) return 'tenant_compare'
   if (pathname.startsWith('/tenant/inquiries')) return 'tenant_inquiries'
+  if (pathname.startsWith('/tenant/payments')) return 'tenant_payments'
   if (pathname.startsWith('/tenant')) return 'tenant_listings'
 
   if (pathname.startsWith('/landlord/favorites')) return 'landlord_favorites'
@@ -88,6 +96,7 @@ function pathToKey(pathname: string): TopNavKey {
 
   if (pathname.startsWith('/admin/users')) return 'admin_users'
   if (pathname.startsWith('/admin/listings')) return 'admin_listings'
+  if (pathname.startsWith('/admin/payments')) return 'admin_payments'
   if (pathname.startsWith('/admin')) return 'admin_dashboard'
 
   if (pathname.startsWith('/register')) return 'auth_register'
@@ -102,6 +111,7 @@ const ROLE_MENU: Record<UserRole, { key: TopNavKey; label: string }[]> = {
     { key: 'tenant_reco', label: '推荐' },
     { key: 'tenant_compare', label: '收藏' },
     { key: 'tenant_inquiries', label: '咨询' },
+    { key: 'tenant_payments', label: '支付' },
   ],
   landlord: [
     // { key: 'home', label: '首页' },
@@ -116,6 +126,7 @@ const ROLE_MENU: Record<UserRole, { key: TopNavKey; label: string }[]> = {
     { key: 'admin_dashboard', label: '看板' },
     { key: 'admin_users', label: '用户管理' },
     { key: 'admin_listings', label: '房源审核' },
+    { key: 'admin_payments', label: '支付管理' },
   ],
 }
 
@@ -238,7 +249,7 @@ export function MainLayout() {
               <Button
                 onClick={() => {
                   auth.logout()
-                  navigate('/tenant/listings', { replace: true })
+                  navigate('/', { replace: true })
                 }}
                 style={{
                   background: 'rgba(255,255,255,0.15)',
@@ -404,10 +415,6 @@ export function MainLayout() {
                 overflow: 'hidden',
                 background: 'transparent !important',
               },
-              content: {
-                background: 'transparent !important',
-                boxShadow: 'none',
-              },
             }}
             className="transparent-modal"
           >
@@ -420,7 +427,13 @@ export function MainLayout() {
                 borderRadius: 16,
               }}
             >
-              {authModal.mode === 'login' ? <LoginPage /> : <RegisterPage />}
+              {authModal.mode === 'login' ? (
+                <LoginPage />
+              ) : authModal.mode === 'verify-email' ? (
+                <EmailVerifyModal />
+              ) : (
+                <RegisterPage />
+              )}
             </div>
           </Modal>
         )}
