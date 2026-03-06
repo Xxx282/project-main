@@ -3,6 +3,7 @@ import type { MouseEvent } from 'react'
 import { Button, Card, Space, Typography, Empty, Image, Slider } from 'antd'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { SettingOutlined } from '@ant-design/icons'
 import { PageHeader } from '../../../shared/ui/PageHeader'
 import type { Listing } from '../../../shared/api/types'
@@ -12,6 +13,7 @@ import { useAuth } from '../../auth/context/AuthContext'
 const { Text } = Typography
 
 export function TenantRecommendationsPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const auth = useAuth()
   const isGuest = !auth.user
@@ -157,14 +159,14 @@ export function TenantRecommendationsPage() {
             }}
             ellipsis={{ rows: 2 }}
           >
-            {listing.title || '暂无标题'}
+            {listing.title || t('pages.noTitle')}
           </Typography.Title>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
             <Text strong style={{ fontSize: 32, color: '#f97316', fontWeight: 700 }}>
-              {listing.price ? `¥${listing.price}` : '价格待定'}
+              {listing.price ? `¥${listing.price}` : t('pages.pricePending')}
             </Text>
             {listing.price && (
-              <Text style={{ fontSize: 16, color: '#6b7280', marginLeft: 4 }}>元 / 月</Text>
+              <Text style={{ fontSize: 16, color: '#6b7280', marginLeft: 4 }}>{t('common.yuanPerMonth')}</Text>
             )}
           </div>
           <Text
@@ -175,7 +177,7 @@ export function TenantRecommendationsPage() {
               cursor: 'pointer',
             }}
           >
-            点击查看详情 →
+            {t('pages.clickToViewDetails')}
           </Text>
         </div>
       </div>
@@ -185,15 +187,15 @@ export function TenantRecommendationsPage() {
   return (
     <Space orientation="vertical" size={24} style={{ width: '100%' }}>
       <PageHeader
-        title="租客-个性化推荐"
-        subtitle={isGuest ? '无后端时自动使用 mock 推荐' : '根据您的偏好为您推荐房源'}
+        title={t('pages.tenantRecommendations')}
+        subtitle={isGuest ? t('pages.mockRecommendations') : t('pages.recommendationsSubtitle')}
         extra={
           <Button
             type="primary"
             icon={<SettingOutlined />}
             onClick={handlePreferences}
           >
-            偏好设置
+            {t('pages.preferenceSettings')}
           </Button>
         }
       />
@@ -201,11 +203,11 @@ export function TenantRecommendationsPage() {
       {listings.length === 0 ? (
         <Card style={{ maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
           <Empty
-            description="暂无推荐房源"
+            description={t('pages.noRecommendations')}
             image={Empty.PRESENTED_IMAGE_SIMPLE}
           >
             <Button type="primary" onClick={handlePreferences}>
-              设置偏好获取推荐
+              {t('pages.setPreferencesForRecommendations')}
             </Button>
           </Empty>
         </Card>
@@ -224,18 +226,18 @@ export function TenantRecommendationsPage() {
             {/* 结果统计说明 */}
             <div style={{ marginBottom: 16, textAlign: 'center' }}>
               <Text style={{ fontSize: 24, fontWeight: 500 }}>
-                本次根据您的偏好共为您筛选出{' '}
+                {t('pages.filteredResults')}{' '}
                 <Text strong style={{ fontSize: 32, color: '#f97316', fontWeight: 700 }}>
                   {listings.length}
                 </Text>{' '}
-                套推荐房源
+                {t('pages.recommendedListings')}
               </Text>
             </div>
 
             {/* 浏览说明 */}
             <div style={{ marginBottom: 24, textAlign: 'center' }}>
               <Text type="secondary" style={{ fontSize: 14 }}>
-                支持轮播浏览：按住鼠标左键左右拖动或使用下方滑动条，在推荐房源之间平滑切换，点击卡片查看详情
+                {t('pages.browseInstructions')}
               </Text>
             </div>
 
@@ -296,7 +298,7 @@ export function TenantRecommendationsPage() {
                 step={1}
                 value={currentIndex + 1}
                 onChange={handleSliderChange}
-                tooltip={{ formatter: (value) => `第 ${value} 套` }}
+                tooltip={{ formatter: (value) => `${t('pages.listing')} ${value} ${t('pages.set')}` }}
               />
             </div>
           </Card>
@@ -317,6 +319,7 @@ const buildImageUrl = (imageUrl: string) => {
 
 // 推荐卡片左侧封面图组件
 function ListingThumbnail({ propertyId }: { propertyId: number }) {
+  const { t } = useTranslation()
   const imagesQ = useQuery({
     queryKey: ['tenant', 'listing', propertyId, 'thumbnail'],
     queryFn: () => getListingImages(propertyId),
@@ -344,14 +347,14 @@ function ListingThumbnail({ propertyId }: { propertyId: number }) {
       {hasImage ? (
         <Image
           src={buildImageUrl(cover!.imageUrl)}
-          alt="房源封面"
+          alt={t('common.coverImage')}
           width={320}
           height={240}
           style={{ objectFit: 'cover' }}
           preview={false}
         />
       ) : (
-        <span style={{ color: '#9ca3af', fontSize: 14 }}>暂无图片</span>
+        <span style={{ color: '#9ca3af', fontSize: 14 }}>{t('common.noImage')}</span>
       )}
     </div>
   )

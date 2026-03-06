@@ -1,6 +1,7 @@
 import { Button, Card, Space, Table, Tag, message } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { PageHeader } from '../../../shared/ui/PageHeader'
 import { listListingsForReview, reviewListing } from '../api/adminApi'
 
@@ -15,6 +16,7 @@ type ListingRow = {
 }
 
 export function AdminListingsReviewPage() {
+  const { t } = useTranslation()
   const queryClient = useQueryClient()
 
   const q = useQuery({
@@ -33,47 +35,47 @@ export function AdminListingsReviewPage() {
       await reviewListing(id, approved ? 'approved' : 'rejected')
     },
     onSuccess: () => {
-      message.success('审核操作成功')
+      message.success(t('pages.reviewOperationSuccess'))
       queryClient.invalidateQueries({ queryKey: ['admin', 'listings'] })
     },
     onError: () => {
-      message.error('审核操作失败')
+      message.error(t('pages.reviewOperationFailed'))
     },
   })
 
   const columns: ColumnsType<ListingRow> = [
-    { title: 'ID', dataIndex: 'id', width: 70 },
-    { title: '标题', dataIndex: 'title', ellipsis: true },
-    { title: '城市', dataIndex: 'city', width: 100 },
-    { title: '区域', dataIndex: 'region', width: 100 },
+    { title: t('common.id'), dataIndex: 'id', width: 70 },
+    { title: t('common.title'), dataIndex: 'title', ellipsis: true },
+    { title: t('pages.city'), dataIndex: 'city', width: 100 },
+    { title: t('pages.region'), dataIndex: 'region', width: 100 },
     { 
-      title: '租金', 
+      title: t('common.price'), 
       dataIndex: 'price', 
       width: 100,
-      render: (v: number) => v ? `¥ ${v}/月` : '-'
+      render: (v: number) => v ? `¥ ${v}${t('common.yuanPerMonth')}` : '-'
     },
     { 
-      title: '户型', 
+      title: t('common.layout'), 
       dataIndex: 'bedrooms', 
       width: 80,
-      render: (v: number) => v ? `${v}室` : '-'
+      render: (v: number) => v ? `${v}${t('common.bedrooms')}` : '-'
     },
     {
-      title: '状态',
+      title: t('pages.status'),
       dataIndex: 'status',
       width: 100,
       render: (v: ListingRow['status']) => {
         const map: Record<ListingRow['status'], { color: string; text: string }> = {
-          pending: { color: 'gold', text: '待审核' },
-          available: { color: 'green', text: '可租' },
-          rented: { color: 'blue', text: '已租' },
-          offline: { color: 'red', text: '下架' },
+          pending: { color: 'gold', text: t('pages.pendingReview') },
+          available: { color: 'green', text: t('pages.available') },
+          rented: { color: 'blue', text: t('pages.rented') },
+          offline: { color: 'red', text: t('pages.offline') },
         }
         return <Tag color={map[v]?.color || 'default'}>{map[v]?.text || v}</Tag>
       },
     },
     {
-      title: '操作',
+      title: t('common.operation'),
       width: 150,
       render: (_, row) => (
         <Space>
@@ -86,7 +88,7 @@ export function AdminListingsReviewPage() {
               reviewMutation.mutate({ id: row.id, approved: true })
             }}
           >
-            通过
+            {t('pages.approve')}
           </Button>
           <Button
             size="small"
@@ -97,7 +99,7 @@ export function AdminListingsReviewPage() {
               reviewMutation.mutate({ id: row.id, approved: false })
             }}
           >
-            拒绝
+            {t('pages.reject')}
           </Button>
         </Space>
       ),
@@ -116,7 +118,7 @@ export function AdminListingsReviewPage() {
 
   return (
     <Space orientation="vertical" size={16} style={{ width: '100%' }}>
-      <PageHeader title="管理员-房源审核" />
+      <PageHeader title={t('pages.adminListingReview')} />
       <Card>
         <Table<ListingRow>
           rowKey="id"

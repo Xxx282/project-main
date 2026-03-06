@@ -1,7 +1,8 @@
-import { Button, Layout, Menu, Space, Typography, Modal } from 'antd'
+import { Button, Layout, Menu, Space, Typography, Modal, Select } from 'antd'
 import type { MenuProps } from 'antd'
 import { useEffect, useMemo, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../features/auth/context/AuthContext'
 import { useAuthModal } from '../../features/auth/context/AuthModalContext'
 import type { UserRole } from '../../features/auth/store/authStore'
@@ -104,45 +105,51 @@ function pathToKey(pathname: string): TopNavKey {
   return 'tenant_listings'
 }
 
-const ROLE_MENU: Record<UserRole, { key: TopNavKey; label: string }[]> = {
-  tenant: [
-    // { key: 'home', label: '首页' },
-    { key: 'tenant_listings', label: '房源' },
-    { key: 'tenant_reco', label: '推荐' },
-    { key: 'tenant_compare', label: '收藏' },
-    { key: 'tenant_inquiries', label: '咨询' },
-    { key: 'tenant_payments', label: '支付' },
-  ],
-  landlord: [
-    // { key: 'home', label: '首页' },
-    { key: 'landlord_all_listings', label: '房源' },
-    { key: 'landlord_listings', label: '发布' },
-    { key: 'landlord_favorites', label: '收藏' },
-    { key: 'landlord_predict', label: '预测' },
-    { key: 'landlord_inquiries', label: '咨询' },
-  ],
-  admin: [
-    { key: 'home', label: '首页' },
-    { key: 'admin_dashboard', label: '看板' },
-    { key: 'admin_users', label: '用户管理' },
-    { key: 'admin_listings', label: '房源审核' },
-    { key: 'admin_payments', label: '支付管理' },
-  ],
+function getRoleMenu(t: (key: string) => string): Record<UserRole, { key: TopNavKey; label: string }[]> {
+  return {
+    tenant: [
+      // { key: 'home', label: t('nav.home') },
+      { key: 'tenant_listings', label: t('nav.listings') },
+      { key: 'tenant_reco', label: t('nav.recommendations') },
+      { key: 'tenant_compare', label: t('nav.favorites') },
+      { key: 'tenant_inquiries', label: t('nav.consultation') },
+      { key: 'tenant_payments', label: t('nav.payments') },
+    ],
+    landlord: [
+      // { key: 'home', label: t('nav.home') },
+      { key: 'landlord_all_listings', label: t('nav.listings') },
+      { key: 'landlord_listings', label: t('nav.publish') },
+      { key: 'landlord_favorites', label: t('nav.favorites') },
+      { key: 'landlord_predict', label: t('nav.prediction') },
+      { key: 'landlord_inquiries', label: t('nav.consultation') },
+    ],
+    admin: [
+      { key: 'home', label: t('nav.home') },
+      { key: 'admin_dashboard', label: t('nav.dashboard') },
+      { key: 'admin_users', label: t('nav.userManagement') },
+      { key: 'admin_listings', label: t('nav.listingReview') },
+      { key: 'admin_payments', label: t('nav.paymentManagement') },
+    ],
+  }
 }
 
 // 未登录用户的菜单配置：首页 + 房源
-const GUEST_MENU: { key: TopNavKey; label: string }[] = [
-  { key: 'home', label: '首页' },
-  { key: 'tenant_listings', label: '房源' },
-]
+function getGuestMenu(t: (key: string) => string): { key: TopNavKey; label: string }[] {
+  return [
+    { key: 'home', label: t('nav.home') },
+    { key: 'tenant_listings', label: t('nav.listings') },
+  ]
+}
 
 export function MainLayout() {
+  const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
   const auth = useAuth()
   const { authModal, openAuthModal, closeAuthModal } = useAuthModal()
   const selectedKey = pathToKey(location.pathname)
   const [scrollY, setScrollY] = useState(0)
+  const [currentLanguage, setCurrentLanguage] = useState(i18n.language)
 
   // 监听滚动位置
   useEffect(() => {
@@ -152,6 +159,11 @@ export function MainLayout() {
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  // 同步i18n语言变化到本地状态
+  useEffect(() => {
+    setCurrentLanguage(i18n.language)
+  }, [i18n.language])
 
   // 判断是否是首页
   const isHomePage = location.pathname === '/'
@@ -183,10 +195,17 @@ export function MainLayout() {
   // 未登录默认显示租客菜单；登录后按用户角色显示
   const effectiveRole: UserRole = auth.user?.role ?? 'tenant'
 
+  // 处理语言切换
+  const handleLanguageChange = (value: string) => {
+    i18n.changeLanguage(value)
+    setCurrentLanguage(value)
+    localStorage.setItem('language', value)
+  }
+
   const menuItems: MenuProps['items'] = useMemo(() => {
     // 未登录时：首页 + 房源 + 租房(跳转登录) + 发布(跳转登录)
     if (!auth.user) {
-      const base = GUEST_MENU.map(({ key, label }) => ({
+      const base = getGuestMenu(t).map(({ key, label }) => ({
         key,
         label,
         onClick: () => navigate(keyToPath(key)),
@@ -194,31 +213,31 @@ export function MainLayout() {
       base.push(
         {
           key: 'rent_house',
-          label: '租房',
+          label: t('nav.rentHouse'),
           onClick: () => openAuthModal('login'),
         },
         {
           key: 'publish',
-          label: '发布',
+          label: t('nav.publish'),
           onClick: () => openAuthModal('login'),
         },
       )
       return base
     }
     // 登录后按用户角色显示菜单
-    const base = ROLE_MENU[effectiveRole].map(({ key, label }) => ({
+    const base = getRoleMenu(t)[effectiveRole].map(({ key, label }) => ({
       key,
       label,
       onClick: () => navigate(keyToPath(key)),
     }))
     return base
-  }, [effectiveRole, auth.user, navigate])
+  }, [effectiveRole, auth.user, navigate, t, openAuthModal])
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Header style={headerStyle}>
         <Typography.Text style={{ color: navTextColor, fontWeight: 600, marginRight: 32 }}>
-          智能租房系统
+          {t('common.appName')}
         </Typography.Text>
         {/* 中间区域：让顶栏菜单居中显示 */}
         <div style={{ flex: 1, display: 'flex', justifyContent: 'center', minWidth: 0 }}>
@@ -227,7 +246,7 @@ export function MainLayout() {
             mode="horizontal"
             selectedKeys={[selectedKey]}
             items={menuItems}
-            overflowedIndicator="更多"
+            overflowedIndicator={t('nav.home')}
             style={{
               background: 'transparent',
               borderBottom: 'none',
@@ -241,6 +260,19 @@ export function MainLayout() {
           />
         </div>
         <Space size="middle">
+          {/* 语言切换下拉菜单 */}
+          <Select
+            value={currentLanguage}
+            onChange={handleLanguageChange}
+            style={{
+              width: 100,
+            }}
+            options={[
+              { value: 'zh-CN', label: t('language.chinese') },
+              { value: 'en-US', label: t('language.english') },
+            ]}
+            className="language-selector"
+          />
           {auth.user ? (
             <>
               <Typography.Text style={{ color: navTextColor }}>
@@ -257,7 +289,7 @@ export function MainLayout() {
                   color: navTextColor,
                 }}
               >
-                退出
+                {t('common.logout')}
               </Button>
             </>
           ) : (
@@ -270,13 +302,13 @@ export function MainLayout() {
                   color: navTextColor,
                 }}
               >
-                登录
+                {t('common.login')}
               </Button>
               <Button
                 type="primary"
                 onClick={() => openAuthModal('register')}
               >
-                注册
+                {t('common.register')}
               </Button>
             </>
           )}

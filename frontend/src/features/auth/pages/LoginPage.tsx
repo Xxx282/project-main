@@ -1,5 +1,6 @@
 import { Button, Card, Form, Input, Radio, Space, message } from 'antd'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { PageHeader } from '../../../shared/ui/PageHeader'
 import { login } from '../api/authApi'
 import { authStore, type UserRole } from '../store/authStore'
@@ -7,6 +8,7 @@ import { useAuth } from '../context/AuthContext'
 import { useAuthModal } from '../context/AuthModalContext'
 
 export function LoginPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
   const auth = useAuth()
@@ -22,7 +24,7 @@ export function LoginPage() {
   return (
     <Space orientation="vertical" size={16} style={{ width: '100%' }}>
       <PageHeader
-        title="登录"
+        title={t('pages.login')}
         align="center"
       />
       <Card
@@ -59,28 +61,28 @@ export function LoginPage() {
                 else navigate('/admin/dashboard', { replace: true })
               }
             } catch (e) {
-              void message.error('登录失败：请检查后端是否已启动以及账号密码是否正确')
+              void message.error(t('common.loginFailed'))
             }
           }}
         >
-          <Form.Item name="email" label="用户名 / 邮箱" rules={[{ required: true }]}>
-            <Input placeholder="请输入用户名或邮箱" autoComplete="username" />
+          <Form.Item name="email" label={t('common.usernameOrEmail')} rules={[{ required: true }]}>
+            <Input placeholder={t('common.enterUsernameOrEmail')} autoComplete="username" />
           </Form.Item>
-          <Form.Item name="password" label="密码" rules={[{ required: true }]}>
-            <Input.Password placeholder="请输入" autoComplete="current-password" />
+          <Form.Item name="password" label={t('common.password')} rules={[{ required: true }]}>
+            <Input.Password placeholder={t('common.enterPassword')} autoComplete="current-password" />
           </Form.Item>
           <Form.Item name="remember" rules={[{ required: true }]}>
             <Radio.Group
               optionType="button"
               buttonStyle="solid"
               options={[
-                { label: '记住登录（localStorage）', value: true },
-                { label: '仅本次（内存）', value: false },
+                { label: t('common.rememberLogin'), value: true },
+                { label: t('common.onlyThisTime'), value: false },
               ]}
             />
           </Form.Item>
           <Button type="primary" htmlType="submit" block>
-            登录
+            {t('common.login')}
           </Button>
         </Form>
       </Card>

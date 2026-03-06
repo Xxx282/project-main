@@ -2,12 +2,14 @@ import { Card, Descriptions, Space, Button, message } from 'antd'
 import { HeartOutlined, HeartFilled, ArrowLeftOutlined, MessageOutlined, DollarOutlined } from '@ant-design/icons'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { PageHeader } from '../../../shared/ui/PageHeader'
 import { getListing, checkFavorite, addFavorite, removeFavorite, getListingImages, getOrCreateConversation } from '../api/tenantApi'
 import { useAuth } from '../../auth/context/AuthContext'
 import { ImageGallery } from '../../../shared/components/ImageGallery'
 
 export function TenantListingDetailPage() {
+  const { t } = useTranslation()
   const { id } = useParams()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -38,11 +40,11 @@ export function TenantListingDetailPage() {
   const addFavoriteMutation = useMutation({
     mutationFn: () => addFavorite(propertyId),
     onSuccess: () => {
-      message.success('收藏成功')
+      message.success(t('pages.favoriteSuccess'))
       queryClient.invalidateQueries({ queryKey: ['tenant', 'favorite', id] })
     },
     onError: () => {
-      message.error('收藏失败')
+      message.error(t('pages.favoriteFailed'))
     },
   })
 
@@ -50,11 +52,11 @@ export function TenantListingDetailPage() {
   const removeFavoriteMutation = useMutation({
     mutationFn: () => removeFavorite(propertyId),
     onSuccess: () => {
-      message.success('取消收藏成功')
+      message.success(t('pages.unfavoriteSuccess'))
       queryClient.invalidateQueries({ queryKey: ['tenant', 'favorite', id] })
     },
     onError: () => {
-      message.error('取消收藏失败')
+      message.error(t('pages.unfavoriteFailed'))
     },
   })
 
@@ -74,10 +76,10 @@ export function TenantListingDetailPage() {
         onClick={() => navigate(-1)}
         style={{ marginBottom: 8 }}
       >
-        返回
+        {t('common.back')}
       </Button>
       <PageHeader
-        title="房源详情"
+        title={t('pages.listingDetails')}
         extra={
           <Space>
             {auth.user && (
@@ -90,7 +92,7 @@ export function TenantListingDetailPage() {
                     navigate(`/tenant/payments/create?propertyId=${propertyId}&payeeId=${listingQ.data.landlordId}`)
                   }}
                 >
-                  支付
+                  {t('pages.pay')}
                 </Button>
                 <Button
                   type="primary"
@@ -103,11 +105,11 @@ export function TenantListingDetailPage() {
                       // 跳转到对话页面
                       navigate(`/tenant/chats/${conversation.id}`)
                     } catch (error) {
-                      message.error('发起咨询失败')
+                      message.error(t('pages.consultFailed'))
                     }
                   }}
                 >
-                  咨询房东
+                  {t('pages.consultLandlord')}
                 </Button>
               </>
             )}
@@ -119,7 +121,7 @@ export function TenantListingDetailPage() {
                 onClick={handleFavorite}
                 loading={favoriteQ.isLoading || addFavoriteMutation.isPending || removeFavoriteMutation.isPending}
               >
-                {favoriteQ.data ? '已收藏' : '收藏'}
+                {favoriteQ.data ? t('pages.favorited') : t('pages.favorite')}
               </Button>
             ) : null}
           </Space>
@@ -130,38 +132,38 @@ export function TenantListingDetailPage() {
         <ImageGallery images={imagesQ.data ?? []} />
 
         <Descriptions bordered size="small" column={2}>
-          <Descriptions.Item label="ID">{listingQ.data?.id ?? '-'}</Descriptions.Item>
-          <Descriptions.Item label="标题">{listingQ.data?.title ?? '-'}</Descriptions.Item>
-          <Descriptions.Item label="城市">{listingQ.data?.city ?? '-'}</Descriptions.Item>
-          <Descriptions.Item label="区域">{listingQ.data?.region ?? '-'}</Descriptions.Item>
-          <Descriptions.Item label="租金">
-            {listingQ.data ? `¥ ${listingQ.data.price} / 月` : '-'}
+          <Descriptions.Item label={t('common.id')}>{listingQ.data?.id ?? '-'}</Descriptions.Item>
+          <Descriptions.Item label={t('common.title')}>{listingQ.data?.title ?? '-'}</Descriptions.Item>
+          <Descriptions.Item label={t('pages.city')}>{listingQ.data?.city ?? '-'}</Descriptions.Item>
+          <Descriptions.Item label={t('pages.region')}>{listingQ.data?.region ?? '-'}</Descriptions.Item>
+          <Descriptions.Item label={t('common.price')}>
+            {listingQ.data ? `¥ ${listingQ.data.price} ${t('common.yuanPerMonth')}` : '-'}
           </Descriptions.Item>
-          <Descriptions.Item label="状态">
-            {listingQ.data?.status === 'available' && '可租'}
-            {listingQ.data?.status === 'rented' && '已租'}
-            {listingQ.data?.status === 'offline' && '下架'}
+          <Descriptions.Item label={t('pages.status')}>
+            {listingQ.data?.status === 'available' && t('pages.available')}
+            {listingQ.data?.status === 'rented' && t('pages.rented')}
+            {listingQ.data?.status === 'offline' && t('pages.offline')}
             {!listingQ.data?.status && '-'}
           </Descriptions.Item>
-          <Descriptions.Item label="卧室数">{listingQ.data?.bedrooms ?? '-'}</Descriptions.Item>
-          <Descriptions.Item label="卫生间数">{listingQ.data?.bathrooms ?? '-'}</Descriptions.Item>
-          <Descriptions.Item label="面积">{listingQ.data?.area ? `${listingQ.data.area} m²` : '-'}</Descriptions.Item>
-          <Descriptions.Item label="总楼层">{listingQ.data?.totalFloors ?? '-'}</Descriptions.Item>
-          <Descriptions.Item label="朝向">
-            {listingQ.data?.orientation === 'east' && '东'}
-            {listingQ.data?.orientation === 'south' && '南'}
-            {listingQ.data?.orientation === 'west' && '西'}
-            {listingQ.data?.orientation === 'north' && '北'}
+          <Descriptions.Item label={t('pages.bedroomCountLabel')}>{listingQ.data?.bedrooms ?? '-'}</Descriptions.Item>
+          <Descriptions.Item label={t('pages.bathroomCountLabel')}>{listingQ.data?.bathrooms ?? '-'}</Descriptions.Item>
+          <Descriptions.Item label={t('pages.areaLabel')}>{listingQ.data?.area ? `${listingQ.data.area} m²` : '-'}</Descriptions.Item>
+          <Descriptions.Item label={t('pages.totalFloorsLabel')}>{listingQ.data?.totalFloors ?? '-'}</Descriptions.Item>
+          <Descriptions.Item label={t('pages.orientationLabel')}>
+            {listingQ.data?.orientation === 'east' && t('common.east')}
+            {listingQ.data?.orientation === 'south' && t('common.south')}
+            {listingQ.data?.orientation === 'west' && t('common.west')}
+            {listingQ.data?.orientation === 'north' && t('common.north')}
             {!listingQ.data?.orientation && '-'}
           </Descriptions.Item>
-          <Descriptions.Item label="装修">
-            {listingQ.data?.decoration === 'rough' && '毛坯'}
-            {listingQ.data?.decoration === 'simple' && '简装'}
-            {listingQ.data?.decoration === 'fine' && '精装'}
-            {listingQ.data?.decoration === 'luxury' && '豪华'}
+          <Descriptions.Item label={t('pages.decorationLabel')}>
+            {listingQ.data?.decoration === 'rough' && t('common.rough')}
+            {listingQ.data?.decoration === 'simple' && t('common.simple')}
+            {listingQ.data?.decoration === 'fine' && t('common.fine')}
+            {listingQ.data?.decoration === 'luxury' && t('common.luxury')}
             {!listingQ.data?.decoration && '-'}
           </Descriptions.Item>
-          <Descriptions.Item label="描述" span={2}>{listingQ.data?.description ?? '-'}</Descriptions.Item>
+          <Descriptions.Item label={t('pages.description')} span={2}>{listingQ.data?.description ?? '-'}</Descriptions.Item>
         </Descriptions>
       </Card>
     </Space>

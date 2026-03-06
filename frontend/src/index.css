@@ -76,3 +76,27 @@ a:hover {
 .transparent-modal .ant-modal-wrap {
   background-color: transparent !important;
 }
+
+/* 语言切换选择器样式 */
+.language-selector .ant-select-selector {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  color: #fff !important;
+}
+
+.language-selector .ant-select-selection-item {
+  color: #fff !important;
+}
+
+.language-selector .ant-select-arrow {
+  color: #fff !important;
+}
+
+.language-selector:hover .ant-select-selector {
+  border-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.language-selector.ant-select-focused .ant-select-selector {
+  border-color: rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1) !important;
+}

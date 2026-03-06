@@ -1,5 +1,6 @@
 import { Button, Card, Form, Input, Radio, Space, message } from 'antd'
 import { useNavigate, useLocation, Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { PageHeader } from '../../../shared/ui/PageHeader'
 import { register } from '../api/authApi'
 import { useAuthModal } from '../context/AuthModalContext'
@@ -7,6 +8,7 @@ import { useAuth } from '../context/AuthContext'
 import { authStore } from '../store/authStore'
 
 export function RegisterPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
   const { closeAuthModal, openAuthModal } = useAuthModal()
@@ -23,8 +25,8 @@ export function RegisterPage() {
   return (
     <Space orientation="vertical" size={16} style={{ width: '100%' }}>
       <PageHeader
-        title="注册"
-        subtitle="注册完成后需要邮箱验证"
+        title={t('pages.register')}
+        subtitle={t('common.emailVerificationRequired')}
         align="center"
       />
       <Card
@@ -48,7 +50,7 @@ export function RegisterPage() {
                 // 如果后端返回了 token，自动登录（兼容旧逻辑）
                 authStore.setToken(res.accessToken, true)
                 await auth.refresh()
-                void message.success('注册成功，已自动登录')
+                void message.success(t('common.registerSuccess'))
                 if (isInModal) {
                   closeAuthModal()
                 } else {
@@ -65,7 +67,7 @@ export function RegisterPage() {
                 // 打开邮箱验证弹窗
                 openAuthModal('verify-email', values.email)
               } else {
-                void message.success('注册成功，请登录')
+                void message.success(t('common.registerSuccessLogin'))
                 if (isInModal) {
                   openAuthModal('login')
                 } else {
@@ -73,58 +75,58 @@ export function RegisterPage() {
                 }
               }
             } catch {
-              void message.error('注册失败：请检查后端是否已启动，或该邮箱是否已被注册')
+              void message.error(t('common.registerFailed'))
             }
           }}
         >
-          <Form.Item name="role" label="注册为" rules={[{ required: true }]}>
+          <Form.Item name="role" label={t('common.registerAs')} rules={[{ required: true }]}>
             <Radio.Group
               options={[
-                { label: '租客', value: 'tenant' },
-                { label: '房东', value: 'landlord' },
+                { label: t('common.tenant'), value: 'tenant' },
+                { label: t('common.landlord'), value: 'landlord' },
               ]}
             />
           </Form.Item>
-          <Form.Item name="username" label="用户名" rules={[
-            { required: true, message: '请输入用户名' },
-            { min: 3, max: 20, message: '用户名长度必须在3-20之间' },
-            { pattern: /^[a-zA-Z0-9_]+$/, message: '用户名只能包含字母、数字和下划线' }
+          <Form.Item name="username" label={t('common.username')} rules={[
+            { required: true, message: t('common.enterUsername') },
+            { min: 3, max: 20, message: t('common.usernameLength') },
+            { pattern: /^[a-zA-Z0-9_]+$/, message: t('common.usernamePattern') }
           ]}>
-            <Input placeholder="3-20 位字母、数字、下划线" autoComplete="username" />
+            <Input placeholder={t('common.usernamePlaceholder')} autoComplete="username" />
           </Form.Item>
-          <Form.Item name="email" label="邮箱" rules={[
-            { required: true, message: '请输入邮箱地址' },
-            { type: 'email', message: '请输入有效的邮箱格式，如：name@example.com' }
+          <Form.Item name="email" label={t('common.email')} rules={[
+            { required: true, message: t('common.enterEmail') },
+            { type: 'email', message: t('common.emailFormat') }
           ]}>
             <Input 
-              placeholder="name@example.com" 
+              placeholder={t('common.emailPlaceholder')} 
               autoComplete="email"
               onBlur={(e) => {
                 const value = e.target.value
                 if (value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-                  message.warning('邮箱格式似乎不太对哦~')
+                  message.warning(t('common.emailFormatWarning'))
                 }
               }}
             />
           </Form.Item>
-          <Form.Item name="phone" label="手机号" rules={[
-            { required: true, message: '请输入手机号' },
-            { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的11位手机号' }
+          <Form.Item name="phone" label={t('common.phone')} rules={[
+            { required: true, message: t('common.enterPhone') },
+            { pattern: /^1[3-9]\d{9}$/, message: t('common.phonePattern') }
           ]}>
-            <Input placeholder="11位手机号" autoComplete="tel" />
+            <Input placeholder={t('common.phonePlaceholder')} autoComplete="tel" />
           </Form.Item>
-          <Form.Item name="password" label="密码" rules={[
-            { required: true, message: '请输入密码' },
-            { min: 6, message: '密码至少6位' }
+          <Form.Item name="password" label={t('common.password')} rules={[
+            { required: true, message: t('common.enterPasswordRequired') },
+            { min: 6, message: t('common.passwordMinLength') }
           ]}>
-            <Input.Password placeholder="至少 6 位" autoComplete="new-password" />
+            <Input.Password placeholder={t('common.passwordPlaceholder')} autoComplete="new-password" />
           </Form.Item>
           <Button type="primary" htmlType="submit" block>
-            注册
+            {t('common.register')}
           </Button>
         </Form>
         <div style={{ textAlign: 'center', marginTop: 16 }}>
-          已有账号？<Link to="/login">立即登录</Link>
+          {t('common.alreadyHaveAccount')}<Link to="/login">{t('common.loginNow')}</Link>
         </div>
       </Card>
     </Space>

@@ -11,6 +11,7 @@ import { Button, Card, Col, Form, Input, InputNumber, Row, Select, Space, messag
 import { useQuery } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { PageHeader } from '../../../shared/ui/PageHeader'
 import { getPreferences, savePreferences } from '../api/tenantApi'
 import type { TenantPreferences } from '../../../shared/api/types'
@@ -24,32 +25,33 @@ import type { TenantPreferences } from '../../../shared/api/types'
 //   { label: '成都', value: '成都' },
 // ]
 
-// 朝向选项
-const ORIENTATION_OPTIONS = [
-  { label: '东', value: 'east' },
-  { label: '南', value: 'south' },
-  { label: '西', value: 'west' },
-  { label: '北', value: 'north' },
+// 朝向选项 - will be translated in component
+const getOrientationOptions = (t: any) => [
+  { label: t('common.east'), value: 'east' },
+  { label: t('common.south'), value: 'south' },
+  { label: t('common.west'), value: 'west' },
+  { label: t('common.north'), value: 'north' },
 ]
 
-// 装修选项
-const DECORATION_OPTIONS = [
-  { label: '毛坯', value: 'rough' },
-  { label: '简装', value: 'simple' },
-  { label: '精装', value: 'fine' },
-  { label: '豪华', value: 'luxury' },
+// 装修选项 - will be translated in component
+const getDecorationOptions = (t: any) => [
+  { label: t('common.rough'), value: 'rough' },
+  { label: t('common.simple'), value: 'simple' },
+  { label: t('common.fine'), value: 'fine' },
+  { label: t('common.luxury'), value: 'luxury' },
 ]
 
-// 户型选项
-const BEDROOM_OPTIONS = [
-  { label: '1室', value: 1 },
-  { label: '2室', value: 2 },
-  { label: '3室', value: 3 },
-  { label: '4室', value: 4 },
-  { label: '5室及以上', value: 5 },
+// 户型选项 - will be translated in component
+const getBedroomOptions = (t: any) => [
+  { label: t('pages.oneBedroom'), value: 1 },
+  { label: t('pages.twoBedrooms'), value: 2 },
+  { label: t('pages.threeBedrooms'), value: 3 },
+  { label: t('pages.fourBedrooms'), value: 4 },
+  { label: t('pages.fiveOrMoreBedrooms'), value: 5 },
 ]
 
 export function TenantPreferencesPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
@@ -84,14 +86,14 @@ export function TenantPreferencesPage() {
       await savePreferences(preferencesToSave)
       // 刷新偏好设置查询，确保缓存更新
       await queryClient.invalidateQueries({ queryKey: ['tenant', 'preferences'] })
-      void message.success('保存成功，正在刷新推荐...')
+      void message.success(t('pages.saveSuccess'))
       // 直接清除推荐缓存，强制重新获取
       queryClient.removeQueries({ queryKey: ['tenant', 'recommendations'] })
       // 等待一小段时间确保缓存被清除
       await new Promise(resolve => setTimeout(resolve, 100))
       navigate('/tenant/recommendations')
     } catch {
-      void message.error('保存失败')
+      void message.error(t('pages.saveFailed'))
     }
   }
 
@@ -116,7 +118,7 @@ export function TenantPreferencesPage() {
       form.setFieldsValue(emptyPreferences)
       // 重置表单的初始值，防止后续保存时使用旧值
       form.resetFields()
-      void message.success('已重置所有偏好设置')
+      void message.success(t('pages.resetSuccess'))
       // 清除推荐缓存
       queryClient.removeQueries({ queryKey: ['tenant', 'recommendations'] })
       // 刷新偏好设置查询，确保缓存更新
@@ -124,13 +126,13 @@ export function TenantPreferencesPage() {
       // 等待查询刷新完成后再更新表单，确保使用最新的空值
       await queryClient.refetchQueries({ queryKey: ['tenant', 'preferences'] })
     } catch {
-      void message.error('重置失败')
+      void message.error(t('pages.resetFailed'))
     }
   }
 
   return (
     <Space orientation="vertical" size={16} style={{ width: '100%' }}>
-      <PageHeader title="租客-偏好设置" />
+      <PageHeader title={t('pages.tenantPreferences')} />
       <Card style={{ maxWidth: 900, margin: '0 auto' }}>
         <Form
           form={form}
@@ -140,34 +142,34 @@ export function TenantPreferencesPage() {
         >
           <Row gutter={24}>
             <Col xs={24} sm={12}>
-              <Form.Item label="预算（每月）" name="budget">
+              <Form.Item label={t('pages.budgetPerMonth')} name="budget">
                 <InputNumber
                   style={{ width: '100%' }}
                   min={0}
-                  placeholder="例如 3000"
-                  addonAfter="元/月"
+                  placeholder={t('pages.budgetExample')}
+                  addonAfter={t('common.yuanPerMonth')}
                 />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="城市" name="city">
-                <Input placeholder="例如 上海、北京、深圳" />
+              <Form.Item label={t('pages.city')} name="city">
+                <Input placeholder={t('pages.cityExample')} />
               </Form.Item>
             </Col>
           </Row>
 
           <Row gutter={24}>
             <Col xs={24} sm={12}>
-              <Form.Item label="区域" name="region">
-                <Input placeholder="例如 朝阳区、浦东新区" />
+              <Form.Item label={t('pages.region')} name="region">
+                <Input placeholder={t('pages.regionExample')} />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="户型（卧室数）" name="bedrooms">
+              <Form.Item label={t('pages.bedroomCount')} name="bedrooms">
                 <Select
                   allowClear
-                  options={BEDROOM_OPTIONS}
-                  placeholder="请选择"
+                  options={getBedroomOptions(t)}
+                  placeholder={t('pages.select')}
                 />
               </Form.Item>
             </Col>
@@ -175,26 +177,26 @@ export function TenantPreferencesPage() {
 
           <Row gutter={24}>
             <Col xs={24} sm={12}>
-              <Form.Item label="卫生间数" name="bathrooms">
+              <Form.Item label={t('pages.bathroomCount')} name="bathrooms">
                 <Select
                   allowClear
                   options={[
-                    { label: '1个', value: 1 },
-                    { label: '2个', value: 2 },
-                    { label: '3个及以上', value: 3 },
+                    { label: t('pages.one'), value: 1 },
+                    { label: t('pages.two'), value: 2 },
+                    { label: t('pages.threeOrMore'), value: 3 },
                   ]}
-                  placeholder="请选择"
+                  placeholder={t('pages.select')}
                 />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="面积范围" >
+              <Form.Item label={t('pages.areaRange')} >
                 <Input.Group compact>
                   <Form.Item name="minArea" noStyle>
                     <InputNumber
                       style={{ width: '45%' }}
                       min={0}
-                      placeholder="最小"
+                      placeholder={t('pages.min')}
                       addonAfter="m²"
                     />
                   </Form.Item>
@@ -203,7 +205,7 @@ export function TenantPreferencesPage() {
                     <InputNumber
                       style={{ width: '45%' }}
                       min={0}
-                      placeholder="最大"
+                      placeholder={t('pages.max')}
                       addonAfter="m²"
                     />
                   </Form.Item>
@@ -214,14 +216,14 @@ export function TenantPreferencesPage() {
 
           <Row gutter={24}>
             <Col xs={24} sm={12}>
-              <Form.Item label="楼层范围" >
+              <Form.Item label={t('pages.floorRange')} >
                 <Input.Group compact>
                   <Form.Item name="minFloors" noStyle>
                     <InputNumber
                       style={{ width: '45%' }}
                       min={1}
-                      placeholder="最低"
-                      addonAfter="层"
+                      placeholder={t('pages.lowest')}
+                      addonAfter={t('pages.floor')}
                     />
                   </Form.Item>
                   <span style={{ display: 'inline-block', width: '10%', textAlign: 'center' }}>~</span>
@@ -229,19 +231,19 @@ export function TenantPreferencesPage() {
                     <InputNumber
                       style={{ width: '45%' }}
                       min={1}
-                      placeholder="最高"
-                      addonAfter="层"
+                      placeholder={t('pages.highest')}
+                      addonAfter={t('pages.floor')}
                     />
                   </Form.Item>
                 </Input.Group>
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="朝向" name="orientation">
+              <Form.Item label={t('pages.orientation')} name="orientation">
                 <Select
                   allowClear
-                  options={ORIENTATION_OPTIONS}
-                  placeholder="请选择"
+                  options={getOrientationOptions(t)}
+                  placeholder={t('pages.select')}
                 />
               </Form.Item>
             </Col>
@@ -249,11 +251,11 @@ export function TenantPreferencesPage() {
 
           <Row gutter={24}>
             <Col xs={24} sm={12}>
-              <Form.Item label="装修" name="decoration">
+              <Form.Item label={t('pages.decorationLabel')} name="decoration">
                 <Select
                   allowClear
-                  options={DECORATION_OPTIONS}
-                  placeholder="请选择"
+                  options={getDecorationOptions(t)}
+                  placeholder={t('pages.select')}
                 />
               </Form.Item>
             </Col>
@@ -262,13 +264,13 @@ export function TenantPreferencesPage() {
           <Form.Item style={{ marginTop: 24 }}>
             <Space>
               <Button type="primary" htmlType="submit" loading={prefsQ.isLoading}>
-                保存偏好设置
+                {t('pages.savePreferences')}
               </Button>
               <Button onClick={handleReset} loading={prefsQ.isLoading}>
-                重置所有偏好
+                {t('pages.resetAllPreferences')}
               </Button>
               <Button onClick={() => navigate('/tenant/recommendations')}>
-                返回推荐页面
+                {t('pages.backToRecommendations')}
               </Button>
             </Space>
           </Form.Item>

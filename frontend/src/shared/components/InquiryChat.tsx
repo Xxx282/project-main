@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
-import { Card, Input, Button, Space, Avatar, message, Spin } from 'antd'
-import { UserOutlined, ArrowLeftOutlined, SendOutlined } from '@ant-design/icons'
+import { Card, Input, Button, Space, Avatar, message, Spin, Typography } from 'antd'
+import { UserOutlined, ArrowLeftOutlined, SendOutlined, MessageOutlined, HomeOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { getListing, getLandlordInfo, getTenantInfo } from '../../features/tenant/api/tenantApi'
@@ -156,7 +156,14 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
   const isOtherPartyLoading = userRole === 'landlord' ? otherPartyQ.isLoading : false
   if (conversationQ.isLoading || listingQ.isLoading || isOtherPartyLoading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
+      <div style={{ 
+        width: '100%', 
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #4facfe 0%, #667eea 50%, #8b5cf6 100%)',
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+      }}>
         <Spin size="large" />
       </div>
     )
@@ -164,16 +171,40 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
 
   if (!conversationQ.data) {
     return (
-      <Space orientation="vertical" size={16} style={{ width: '100%' }}>
-        <Button icon={<ArrowLeftOutlined />} onClick={() => navigate(listPath)}>
-          返回咨询列表
-        </Button>
-        <Card>
-          <div style={{ textAlign: 'center', padding: '40px' }}>
-            咨询信息加载失败
-          </div>
-        </Card>
-      </Space>
+      <div style={{ 
+        width: '100%', 
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #4facfe 0%, #667eea 50%, #8b5cf6 100%)',
+        padding: '24px',
+      }}>
+        <div style={{ maxWidth: 1000, margin: '0 auto' }}>
+          <Space direction="vertical" size={16} style={{ width: '100%' }}>
+            <Button 
+              icon={<ArrowLeftOutlined />} 
+              onClick={() => navigate(listPath)}
+              style={{
+                background: 'rgba(255, 255, 255, 0.95)',
+                backdropFilter: 'blur(10px)',
+                border: 'none',
+              }}
+            >
+              返回咨询列表
+            </Button>
+            <Card
+              style={{ 
+                background: 'rgba(255, 255, 255, 0.95)',
+                backdropFilter: 'blur(10px)',
+                borderRadius: '16px',
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+              }}
+            >
+              <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
+                咨询信息加载失败
+              </div>
+            </Card>
+          </Space>
+        </div>
+      </div>
     )
   }
 
@@ -181,99 +212,166 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
   const isTenant = userRole === 'tenant'
 
   return (
-    <Space orientation="vertical" size={16} style={{ width: '100%' }}>
-      {/* 返回按钮 */}
-      <Button type="primary" icon={<ArrowLeftOutlined />} onClick={() => navigate(listPath)}>
-        返回咨询列表
-      </Button>
-
-      {/* 聊天区域 - 包含对方信息头部 */}
-      <Card
-        title={
-          <Space>
-            <Avatar size="small" icon={<UserOutlined />} style={{ backgroundColor: '#1890ff' }} />
-            <span>
-              {isTenant ? '房东' : '租客'}: {otherPartyQ.data?.username || '-'}
-              {otherPartyQ.data?.realName && ` (${otherPartyQ.data.realName})`}
-            </span>
-            <span style={{ color: '#999', fontSize: 12 }}>
-              房源: {listingQ.data?.title}
-            </span>
-          </Space>
-        }
-        extra={
-          <span style={{ fontSize: 12, color: '#999' }}>
-            ¥{listingQ.data?.price}/月
-          </span>
-        }
-        style={{ height: '500px', display: 'flex', flexDirection: 'column' }}
-        bodyStyle={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 }}
-      >
-        {/* 聊天记录区域 */}
-        <div style={{ flex: 1, overflow: 'auto', padding: '12px' }}>
-          {messages.length === 0 ? (
-            <div style={{ textAlign: 'center', color: '#999', padding: '40px' }}>
-              暂无聊天记录，请发送消息开始咨询
-            </div>
-          ) : (
-            <div>
-              {messages.map((msg) => {
-                const isMe = (isTenant && msg.senderRole === 'tenant') || (!isTenant && msg.senderRole === 'landlord')
-                return (
-                  <div
-                    key={msg.id}
-                    style={{
-                      display: 'flex',
-                      border: 'none',
-                      justifyContent: isMe ? 'flex-end' : 'flex-start',
-                      marginBottom: 12,
-                    }}
-                  >
-                    <div
-                      style={{
-                        maxWidth: '70%',
-                        padding: '8px 12px',
-                        borderRadius: '8px',
-                        backgroundColor: isMe ? '#1890ff' : '#f0f0f0',
-                        color: isMe ? '#fff' : '#000',
-                      }}
-                    >
-                      <div style={{ fontSize: 12, marginBottom: 4, opacity: 0.7 }}>
-                        {msg.senderRole === 'tenant' ? '租客' : '房东'}
-                      </div>
-                      <div>{msg.content}</div>
-                      <div style={{ fontSize: 10, textAlign: 'right', marginTop: 4, opacity: 0.6 }}>
-                        {new Date(msg.createdAt).toLocaleString()}
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
-
-        {/* 输入区域 */}
-        <div style={{ padding: '12px', borderTop: '1px solid #f0f0f0', display: 'flex', gap: 8 }}>
-          <TextArea
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-            onKeyDown={handleKeyPress}
-            placeholder="输入消息内容..."
-            autoSize={{ minRows: 1, maxRows: 4 }}
-            style={{ flex: 1 }}
-          />
-          <Button
+    <div style={{ 
+      width: '100%', 
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #4facfe 0%, #667eea 50%, #8b5cf6 100%)',
+      padding: '24px',
+    }}>
+      <div style={{ maxWidth: 1000, margin: '0 auto' }}>
+        <Space direction="vertical" size={24} style={{ width: '100%' }}>
+          {/* 返回按钮 */}
+          <Button 
             type="primary"
-            icon={<SendOutlined />}
-            onClick={handleSendMessage}
-            loading={sendMessageMutation.isPending}
+            icon={<ArrowLeftOutlined />} 
+            onClick={() => navigate(listPath)}
+            size="large"
+            style={{
+              background: 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(10px)',
+              border: 'none',
+              color: '#667eea',
+              fontWeight: 600,
+            }}
           >
-            发送
+            返回咨询列表
           </Button>
-        </div>
-      </Card>
-    </Space>
+
+          {/* 聊天区域 */}
+          <Card
+            style={{ 
+              background: 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: '16px',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+              height: '600px', 
+              display: 'flex', 
+              flexDirection: 'column' 
+            }}
+            title={
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+                <Avatar 
+                  size="default" 
+                  icon={<UserOutlined />} 
+                  style={{ 
+                    backgroundColor: isTenant ? '#667eea' : '#52c41a',
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+                  }} 
+                />
+                <div>
+                  <div style={{ fontWeight: 600 }}>
+                    {isTenant ? '房东' : '租客'}: {otherPartyQ.data?.username || '-'}
+                    {otherPartyQ.data?.realName && ` (${otherPartyQ.data.realName})`}
+                  </div>
+                  <div style={{ fontSize: 12, color: '#999', display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <HomeOutlined />
+                    <span>{listingQ.data?.title}</span>
+                    <span style={{ marginLeft: 8, color: '#667eea', fontWeight: 600 }}>
+                      ₹{listingQ.data?.price}/月
+                    </span>
+                  </div>
+                </div>
+              </div>
+            }
+            bodyStyle={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 }}
+          >
+            {/* 聊天记录区域 */}
+            <div style={{ flex: 1, overflow: 'auto', padding: '16px', background: '#fafafa' }}>
+              {messages.length === 0 ? (
+                <div style={{ 
+                  textAlign: 'center', 
+                  color: '#999', 
+                  padding: '60px 40px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  height: '100%',
+                }}>
+                  <MessageOutlined style={{ fontSize: 64, marginBottom: 16, color: '#d9d9d9' }} />
+                  <Typography.Text style={{ fontSize: 16 }}>
+                    暂无聊天记录，请发送消息开始咨询
+                  </Typography.Text>
+                </div>
+              ) : (
+                <div>
+                  {messages.map((msg) => {
+                    const isMe = (isTenant && msg.senderRole === 'tenant') || (!isTenant && msg.senderRole === 'landlord')
+                    return (
+                      <div
+                        key={msg.id}
+                        style={{
+                          display: 'flex',
+                          justifyContent: isMe ? 'flex-end' : 'flex-start',
+                          marginBottom: 16,
+                        }}
+                      >
+                        <div
+                          style={{
+                            maxWidth: '70%',
+                            padding: '12px 16px',
+                            borderRadius: isMe ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                            background: isMe 
+                              ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' 
+                              : '#fff',
+                            color: isMe ? '#fff' : '#000',
+                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                          }}
+                        >
+                          <div style={{ fontSize: 12, marginBottom: 4, opacity: 0.8 }}>
+                            {msg.senderRole === 'tenant' ? '租客' : '房东'}
+                          </div>
+                          <div style={{ fontSize: 15, lineHeight: 1.5 }}>{msg.content}</div>
+                          <div style={{ fontSize: 11, textAlign: 'right', marginTop: 6, opacity: 0.7 }}>
+                            {new Date(msg.createdAt).toLocaleString()}
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+
+            {/* 输入区域 */}
+            <div style={{ 
+              padding: '16px', 
+              borderTop: '1px solid #f0f0f0', 
+              display: 'flex', 
+              gap: 12,
+              background: '#fff',
+            }}>
+              <TextArea
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                onKeyDown={handleKeyPress}
+                placeholder="输入消息内容..."
+                autoSize={{ minRows: 1, maxRows: 4 }}
+                style={{ flex: 1 }}
+                size="large"
+              />
+              <Button
+                type="primary"
+                icon={<SendOutlined />}
+                onClick={handleSendMessage}
+                loading={sendMessageMutation.isPending}
+                size="large"
+                style={{
+                  background: 'linear-gradient(135deg, #4facfe 0%, #667eea 50%, #8b5cf6 100%)',
+                  border: 'none',
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
+                  height: 'auto',
+                  padding: '0 24px',
+                }}
+              >
+                发送
+              </Button>
+            </div>
+          </Card>
+        </Space>
+      </div>
+    </div>
   )
 }

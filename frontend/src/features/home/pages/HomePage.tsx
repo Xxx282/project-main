@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Button, Typography } from 'antd'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { getCityStatistics, type CityStats } from '../../tenant/api/tenantApi'
 import { useAuthModal } from '../../auth/context/AuthModalContext'
 
@@ -60,6 +61,7 @@ const generateRandomPosition = (index: number, total: number): WordPosition => {
 }
 
 export function HomePage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { openAuthModal } = useAuthModal()
   const [scrollY, setScrollY] = useState(0)
@@ -162,7 +164,7 @@ export function HomePage() {
       >
         {/* 词云图标题 */}
         <div style={styles.cloudTitle}>
-          探索 · 发现 · 咨询
+          {t('home.exploreDiscoverConsult')}
         </div>
         {/* 词云词语文本容器 - 词语围绕中心随机分布 */}
         <div style={styles.wordCloudWrapper}>
@@ -266,7 +268,7 @@ export function HomePage() {
               textShadow: '0 2px 12px rgba(0,0,0,0.9)',
             }}
           >
-            租房？
+            {t('home.rentHouse')}
           </span>
           <span
             style={{
@@ -281,7 +283,7 @@ export function HomePage() {
               lineHeight: 1.6,
             }}
           >
-            {'个性化推荐\n找房不再是烦恼'}
+            {t('home.personalizedRecommendation')}
           </span>
         </div>
         {/* 中间大窗标题 */}
@@ -300,7 +302,7 @@ export function HomePage() {
             transform: `translateY(${sideTextTranslateY}px)`,
           }}
         >
-          智能租房
+          {t('home.smartRental')}
         </span>
         {/* 右侧窗户文字 */}
         <div
@@ -327,7 +329,7 @@ export function HomePage() {
               textShadow: '0 2px 12px rgba(0,0,0,0.9)',
             }}
           >
-            发布？
+            {t('home.publish')}
           </span>
           <span
             style={{
@@ -342,7 +344,7 @@ export function HomePage() {
               lineHeight: 1.6,
             }}
           >
-            {'实时咨询对比\n快人一步'}
+            {t('home.realTimeConsultation')}
           </span>
         </div>
       </div>
@@ -376,10 +378,10 @@ export function HomePage() {
           level={1}
           style={styles.title}
         >
-          寻找理想之家
+          {t('home.findIdealHome')}
         </Title>
         <Text style={styles.subtitle}>
-          智能匹配 · 轻松租房 · 开启品质生活
+          {t('home.smartMatch')}
         </Text>
 
         <div style={styles.buttons}>
@@ -389,14 +391,14 @@ export function HomePage() {
             style={styles.primaryBtn}
             onClick={() => navigate('/tenant/listings')}
           >
-            浏览房源
+            {t('home.browseListings')}
           </Button>
           <Button
             size="large"
             style={styles.secondaryBtn}
             onClick={() => openAuthModal('register')}
           >
-            立即注册
+            {t('home.registerNow')}
           </Button>
         </div>
       </div>
@@ -410,7 +412,7 @@ export function HomePage() {
           <div style={styles.scrollWheel} />
         </div>
         <Text style={styles.scrollText}>
-          向下滚动探索
+          {t('home.scrollDownToExplore')}
         </Text>
       </div>
     </div>

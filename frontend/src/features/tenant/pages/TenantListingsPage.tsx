@@ -3,6 +3,7 @@ import type { ColumnsType } from 'antd/es/table'
 import { useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { SettingOutlined, SearchOutlined } from '@ant-design/icons'
 import { PageHeader } from '../../../shared/ui/PageHeader'
 import { getListingImages, listListings } from '../api/tenantApi'
@@ -17,14 +18,15 @@ interface FieldOption {
 }
 
 // 默认字段配置（新增封面图列）
+// Note: Field titles will be translated in the component using useTranslation
 const DEFAULT_FIELDS: FieldOption[] = [
-  { key: 'cover', title: '封面图', visible: true },
-  { key: 'id', title: 'ID', visible: true },
-  { key: 'title', title: '标题', visible: true },
-  { key: 'cityRegion', title: '城市/区域', visible: true },
-  { key: 'price', title: '租金', visible: true },
-  { key: 'layout', title: '户型', visible: true },
-  { key: 'decorationOrientation', title: '装修/朝向', visible: true },
+  { key: 'cover', title: 'cover', visible: true },
+  { key: 'id', title: 'id', visible: true },
+  { key: 'title', title: 'title', visible: true },
+  { key: 'cityRegion', title: 'cityRegion', visible: true },
+  { key: 'price', title: 'price', visible: true },
+  { key: 'layout', title: 'layout', visible: true },
+  { key: 'decorationOrientation', title: 'decorationOrientation', visible: true },
 ]
 
 // 构建缩略图 URL - 与图片画廊保持一致逻辑
@@ -37,6 +39,7 @@ const buildImageUrl = (imageUrl: string) => {
 }
 
 export function TenantListingsPage() {
+  const { t } = useTranslation()
   const [params, setParams] = useSearchParams()
   const auth = useAuth()
   const isGuest = !auth.user
@@ -88,13 +91,13 @@ export function TenantListingsPage() {
     const settings = loadColumnSettings()
     const cols: ColumnsType<Listing> = [
       {
-        title: '房源信息',
+        title: t('common.listingInfo'),
         render: (_, row) => <ListingRow listing={row} settings={settings} />,
       },
     ]
 
     return cols
-  }, [])
+  }, [t])
 
   // 打开设置弹窗
   const handleOpenSettings = () => {
@@ -122,20 +125,26 @@ export function TenantListingsPage() {
   }
 
   return (
-    <Space orientation="vertical" size={24} style={{ width: '100%' }}>
-      <PageHeader title="房源列表" align="center" />
+    <div style={{ 
+      width: '100%', 
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #4facfe 0%, #667eea 50%, #8b5cf6 100%)',
+      padding: '16px',
+    }}>
+      <div style={{ maxWidth: cardMaxWidth, margin: '0 auto' }}>
+        <Space orientation="vertical" size={16} style={{ width: '100%' }}>
+          <PageHeader title={t('pages.listings')} align="center" />
 
-      {/* 关键词搜索面板 */}
-      <Card
-        style={{
-          maxWidth: cardMaxWidth,
-          margin: '0 auto',
-          borderRadius: 12,
-          boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)',
-          border: '1px solid #f3f4f6',
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        }}
-      >
+          {/* 关键词搜索面板 */}
+          <Card
+            style={{
+              width: '100%',
+              borderRadius: 12,
+              boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)',
+              border: '1px solid #f3f4f6',
+              background: 'linear-gradient(135deg, #4facfe 0%, #667eea 50%, #8b5cf6 100%)',
+            }}
+          >
         <Form
           layout="inline"
           style={{
@@ -154,7 +163,7 @@ export function TenantListingsPage() {
           <Form.Item name="q" style={{ marginBottom: 0, flex: 1, maxWidth: 500 }}>
             <Input
               size="large"
-              placeholder="搜索房源标题"
+              placeholder={t('pages.searchListings')}
               allowClear
               style={{
                 width: '100%',
@@ -181,7 +190,7 @@ export function TenantListingsPage() {
                   fontWeight: 600,
                 }}
               >
-                搜索
+                {t('common.search')}
               </Button>
               <Button
                 size="large"
@@ -198,91 +207,94 @@ export function TenantListingsPage() {
                   setParams(new URLSearchParams())
                 }}
               >
-                重置
+                {t('common.reset')}
               </Button>
             </Space>
           </Form.Item>
-        </Form>
-      </Card>
+            </Form>
+          </Card>
 
-      <Card
-        title="房源列表"
-        extra={
-          <Button icon={<SettingOutlined />} onClick={handleOpenSettings}>
-            显示字段
-          </Button>
-        }
-        style={{
-          maxWidth: cardMaxWidth,
-          margin: '0 auto',
-          borderRadius: 12,
-          boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)',
-          border: '1px solid #f3f4f6',
-        }}
-      >
-        <Table<Listing>
-          rowKey="id"
-          loading={listingsQ.isLoading}
-          columns={columns}
-          dataSource={listingsQ.data ?? []}
-          size="middle"
-          pagination={{ pageSize: 4, showSizeChanger: false, placement: ['bottomCenter'] }}
-        />
-      </Card>
+          <Card
+            title={t('pages.listings')}
+            extra={
+              <Button icon={<SettingOutlined />} onClick={handleOpenSettings}>
+                {t('common.showFields')}
+              </Button>
+            }
+            style={{
+              width: '100%',
+              borderRadius: 12,
+              boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)',
+              border: '1px solid #f3f4f6',
+            }}
+            bodyStyle={{ padding: '12px' }}
+          >
+            <Table<Listing>
+              rowKey="id"
+              loading={listingsQ.isLoading}
+              columns={columns}
+              dataSource={listingsQ.data ?? []}
+              size="middle"
+              pagination={{ pageSize: 4, showSizeChanger: false, placement: ['bottomCenter'] }}
+            />
+          </Card>
 
-      {/* 字段显示设置弹窗 */}
-      <Modal
-        title="显示字段设置"
-        open={settingsModalOpen}
-        onOk={handleSaveSettings}
-        onCancel={() => setSettingsModalOpen(false)}
-        okText="保存"
-        cancelText="取消"
-      >
-        <Form form={form} layout="vertical">
-          <Form.Item name="cover" valuePropName="checked">
-            <Checkbox>封面图</Checkbox>
-          </Form.Item>
-          <Form.Item name="id" valuePropName="checked">
-            <Checkbox>ID</Checkbox>
-          </Form.Item>
-          <Form.Item name="title" valuePropName="checked">
-            <Checkbox>标题</Checkbox>
-          </Form.Item>
-          <Form.Item name="cityRegion" valuePropName="checked">
-            <Checkbox>城市/区域</Checkbox>
-          </Form.Item>
-          <Form.Item name="price" valuePropName="checked">
-            <Checkbox>租金</Checkbox>
-          </Form.Item>
-          <Form.Item name="layout" valuePropName="checked">
-            <Checkbox>户型</Checkbox>
-          </Form.Item>
-          <Form.Item name="decorationOrientation" valuePropName="checked">
-            <Checkbox>装修/朝向</Checkbox>
-          </Form.Item>
-        </Form>
-      </Modal>
-    </Space>
+          {/* 字段显示设置弹窗 */}
+          <Modal
+            title={t('common.fieldDisplaySettings')}
+            open={settingsModalOpen}
+            onOk={handleSaveSettings}
+            onCancel={() => setSettingsModalOpen(false)}
+            okText={t('common.save')}
+            cancelText={t('common.cancel')}
+          >
+            <Form form={form} layout="vertical">
+              <Form.Item name="cover" valuePropName="checked">
+                <Checkbox>{t('common.cover')}</Checkbox>
+              </Form.Item>
+              <Form.Item name="id" valuePropName="checked">
+                <Checkbox>{t('common.id')}</Checkbox>
+              </Form.Item>
+              <Form.Item name="title" valuePropName="checked">
+                <Checkbox>{t('common.title')}</Checkbox>
+              </Form.Item>
+              <Form.Item name="cityRegion" valuePropName="checked">
+                <Checkbox>{t('common.cityRegion')}</Checkbox>
+              </Form.Item>
+              <Form.Item name="price" valuePropName="checked">
+                <Checkbox>{t('common.price')}</Checkbox>
+              </Form.Item>
+              <Form.Item name="layout" valuePropName="checked">
+                <Checkbox>{t('common.layout')}</Checkbox>
+              </Form.Item>
+              <Form.Item name="decorationOrientation" valuePropName="checked">
+                <Checkbox>{t('common.decorationOrientation')}</Checkbox>
+              </Form.Item>
+            </Form>
+          </Modal>
+        </Space>
+      </div>
+    </div>
   )
 }
 
 function ListingRow({ listing, settings }: { listing: Listing; settings: FieldOption[] }) {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const show = (key: string) => settings.find((s) => s.key === key && s.visible)
 
   const orientationLabel =
-    (listing.orientation === 'east' && '东') ||
-    (listing.orientation === 'south' && '南') ||
-    (listing.orientation === 'west' && '西') ||
-    (listing.orientation === 'north' && '北') ||
+    (listing.orientation === 'east' && t('common.east')) ||
+    (listing.orientation === 'south' && t('common.south')) ||
+    (listing.orientation === 'west' && t('common.west')) ||
+    (listing.orientation === 'north' && t('common.north')) ||
     undefined
 
   const decorationLabel =
-    (listing.decoration === 'rough' && '毛坯') ||
-    (listing.decoration === 'simple' && '简装') ||
-    (listing.decoration === 'fine' && '精装') ||
-    (listing.decoration === 'luxury' && '豪华') ||
+    (listing.decoration === 'rough' && t('common.rough')) ||
+    (listing.decoration === 'simple' && t('common.simple')) ||
+    (listing.decoration === 'fine' && t('common.fine')) ||
+    (listing.decoration === 'luxury' && t('common.luxury')) ||
     undefined
 
   const handleClick = () => {
@@ -295,7 +307,7 @@ function ListingRow({ listing, settings }: { listing: Listing; settings: FieldOp
       style={{
         display: 'flex',
         alignItems: 'stretch',
-        padding: 16,
+        padding: '12px 16px',
         gap: 16,
         cursor: 'pointer',
         borderRadius: 8,
@@ -346,7 +358,7 @@ function ListingRow({ listing, settings }: { listing: Listing; settings: FieldOp
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, fontSize: 13, color: '#4b5563' }}>
             {show('layout') && (
               <span>
-                {(listing.bedrooms ?? '-')}室 {(listing.bathrooms ?? '-')}卫
+                {(listing.bedrooms ?? '-')}{t('common.bedrooms')} {(listing.bathrooms ?? '-')}{t('common.bathrooms')}
               </span>
             )}
             {typeof listing.area === 'number' && <span>{listing.area}㎡</span>}
@@ -381,8 +393,8 @@ function ListingRow({ listing, settings }: { listing: Listing; settings: FieldOp
             <Typography.Text strong style={{ color: '#f97316', fontSize: 26 }}>
               ¥ {listing.price}
             </Typography.Text>
-            <span style={{ fontSize: 12, color: '#9ca3af' }}>元 / 月</span>
-            <span style={{ fontSize: 12, color: '#3b82f6' }}>查看详情</span>
+            <span style={{ fontSize: 12, color: '#9ca3af' }}>{t('common.yuanPerMonth')}</span>
+            <span style={{ fontSize: 12, color: '#3b82f6' }}>{t('common.viewDetails')}</span>
           </div>
         )}
       </div>
@@ -391,6 +403,7 @@ function ListingRow({ listing, settings }: { listing: Listing; settings: FieldOp
 }
 
 function ListingThumbnail({ propertyId }: { propertyId: number }) {
+  const { t } = useTranslation()
   const imagesQ = useQuery({
     queryKey: ['tenant', 'listing', propertyId, 'thumbnail'],
     queryFn: () => getListingImages(propertyId),
@@ -417,14 +430,14 @@ function ListingThumbnail({ propertyId }: { propertyId: number }) {
       {hasImage ? (
         <Image
           src={buildImageUrl(cover!.imageUrl)}
-          alt="房源封面"
+          alt={t('common.coverImage')}
           width={220}
           height={160}
           style={{ objectFit: 'cover' }}
           preview={false}
         />
       ) : (
-        <span style={{ color: '#9ca3af', fontSize: 12 }}>暂无图片</span>
+        <span style={{ color: '#9ca3af', fontSize: 12 }}>{t('common.noImage')}</span>
       )}
     </div>
   )

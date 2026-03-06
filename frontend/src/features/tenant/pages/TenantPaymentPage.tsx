@@ -3,6 +3,7 @@ import { WechatOutlined, AlipayOutlined } from '@ant-design/icons'
 import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useQuery, useMutation } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { PageHeader } from '../../../shared/ui/PageHeader'
 import { getListing, getLandlordInfo } from '../../tenant/api/tenantApi'
 import { createPayment } from '../../payment/api/paymentApi'
@@ -14,6 +15,7 @@ const QR_CODES = {
 }
 
 export function TenantPaymentPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const propertyId = Number(searchParams.get('propertyId'))
@@ -39,17 +41,17 @@ export function TenantPaymentPage() {
   const createPaymentMutation = useMutation({
     mutationFn: createPayment,
     onSuccess: () => {
-      message.success('支付订单已创建，请等待管理员审核')
+      message.success(t('pages.paymentOrderCreated'))
       navigate('/tenant/payments')
     },
     onError: (error: any) => {
-      message.error(error?.response?.data?.message || '创建订单失败')
+      message.error(error?.response?.data?.message || t('pages.createOrderFailed'))
     },
   })
 
   const handleSubmit = (values: any) => {
     if (!propertyId || !payeeId) {
-      message.error('缺少必要参数')
+      message.error(t('pages.missingRequiredParams'))
       return
     }
     createPaymentMutation.mutate({
@@ -68,14 +70,14 @@ export function TenantPaymentPage() {
   return (
     <Space orientation="vertical" size={16} style={{ width: '100%' }}>
       <PageHeader
-        title="发起支付"
-        subtitle="扫码支付，创建订单后等待管理员审核"
+        title={t('pages.createPayment')}
+        subtitle={t('pages.createPaymentSubtitle')}
       />
 
       <Card>
         <Descriptions bordered size="small" column={2}>
-          <Descriptions.Item label="房源">{listingQ.data?.title || '-'}</Descriptions.Item>
-          <Descriptions.Item label="月租金">¥ {listingQ.data?.price || '-'}</Descriptions.Item>
+          <Descriptions.Item label={t('pages.property')}>{listingQ.data?.title || '-'}</Descriptions.Item>
+          <Descriptions.Item label={t('pages.monthlyRent')}>¥ {listingQ.data?.price || '-'}</Descriptions.Item>
         </Descriptions>
       </Card>
 
@@ -92,26 +94,26 @@ export function TenantPaymentPage() {
                 paymentChannel: 'WECHAT',
               }}
             >
-              <Form.Item name="paymentType" label="支付类型" rules={[{ required: true }]}>
+              <Form.Item name="paymentType" label={t('pages.paymentType')} rules={[{ required: true }]}>
                 <Radio.Group>
-                  <Radio value="DEPOSIT">押金</Radio>
-                  <Radio value="RENT">月租</Radio>
+                  <Radio value="DEPOSIT">{t('pages.deposit')}</Radio>
+                  <Radio value="RENT">{t('pages.rent')}</Radio>
                 </Radio.Group>
               </Form.Item>
 
-              <Form.Item name="amount" label="金额（元）" rules={[{ required: true, message: '请输入支付金额' }]}>
+              <Form.Item name="amount" label={t('pages.amountYuan')} rules={[{ required: true, message: t('pages.enterPaymentAmount') }]}>
                 <InputNumber
                   style={{ width: '100%' }}
                   min={0.01}
                   step={100}
-                  placeholder="请输入支付金额"
+                  placeholder={t('pages.enterPaymentAmount')}
                 />
               </Form.Item>
 
-              <Form.Item name="paymentChannel" label="支付方式" rules={[{ required: true }]}>
+              <Form.Item name="paymentChannel" label={t('pages.paymentMethod')} rules={[{ required: true }]}>
                 <Radio.Group onChange={(e) => handleChannelChange(e.target.value)}>
-                  <Radio value="WECHAT"><WechatOutlined /> 微信支付</Radio>
-                  <Radio value="ALIPAY"><AlipayOutlined /> 支付宝</Radio>
+                  <Radio value="WECHAT"><WechatOutlined /> {t('pages.wechatPay')}</Radio>
+                  <Radio value="ALIPAY"><AlipayOutlined /> {t('pages.alipay')}</Radio>
                 </Radio.Group>
               </Form.Item>
 
@@ -121,19 +123,19 @@ export function TenantPaymentPage() {
                 <div style={{ textAlign: 'center', padding: '20px 0' }}>
                   <img 
                     src={QR_CODES[paymentChannel as keyof typeof QR_CODES]} 
-                    alt={paymentChannel === 'WECHAT' ? '微信支付' : '支付宝'}
+                    alt={paymentChannel === 'WECHAT' ? t('pages.wechatPay') : t('pages.alipay')}
                     style={{ width: 200, height: 200, border: '1px solid #eee' }}
                   />
                   <div style={{ marginTop: 10, color: '#666' }}>
-                    {paymentChannel === 'WECHAT' ? '请使用微信扫码支付' : '请使用支付宝扫码支付'}
+                    {paymentChannel === 'WECHAT' ? t('pages.scanWechatQR') : t('pages.scanAlipayQR')}
                   </div>
                 </div>
 
                 <Button type="primary" htmlType="submit" size="large" block loading={createPaymentMutation.isPending}>
-                  我已支付
+                  {t('pages.iHavePaid')}
                 </Button>
                 <div style={{ textAlign: 'center', color: '#999', fontSize: 12 }}>
-                  点击上方按钮表示您已完成支付
+                  {t('pages.clickButtonIndicatesPayment')}
                 </div>
               </Space>
             </Form>
@@ -142,23 +144,23 @@ export function TenantPaymentPage() {
 
         {/* 右侧：支付说明 */}
         <Col xs={24} md={12}>
-          <Card title="支付流程说明">
+          <Card title={t('pages.paymentProcessInstructions')}>
             <ol style={{ paddingLeft: 20, lineHeight: 2 }}>
-              <li>选择支付类型（押金/月租）</li>
-              <li>填写支付金额</li>
-              <li>选择支付方式（微信/支付宝）</li>
-              <li>使用对应APP扫描右侧二维码完成支付</li>
-              <li>点击"我已支付"创建订单</li>
-              <li>等待管理员审核通过</li>
+              <li>{t('pages.paymentStep1')}</li>
+              <li>{t('pages.paymentStep2')}</li>
+              <li>{t('pages.paymentStep3')}</li>
+              <li>{t('pages.paymentStep4')}</li>
+              <li>{t('pages.paymentStep5')}</li>
+              <li>{t('pages.paymentStep6')}</li>
             </ol>
           </Card>
 
-          <Card title="房源信息" style={{ marginTop: 16 }}>
+          <Card title={t('pages.propertyInfo')} style={{ marginTop: 16 }}>
             <Descriptions bordered size="small" column={1}>
-              <Descriptions.Item label="房源标题">{listingQ.data?.title || '-'}</Descriptions.Item>
-              <Descriptions.Item label="月租金">¥ {listingQ.data?.price || '-'}</Descriptions.Item>
-              <Descriptions.Item label="房东">{landlordQ.data?.realName || landlordQ.data?.username || '-'}</Descriptions.Item>
-              <Descriptions.Item label="联系电话">{landlordQ.data?.phone || '-'}</Descriptions.Item>
+              <Descriptions.Item label={t('pages.propertyTitle')}>{listingQ.data?.title || '-'}</Descriptions.Item>
+              <Descriptions.Item label={t('pages.monthlyRent')}>¥ {listingQ.data?.price || '-'}</Descriptions.Item>
+              <Descriptions.Item label={t('pages.landlord')}>{landlordQ.data?.realName || landlordQ.data?.username || '-'}</Descriptions.Item>
+              <Descriptions.Item label={t('pages.contactPhone')}>{landlordQ.data?.phone || '-'}</Descriptions.Item>
             </Descriptions>
           </Card>
         </Col>
