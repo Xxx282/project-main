@@ -1,0 +1,102 @@
+:root {
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial,
+    'Apple Color Emoji', 'Segoe UI Emoji';
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+html {
+  /* 略微放大全局基础字号，配合 antd token 的 fontSize=16 使用 */
+  font-size: 16px;
+}
+
+body {
+  margin: 0;
+  background: #f3f4f6;
+  color: #1f2933;
+}
+
+a {
+  color: #1677ff;
+}
+
+a:hover {
+  color: #1452b6;
+}
+
+/* 首页滚轮动画 */
+@keyframes scroll {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+}
+
+/* 词云文字逐个淡入动画 */
+@keyframes fadeInWord {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 透明Modal样式 */
+.transparent-modal .ant-modal-content {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.transparent-modal .ant-modal-body {
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+.transparent-modal .ant-modal-mask {
+  background-color: rgba(0, 0, 0, 0.1) !important;
+  backdrop-filter: blur(2px) !important;
+}
+
+.transparent-modal .ant-modal-wrap {
+  background-color: transparent !important;
+}
+
+/* 语言切换选择器样式 */
+.language-selector .ant-select-selector {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  color: #fff !important;
+}
+
+.language-selector .ant-select-selection-item {
+  color: #fff !important;
+}
+
+.language-selector .ant-select-arrow {
+  color: #fff !important;
+}
+
+.language-selector:hover .ant-select-selector {
+  border-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.language-selector.ant-select-focused .ant-select-selector {
+  border-color: rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1) !important;
+}
