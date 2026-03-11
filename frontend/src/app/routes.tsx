@@ -21,6 +21,7 @@ import { TenantInquiryPage } from '../features/tenant/pages/TenantInquiryPage'
 import { TenantListingsPage } from '../features/tenant/pages/TenantListingsPage'
 import { TenantPreferencesPage } from '../features/tenant/pages/TenantPreferencesPage'
 import { TenantRecommendationsPage } from '../features/tenant/pages/TenantRecommendationsPage'
+import { TenantContractPage } from '../features/tenant/pages/TenantContractPage'
 import { TenantPaymentPage } from '../features/tenant/pages/TenantPaymentPage'
 import { TenantPaymentsPage } from '../features/tenant/pages/TenantPaymentsPage'
 
@@ -84,6 +85,14 @@ export function AppRoutes() {
             element={
               <RequireAuth roles={['tenant']}>
                 <TenantPaymentsPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="contract"
+            element={
+              <RequireAuth roles={['tenant']}>
+                <TenantContractPage />
               </RequireAuth>
             }
           />

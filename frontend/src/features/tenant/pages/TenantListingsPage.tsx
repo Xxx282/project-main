@@ -1,10 +1,10 @@
-import { Button, Card, Form, Image, Input, Space, Table, Modal, Checkbox, Typography } from 'antd'
+import { Button, Card, Form, Image, Input, Space, Table, Modal, Checkbox, Typography, InputNumber, Select, Collapse } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import { useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { SettingOutlined, SearchOutlined } from '@ant-design/icons'
+import { SettingOutlined, SearchOutlined, FilterOutlined, DownOutlined } from '@ant-design/icons'
 import { PageHeader } from '../../../shared/ui/PageHeader'
 import { getListingImages, listListings } from '../api/tenantApi'
 import type { Listing } from '../../../shared/api/types'
@@ -135,7 +135,7 @@ export function TenantListingsPage() {
         <Space orientation="vertical" size={16} style={{ width: '100%' }}>
           <PageHeader title={t('pages.listings')} align="center" />
 
-          {/* 关键词搜索面板 */}
+          {/* 搜索 + 高级筛选面板 */}
           <Card
             style={{
               width: '100%',
@@ -145,72 +145,154 @@ export function TenantListingsPage() {
               background: 'linear-gradient(135deg, #4facfe 0%, #667eea 50%, #8b5cf6 100%)',
             }}
           >
-        <Form
-          layout="inline"
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: 12,
-          }}
-          initialValues={Object.fromEntries(params)}
-          onFinish={(v) => {
-            const next = new URLSearchParams()
-            if (v.q) next.set('q', v.q)
-            setParams(next)
-          }}
-        >
-          <Form.Item name="q" style={{ marginBottom: 0, flex: 1, maxWidth: 500 }}>
-            <Input
-              size="large"
-              placeholder={t('pages.searchListings')}
-              allowClear
-              style={{
-                width: '100%',
-                height: 48,
-                borderRadius: 24,
-                fontSize: 16,
+            <Form
+              layout="vertical"
+              initialValues={Object.fromEntries(params)}
+              onFinish={(v) => {
+                const next = new URLSearchParams()
+                if (v.q) next.set('q', v.q)
+                if (v.city) next.set('city', v.city)
+                if (v.region) next.set('region', v.region)
+                if (v.bedrooms != null) next.set('bedrooms', String(v.bedrooms))
+                if (v.minPrice != null) next.set('minPrice', String(v.minPrice))
+                if (v.maxPrice != null) next.set('maxPrice', String(v.maxPrice))
+                setParams(next)
               }}
-              prefix={<SearchOutlined style={{ color: '#999', fontSize: 18 }} />}
-            />
-          </Form.Item>
-          <Form.Item style={{ marginBottom: 0 }}>
-            <Space size={12}>
-              <Button
-                type="primary"
-                htmlType="submit"
-                size="large"
-                style={{
-                  height: 48,
-                  paddingInline: 32,
-                  borderRadius: 24,
-                  fontSize: 16,
-                  background: '#fff',
-                  color: '#667eea',
-                  fontWeight: 600,
-                }}
-              >
-                {t('common.search')}
-              </Button>
-              <Button
-                size="large"
-                style={{
-                  height: 48,
-                  paddingInline: 24,
-                  borderRadius: 24,
-                  fontSize: 16,
-                  background: 'rgba(255,255,255,0.2)',
-                  border: '1px solid rgba(255,255,255,0.5)',
-                  color: '#fff',
-                }}
-                onClick={() => {
-                  setParams(new URLSearchParams())
-                }}
-              >
-                {t('common.reset')}
-              </Button>
-            </Space>
-          </Form.Item>
+            >
+              {/* 关键词搜索行 */}
+              <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 0 }}>
+                <Form.Item name="q" style={{ marginBottom: 0, flex: 1 }}>
+                  <Input
+                    size="large"
+                    placeholder={t('pages.searchListings')}
+                    allowClear
+                    style={{ height: 48, borderRadius: 24, fontSize: 16 }}
+                    prefix={<SearchOutlined style={{ color: '#999', fontSize: 18 }} />}
+                  />
+                </Form.Item>
+                <Form.Item style={{ marginBottom: 0 }}>
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    size="large"
+                    style={{
+                      height: 48, paddingInline: 32, borderRadius: 24, fontSize: 16,
+                      background: '#fff', color: '#667eea', fontWeight: 600, border: 'none',
+                    }}
+                  >
+                    {t('common.search')}
+                  </Button>
+                </Form.Item>
+                <Form.Item style={{ marginBottom: 0 }}>
+                  <Button
+                    size="large"
+                    htmlType="reset"
+                    style={{
+                      height: 48, paddingInline: 24, borderRadius: 24, fontSize: 16,
+                      background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.5)', color: '#fff',
+                    }}
+                    onClick={() => setParams(new URLSearchParams())}
+                  >
+                    {t('common.reset')}
+                  </Button>
+                </Form.Item>
+              </div>
+
+              {/* 折叠高级筛选 */}
+              <Collapse
+                ghost
+                style={{ marginTop: 12 }}
+                expandIcon={({ isActive }) => (
+                  <span style={{ color: '#fff', fontSize: 13 }}>
+                    <FilterOutlined /> {t('common.advancedFilter') || '高级筛选'}
+                    <DownOutlined
+                      style={{
+                        marginLeft: 4, fontSize: 11,
+                        transform: isActive ? 'rotate(180deg)' : 'none',
+                        transition: 'transform .25s',
+                      }}
+                    />
+                  </span>
+                )}
+                items={[{
+                  key: 'filters',
+                  label: null,
+                  style: { padding: 0 },
+                  children: (
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                      gap: 12,
+                      padding: '12px 0 4px',
+                    }}>
+                      {/* 城市 */}
+                      <Form.Item name="city" label={
+                        <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 13 }}>{t('pages.city') || '城市'}</span>
+                      } style={{ marginBottom: 0 }}>
+                        <Input
+                          placeholder={t('pages.city') || '城市'}
+                          allowClear
+                          style={{ borderRadius: 8 }}
+                        />
+                      </Form.Item>
+
+                      {/* 区域 */}
+                      <Form.Item name="region" label={
+                        <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 13 }}>{t('pages.region') || '区域'}</span>
+                      } style={{ marginBottom: 0 }}>
+                        <Input
+                          placeholder={t('pages.region') || '区域'}
+                          allowClear
+                          style={{ borderRadius: 8 }}
+                        />
+                      </Form.Item>
+
+                      {/* 卧室数 */}
+                      <Form.Item name="bedrooms" label={
+                        <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 13 }}>{t('pages.bedroomCountLabel') || '卧室数'}</span>
+                      } style={{ marginBottom: 0 }}>
+                        <Select
+                          placeholder={t('pages.bedroomCountLabel') || '不限'}
+                          allowClear
+                          style={{ borderRadius: 8, width: '100%' }}
+                          options={[
+                            { value: 1, label: '1室' },
+                            { value: 2, label: '2室' },
+                            { value: 3, label: '3室' },
+                            { value: 4, label: '4室+' },
+                          ]}
+                        />
+                      </Form.Item>
+
+                      {/* 最低价格 */}
+                      <Form.Item name="minPrice" label={
+                        <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 13 }}>{t('pages.minPrice') || '最低租金（元/月）'}</span>
+                      } style={{ marginBottom: 0 }}>
+                        <InputNumber
+                          placeholder="0"
+                          min={0}
+                          step={500}
+                          style={{ width: '100%', borderRadius: 8 }}
+                          prefix="¥"
+                        />
+                      </Form.Item>
+
+                      {/* 最高价格 */}
+                      <Form.Item name="maxPrice" label={
+                        <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 13 }}>{t('pages.maxPrice') || '最高租金（元/月）'}</span>
+                      } style={{ marginBottom: 0 }}>
+                        <InputNumber
+                          placeholder="99999"
+                          min={0}
+                          step={500}
+                          style={{ width: '100%', borderRadius: 8 }}
+                          prefix="¥"
+                        />
+                      </Form.Item>
+                    </div>
+                  ),
+                }]}
+              />
             </Form>
           </Card>
 

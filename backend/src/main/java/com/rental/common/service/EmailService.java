@@ -1,6 +1,7 @@
 package com.rental.common.service;
 
 import com.rental.common.exception.BusinessException;
+import com.rental.modules.contract.entity.RentalContract;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,6 +48,28 @@ public class EmailService {
         } catch (Exception e) {
             log.error("发送验证码邮件失败: to={}, error={}", toEmail, e.getMessage());
             throw new BusinessException("邮件发送失败，请稍后重试");
+        }
+    }
+
+    /**
+     * 发送合同签署通知邮件（给管理员/房东）
+     */
+    public void sendContractSignedEmail(String toEmail, String recipientName, RentalContract contract, String body) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(fromEmail);
+            message.setTo(toEmail);
+            message.setSubject("【租房平台】租房合同已签署 - " + contract.getContractNo());
+            message.setText(
+                "您好 " + recipientName + "，\n\n" +
+                "以下租房合同已由租客完成电子签名：\n\n" +
+                body + "\n"
+            );
+            mailSender.send(message);
+            log.info("合同通知邮件发送成功: to={}, contractNo={}", toEmail, contract.getContractNo());
+        } catch (Exception e) {
+            log.error("发送合同通知邮件失败: to={}, error={}", toEmail, e.getMessage());
+            throw new BusinessException("合同通知邮件发送失败");
         }
     }
 }

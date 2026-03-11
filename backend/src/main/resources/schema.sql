@@ -16,7 +16,42 @@ CREATE TABLE IF NOT EXISTS users (
     phone VARCHAR(20) DEFAULT NULL COMMENT '联系电话',
     real_name VARCHAR(50) DEFAULT NULL COMMENT '真实姓名',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '账户创建时间',
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '账户更新时间',
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_contract_no (contract_no),
+    KEY idx_tenant_id (tenant_id),
+    KEY idx_landlord_id (landlord_id),
+    KEY idx_property_id (property_id),
+    KEY idx_status (status),
+    CONSTRAINT fk_rental_contract_tenant FOREIGN KEY (tenant_id)
+        REFERENCES users(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_rental_contract_landlord FOREIGN KEY (landlord_id)
+        REFERENCES users(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_rental_contract_property FOREIGN KEY (property_id)
+        REFERENCES properties(id) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='租房合同表';
+
+-- ============================================
+-- 12. 咨询模块迁移（旧表数据迁移准备）
+-- ============================================
+-- 注意: 如果需要将旧inquiries表数据迁移到新表，可执行以下迁移SQL
+-- 迁移后可选择删除inquiries表或保留作为历史数据
+/*
+INSERT INTO conversations (property_id, landlord_id, tenant_id, last_message, last_message_at, created_at, updated_at)
+SELECT listing_id, landlord_id, id, message, created_at, created_at, updated_at
+FROM inquiries;
+
+INSERT INTO messages (conversation_id, sender_id, sender_role, content, is_read, created_at)
+SELECT c.id, i.tenant_id, 'tenant', i.message, CASE WHEN i.reply IS NOT NULL THEN 1 ELSE 0 END, i.created_at
+FROM inquiries i
+JOIN conversations c ON c.property_id = i.listing_id AND c.tenant_id = i.tenant_id;
+
+INSERT INTO messages (conversation_id, sender_id, sender_role, content, is_read, created_at)
+SELECT c.id, i.landlord_id, 'landlord', i.reply, 1, i.updated_at
+FROM inquiries i
+JOIN conversations c ON c.property_id = i.listing_id AND c.tenant_id = i.tenant_id
+WHERE i.reply IS NOT NULL;
+*/ CURRENT_TIMESTAMP COMMENT '账户更新时间',
     is_active TINYINT(1) NOT NULL DEFAULT 1 COMMENT '账户状态: 1-激活, 0-禁用',
     PRIMARY KEY (id),
     UNIQUE KEY uk_username (username),
@@ -272,7 +307,25 @@ CREATE TABLE IF NOT EXISTS messages (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='消息表';
 
 -- ============================================
--- 11. 咨询模块迁移（旧表数据迁移准备）
+-- 11. 租房合同表 (rental_contract)
+-- 用途: 存储租房合同及电子签名信息
+-- ============================================
+CREATE TABLE IF NOT EXISTS rental_contract (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '合同主键ID',
+    contract_no VARCHAR(64) NOT NULL COMMENT '合同编号，唯一',
+    tenant_id BIGINT UNSIGNED NOT NULL COMMENT '租客ID，外键关联users.id',
+    landlord_id BIGINT UNSIGNED NOT NULL COMMENT '房东ID，外键关联users.id',
+    property_id BIGINT UNSIGNED NOT NULL COMMENT '房源ID，外键关联properties.id',
+    monthly_rent DECIMAL(10,2) NOT NULL COMMENT '月租金（元）',
+    deposit DECIMAL(10,2) NOT NULL COMMENT '押金（元）',
+    lease_start DATE NOT NULL COMMENT '租期开始日期',
+    lease_end DATE NOT NULL COMMENT '租期结束日期',
+    status VARCHAR(20) NOT NULL DEFAULT 'PENDING_SIGN' COMMENT '合同状态: PENDING_SIGN(待签署) / SIGNED(已签署)',
+    tenant_signature LONGTEXT DEFAULT NULL COMMENT '租客电子签名（Base64图片）',
+    signed_at TIMESTAMP NULL COMMENT '签署时间',
+    tenant_ip VARCHAR(64) DEFAULT NULL COMMENT '租客签署时IP地址',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE
 -- ============================================
 -- 注意: 如果需要将旧inquiries表数据迁移到新表，可执行以下迁移SQL
 -- 迁移后可选择删除inquiries表或保留作为历史数据
