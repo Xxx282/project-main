@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { message, Spin } from 'antd'
+import { useTranslation } from 'react-i18next'
 import { getListing, getLandlordInfo } from '../../tenant/api/tenantApi'
 import { createContract, signContract } from '../../contract/api/contractApi'
 
@@ -78,6 +79,7 @@ const dateInputStyle: React.CSSProperties = {
 // Main Page
 // ────────────────────────────────────────────────────────────
 export function TenantContractPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const propertyId = Number(searchParams.get('propertyId'))
@@ -117,16 +119,16 @@ export function TenantContractPage() {
   const createMutation = useMutation({
     mutationFn: createContract,
     onSuccess: (data) => setContractId(data.id),
-    onError: (e: any) => message.error(e?.response?.data?.message || '创建合同失败'),
+    onError: (e: any) => message.error(e?.response?.data?.message || t('pages.contractCreateFailed')),
   })
 
   const signMutation = useMutation({
     mutationFn: signContract,
     onSuccess: () => {
       setSigned(true)
-      message.success('合同签署成功！已通知管理员和房东。')
+      message.success(t('pages.contractSignedSuccess'))
     },
-    onError: (e: any) => message.error(e?.response?.data?.message || '签署失败，请重试'),
+    onError: (e: any) => message.error(e?.response?.data?.message || t('pages.signFailed')),
   })
 
   // ── Canvas init ──────────────────────────────────────────
@@ -196,8 +198,8 @@ export function TenantContractPage() {
   }
 
   const handleSign = () => {
-    if (!hasStroke) { message.warning('请先完成手写签名'); return }
-    if (!contractId) { message.error('合同创建中，请稍候'); return }
+    if (!hasStroke) { message.warning(t('pages.pleaseSignFirst')); return }
+    if (!contractId) { message.error(t('pages.contractCreating')); return }
     const sig = canvasRef.current!.toDataURL('image/png')
     signMutation.mutate({ contractId, signature: sig })
   }

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
-import { Card, Input, Button, Space, Avatar, message, Spin, Typography } from 'antd'
-import { UserOutlined, ArrowLeftOutlined, SendOutlined, MessageOutlined, HomeOutlined, PictureOutlined } from '@ant-design/icons'
+import { Card, Input, Button, Space, Avatar, message, Spin, Typography, Dropdown } from 'antd'
+import { UserOutlined, ArrowLeftOutlined, SendOutlined, MessageOutlined, HomeOutlined, PictureOutlined, DeleteOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { getListing, getLandlordInfo, getTenantInfo } from '../../features/tenant/api/tenantApi'
@@ -71,6 +71,12 @@ async function sendMessageApi(conversationId: number, content: string, imageFile
       },
     }
   )
+  return data.data
+}
+
+// 撤回消息
+async function recallMessageApi(messageId: number): Promise<Message> {
+  const { data } = await http.post<{ code: number; data: Message }>(`/conversations/messages/${messageId}/recall`)
   return data.data
 }
 
@@ -156,6 +162,19 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
     },
     onError: () => {
       message.error(t('pages.sendFailed'))
+    },
+  })
+
+  // 撤回消息 mutation
+  const recallMutation = useMutation({
+    mutationFn: (messageId: number) => recallMessageApi(messageId),
+    onSuccess: () => {
+      message.success(t('pages.messageRecalled') || '消息已撤回')
+      queryClient.invalidateQueries({ queryKey: ['conversation', conversationId, 'messages'] })
+      queryClient.invalidateQueries({ queryKey: ['conversation', conversationId] })
+    },
+    onError: (err: any) => {
+      message.error(err?.response?.data?.message || '撤回失败')
     },
   })
 
@@ -362,6 +381,84 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
                 <div>
                   {messages.map((msg) => {
                     const isMe = (isTenant && msg.senderRole === 'tenant') || (!isTenant && msg.senderRole === 'landlord')
+                    const isRecalled = msg.content === '[已撤回]'
+
+                    // 右击菜单项（仅自己发送的未撤回消息可撤回）
+                    const menuItems = isMe && !isRecalled ? [
+                      {
+                        key: 'recall',
+                        label: '撤回消息',
+                        icon: <DeleteOutlined />,
+                        onClick: () => recallMutation.mutate(msg.id),
+                      },
+                    ] : []
+
+                    const messageContent = (
+                      <div
+                        style={{
+                          maxWidth: '70%',
+                          padding: '12px 16px',
+                          borderRadius: isMe ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                          background: isMe 
+                            ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' 
+                            : isRecalled ? '#f5f5f5' : '#fff',
+                          color: isMe ? '#fff' : '#000',
+                          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                          fontStyle: isRecalled ? 'italic' : 'normal',
+                          opacity: isRecalled ? 0.6 : 1,
+                        }}
+                      >
+                        <div style={{ fontSize: 12, marginBottom: 4, opacity: 0.8 }}>
+                          {msg.senderRole === 'tenant' ? t('pages.tenant') : t('pages.landlord')}
+                        </div>
+                        {getMessageImageSrc(msg) && (
+                          <img
+                            src={getMessageImageSrc(msg)}
+                            alt={t('pages.image')}
+                            style={{
+                              maxWidth: '100%',
+                              borderRadius: '8px',
+                              marginBottom: msg.content ? '8px' : 0,
+                              cursor: 'pointer',
+                            }}
+                            onClick={() => {
+                              const src = getMessageImageSrc(msg)
+                              if (msg.imageData) {
+                                const w = window.open('', '_blank')
+                                if (w) w.document.write(`<img src="${src}" alt="${t('pages.image')}" style="max-width:100%" />`)
+                              } else window.open(src, '_blank')
+                            }}
+                          />
+                        )}
+                        {msg.content && <div style={{ fontSize: 15, lineHeight: 1.5 }}>{msg.content}</div>}
+                        <div style={{ fontSize: 11, textAlign: 'right', marginTop: 6, opacity: 0.7 }}>
+                          {new Date(msg.createdAt).toLocaleString()}
+                        </div>
+                      </div>
+                    )
+
+                    // 右键菜单
+                    if (isMe && !isRecalled) {
+                      return (
+                        <div
+                          key={msg.id}
+                          style={{
+                            display: 'flex',
+                            justifyContent: isMe ? 'flex-end' : 'flex-start',
+                            marginBottom: 16,
+                            position: 'relative',
+                          }}
+                        >
+                          <Dropdown
+                            menu={{ items: menuItems }}
+                            trigger={['contextMenu']}
+                          >
+                            {messageContent}
+                          </Dropdown>
+                        </div>
+                      )
+                    }
+
                     return (
                       <div
                         key={msg.id}
@@ -371,45 +468,7 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
                           marginBottom: 16,
                         }}
                       >
-                        <div
-                          style={{
-                            maxWidth: '70%',
-                            padding: '12px 16px',
-                            borderRadius: isMe ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
-                            background: isMe 
-                              ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' 
-                              : '#fff',
-                            color: isMe ? '#fff' : '#000',
-                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                          }}
-                        >
-                          <div style={{ fontSize: 12, marginBottom: 4, opacity: 0.8 }}>
-                            {msg.senderRole === 'tenant' ? t('pages.tenant') : t('pages.landlord')}
-                          </div>
-                          {getMessageImageSrc(msg) && (
-                            <img
-                              src={getMessageImageSrc(msg)}
-                              alt={t('pages.image')}
-                              style={{
-                                maxWidth: '100%',
-                                borderRadius: '8px',
-                                marginBottom: msg.content ? '8px' : 0,
-                                cursor: 'pointer',
-                              }}
-                              onClick={() => {
-                                const src = getMessageImageSrc(msg)
-                                if (msg.imageData) {
-                                  const w = window.open('', '_blank')
-                                  if (w) w.document.write(`<img src="${src}" alt="${t('pages.image')}" style="max-width:100%" />`)
-                                } else window.open(src, '_blank')
-                              }}
-                            />
-                          )}
-                          {msg.content && <div style={{ fontSize: 15, lineHeight: 1.5 }}>{msg.content}</div>}
-                          <div style={{ fontSize: 11, textAlign: 'right', marginTop: 6, opacity: 0.7 }}>
-                            {new Date(msg.createdAt).toLocaleString()}
-                          </div>
-                        </div>
+                        {messageContent}
                       </div>
                     )
                   })}
@@ -470,7 +529,7 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
                   onKeyDown={handleKeyPress}
-                  placeholder="输入消息内容..."
+                  placeholder="。。。"
                   autoSize={{ minRows: 1, maxRows: 4 }}
                   style={{ flex: 1 }}
                   size="large"
@@ -490,7 +549,7 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
                     padding: '0 24px',
                   }}
                 >
-                  发送
+                  {t('pages.send')}
                 </Button>
               </div>
             </div>

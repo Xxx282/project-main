@@ -194,7 +194,7 @@ export function TenantListingsPage() {
                     }}
                     onClick={() => setFilterOpen(!filterOpen)}
                   >
-                    <FilterOutlined /> 筛选
+                    <FilterOutlined /> {t('pages.filter')}
                   </Button>
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 0 }}>
@@ -260,10 +260,10 @@ export function TenantListingsPage() {
                           allowClear
                           style={{ borderRadius: 8, width: '100%' }}
                           options={[
-                            { value: 1, label: '1室' },
-                            { value: 2, label: '2室' },
-                            { value: 3, label: '3室' },
-                            { value: 4, label: '4室+' },
+                            { value: 1, label: t('pages.room1') },
+                            { value: 2, label: t('pages.room2') },
+                            { value: 3, label: t('pages.room3') },
+                            { value: 4, label: t('pages.room4Plus') },
                           ]}
                         />
                       </Form.Item>

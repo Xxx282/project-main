@@ -30,4 +30,14 @@ public interface MessageService {
      * 统计对话的未读消息数
      */
     long getUnreadCount(Long conversationId);
+
+    /**
+     * 删除消息（仅发送者可删除）
+     */
+    void deleteMessage(Long messageId, Long userId, String role);
+
+    /**
+     * 撤回消息（仅发送者可撤回，24小时内）
+     */
+    Message recallMessage(Long messageId, Long userId, String role);
 }

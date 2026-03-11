@@ -6,6 +6,8 @@ import com.rental.modules.payment.dto.CreatePaymentRequest;
 import com.rental.modules.payment.dto.ReviewPaymentRequest;
 import com.rental.modules.payment.entity.PaymentOrder;
 import com.rental.modules.payment.repository.PaymentOrderRepository;
+import com.rental.modules.property.entity.Property;
+import com.rental.modules.property.repository.PropertyRepository;
 import com.rental.modules.user.entity.UserEntity;
 import com.rental.modules.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,7 @@ public class PaymentService {
 
     private final PaymentOrderRepository paymentOrderRepository;
     private final UserRepository userRepository;
+    private final PropertyRepository propertyRepository;
     private final EmailService emailService;
 
     /**
@@ -73,6 +76,12 @@ public class PaymentService {
 
         order = paymentOrderRepository.save(order);
         log.info("支付订单创建成功: orderNo={}", orderNo);
+
+        // 将房源状态改为下架
+        if (request.getPropertyId() != null) {
+            propertyRepository.updateStatus(request.getPropertyId(), Property.PropertyStatus.offline);
+            log.info("房源已下架: propertyId={}", request.getPropertyId());
+        }
 
         return order;
     }

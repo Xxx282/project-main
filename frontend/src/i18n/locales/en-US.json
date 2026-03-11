@@ -72,7 +72,9 @@
     "simple": "Simple",
     "fine": "Fine",
     "luxury": "Luxury",
-    "operation": "Operation"
+    "operation": "Operation",
+    "action": "Action",
+    "detail": "Detail"
   },
   "nav": {
     "home": "Home",
@@ -291,6 +293,8 @@
     "adminListingReview": "Admin - Listing Review",
     "reviewOperationSuccess": "Review operation successful",
     "reviewOperationFailed": "Review operation failed",
+    "operationSuccess": "Operation successful",
+    "operationFailed": "Operation failed",
     "approve": "Approve",
     "reject": "Reject",
     "pendingReview": "Pending Review",
@@ -411,5 +415,42 @@
     "imageSizeLimit": "Image size cannot exceed 5MB",
     "consultLandlord": "Consult Landlord",
     "propertyInfo": "Property Information"
+  },
+  "payment": {
+    "myPayments": "My Payment Orders",
+    "myPaymentsSubtitle": "View payment records and order status",
+    "orderNo": "Order No",
+    "tenant": "Tenant",
+    "landlord": "Landlord",
+    "property": "Property",
+    "type": "Type",
+    "amount": "Amount",
+    "paymentMethod": "Payment Method",
+    "wechatPay": "WeChat Pay",
+    "alipay": "Alipay",
+    "deposit": "Deposit",
+    "monthlyRent": "Monthly Rent",
+    "createdAt": "Created At",
+    "status": {
+      "title": "Status",
+      "pendingLandlordConfirm": "Pending Landlord Confirm",
+      "pendingAdminReview": "Pending Admin Review",
+      "completed": "Completed",
+      "rejected": "Rejected",
+      "refunded": "Refunded"
+    },
+    "adminTitle": "Payment Management",
+    "adminSubtitle": "Manage all payment orders",
+    "pendingReview": "Pending Review",
+    "allOrders": "All Orders",
+    "reviewOrder": "Review Order",
+    "orderDetail": "Order Detail",
+    "payer": "Payer",
+    "payee": "Payee",
+    "reviewNote": "Review Note",
+    "note": "Note",
+    "notePlaceholder": "Enter review note (optional)",
+    "operationSuccess": "Operation successful",
+    "operationFailed": "Operation failed"
   }
 }

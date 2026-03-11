@@ -208,6 +208,44 @@ public class ConversationController {
     }
 
     /**
+     * 删除消息（仅发送者可删除自己的消息）
+     */
+    @DeleteMapping("/messages/{messageId}")
+    @PreAuthorize("hasAnyRole('landlord', 'tenant')")
+    @Operation(summary = "删除消息")
+    public ResponseEntity<Result<Void>> deleteMessage(
+            @PathVariable Long messageId,
+            HttpServletRequest httpRequest) {
+        Long userId = (Long) httpRequest.getAttribute("userId");
+        String role = (String) httpRequest.getAttribute("role");
+
+        log.info("删除消息: messageId={}, userId={}, role={}", messageId, userId, role);
+
+        messageService.deleteMessage(messageId, userId, role);
+
+        return ResponseEntity.ok(Result.success(null));
+    }
+
+    /**
+     * 撤回消息（24小时内可撤回，仅发送者可撤回）
+     */
+    @PostMapping("/messages/{messageId}/recall")
+    @PreAuthorize("hasAnyRole('landlord', 'tenant')")
+    @Operation(summary = "撤回消息")
+    public ResponseEntity<Result<Message>> recallMessage(
+            @PathVariable Long messageId,
+            HttpServletRequest httpRequest) {
+        Long userId = (Long) httpRequest.getAttribute("userId");
+        String role = (String) httpRequest.getAttribute("role");
+
+        log.info("撤回消息: messageId={}, userId={}, role={}", messageId, userId, role);
+
+        Message message = messageService.recallMessage(messageId, userId, role);
+
+        return ResponseEntity.ok(Result.success(message));
+    }
+
+    /**
      * 标记消息为已读
      */
     @PutMapping("/{id}/read")

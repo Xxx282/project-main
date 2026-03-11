@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -89,5 +90,50 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public long getUnreadCount(Long conversationId) {
         return messageRepository.countByConversationIdAndIsReadFalse(conversationId);
+    }
+
+    @Override
+    @Transactional
+    public void deleteMessage(Long messageId, Long userId, String role) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new BusinessException(ResultCode.MESSAGE_SEND_ERROR, "消息不存在"));
+
+        // 验证是否是消息发送者
+        if (!message.getSenderId().equals(userId) || !message.getSenderRole().name().equalsIgnoreCase(role)) {
+            throw new BusinessException(ResultCode.MESSAGE_SEND_ERROR, "无权限删除此消息");
+        }
+
+        // 删除消息
+        messageRepository.delete(message);
+        log.info("消息已删除: messageId={}", messageId);
+    }
+
+    @Override
+    @Transactional
+    public Message recallMessage(Long messageId, Long userId, String role) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new BusinessException(ResultCode.MESSAGE_SEND_ERROR, "消息不存在"));
+
+        // 验证是否是消息发送者
+        if (!message.getSenderId().equals(userId) || !message.getSenderRole().name().equalsIgnoreCase(role)) {
+            throw new BusinessException(ResultCode.MESSAGE_SEND_ERROR, "无权限撤回此消息");
+        }
+
+        // 检查是否在24小时内
+        LocalDateTime now = LocalDateTime.now();
+        Duration diff = Duration.between(message.getCreatedAt(), now);
+        if (diff.toHours() >= 24) {
+            throw new BusinessException(ResultCode.MESSAGE_SEND_ERROR, "消息已超过24小时，无法撤回");
+        }
+
+        // 标记为已撤回
+        message.setContent("[已撤回]");
+        message.setImageData(null);
+        message.setImageUrl(null);
+        message.setImageContentType(null);
+        message = messageRepository.save(message);
+
+        log.info("消息已撤回: messageId={}", messageId);
+        return message;
     }
 }

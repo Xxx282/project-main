@@ -3,8 +3,10 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { PageHeader } from '../../../shared/ui/PageHeader'
 import { getPendingPayments, getAllPayments, reviewPayment, type PaymentOrder } from '../../payment/api/paymentApi'
+import { useTranslation } from 'react-i18next'
 
 export function AdminPaymentsPage() {
+  const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState('pending')
   const [reviewModalVisible, setReviewModalVisible] = useState(false)
   const [selectedOrder, setSelectedOrder] = useState<PaymentOrder | null>(null)
@@ -33,14 +35,14 @@ export function AdminPaymentsPage() {
   const reviewMutation = useMutation({
     mutationFn: reviewPayment,
     onSuccess: () => {
-      message.success('操作成功')
+      message.success(t('pages.operationSuccess'))
       setReviewModalVisible(false)
       setSelectedOrder(null)
       form.resetFields()
       queryClient.invalidateQueries({ queryKey: ['admin', 'payments'] })
     },
     onError: (error: any) => {
-      message.error(error?.response?.data?.message || '操作失败')
+      message.error(error?.response?.data?.message || t('pages.operationFailed'))
     },
   })
 
@@ -61,11 +63,11 @@ export function AdminPaymentsPage() {
 
   const getStatusTag = (status: string) => {
     const map: Record<string, { color: string; text: string }> = {
-      PENDING: { color: 'orange', text: '待房东确认' },
-      LANDLORD_CONFIRMED: { color: 'blue', text: '待管理员审核' },
-      SUCCESS: { color: 'green', text: '已完成' },
-      REJECTED: { color: 'red', text: '已拒绝' },
-      REFUNDED: { color: 'default', text: '已退款' },
+      PENDING: { color: 'orange', text: t('payment.status.pendingLandlordConfirm') },
+      LANDLORD_CONFIRMED: { color: 'blue', text: t('payment.status.pendingAdminReview') },
+      SUCCESS: { color: 'green', text: t('payment.status.completed') },
+      REJECTED: { color: 'red', text: t('payment.status.rejected') },
+      REFUNDED: { color: 'default', text: t('payment.status.refunded') },
     }
     const item = map[status] || { color: 'default', text: status }
     return <Tag color={item.color}>{item.text}</Tag>
@@ -73,44 +75,44 @@ export function AdminPaymentsPage() {
 
   const columns = [
     {
-      title: '订单号',
+      title: t('payment.orderNo'),
       dataIndex: 'orderNo',
       key: 'orderNo',
       width: 200,
     },
     {
-      title: '租户',
+      title: t('payment.tenant'),
       dataIndex: 'payerUsername',
       key: 'payerUsername',
       width: 120,
     },
     {
-      title: '房东',
+      title: t('payment.landlord'),
       dataIndex: 'payeeUsername',
       key: 'payeeUsername',
       width: 120,
     },
     {
-      title: '房源',
+      title: t('payment.property'),
       dataIndex: 'propertyTitle',
       key: 'propertyTitle',
       ellipsis: true,
     },
     {
-      title: '状态',
+      title: t('payment.status.title'),
       dataIndex: 'status',
       key: 'status',
       width: 100,
       render: (status: string) => getStatusTag(status),
     },
     {
-      title: '操作',
+      title: t('common.action'),
       key: 'action',
       width: 180,
       render: (_: any, record: PaymentOrder) => (
         <Space>
           <Button type="link" size="small" onClick={() => openReviewModal(record)}>
-            详情
+            {t('common.detail')}
           </Button>
           {record.status === 'LANDLORD_CONFIRMED' && (
             <>
@@ -118,7 +120,7 @@ export function AdminPaymentsPage() {
                 setSelectedOrder(record)
                 setReviewModalVisible(true)
               }}>
-                同意
+                {t('common.agree')}
               </Button>
               <Button type="link" size="small" danger onClick={() => {
                 reviewMutation.mutate({
@@ -127,7 +129,7 @@ export function AdminPaymentsPage() {
                   note: '',
                 })
               }}>
-                退回
+                {t('common.reject')}
               </Button>
             </>
           )}
@@ -141,8 +143,8 @@ export function AdminPaymentsPage() {
   return (
     <Space orientation="vertical" size={16} style={{ width: '100%' }}>
       <PageHeader
-        title="支付订单管理"
-        subtitle="审核租客支付订单"
+        title={t('payment.adminTitle')}
+        subtitle={t('payment.adminSubtitle')}
       />
 
       <Tabs
@@ -153,13 +155,13 @@ export function AdminPaymentsPage() {
             key: 'pending',
             label: (
               <span>
-                待审核 <Badge count={pendingCount} offset={[10, 0]} />
+                {t('payment.pendingReview')} <Badge count={pendingCount} offset={[10, 0]} />
               </span>
             ),
           },
           {
             key: 'all',
-            label: '所有订单',
+            label: t('payment.allOrders'),
           },
         ]}
       />
@@ -178,7 +180,7 @@ export function AdminPaymentsPage() {
 
       {/* 审核弹窗 */}
       <Modal
-        title={selectedOrder?.status === 'LANDLORD_CONFIRMED' ? '审核订单' : '订单详情'}
+        title={selectedOrder?.status === 'LANDLORD_CONFIRMED' ? t('payment.reviewOrder') : t('payment.orderDetail')}
         open={reviewModalVisible}
         onCancel={() => {
           setReviewModalVisible(false)
@@ -187,34 +189,34 @@ export function AdminPaymentsPage() {
         }}
         footer={selectedOrder?.status === 'LANDLORD_CONFIRMED' ? [
           <Button key="reject" danger onClick={() => handleReview('REJECT')}>
-            退回
+            {t('common.reject')}
           </Button>,
           <Button key="approve" type="primary" onClick={() => handleReview('APPROVE')}>
-            同意
+            {t('common.agree')}
           </Button>,
         ] : [
           <Button key="close" onClick={() => setReviewModalVisible(false)}>
-            关闭
+            {t('common.close')}
           </Button>,
         ]}
       >
         {selectedOrder && (
           <div>
-            <p><strong>订单号：</strong>{selectedOrder.orderNo}</p>
-            <p><strong>支付者：</strong>{selectedOrder.payerUsername} ({selectedOrder.payerRealName || '-'})</p>
-            <p><strong>收款者：</strong>{selectedOrder.payeeUsername} ({selectedOrder.payeeRealName || '-'})</p>
-            <p><strong>房源：</strong>{selectedOrder.propertyTitle}</p>
-            <p><strong>类型：</strong>{selectedOrder.paymentType === 'DEPOSIT' ? '押金' : '月租'}</p>
-            <p><strong>金额：</strong>¥ {selectedOrder.amount}</p>
-            <p><strong>支付方式：</strong>{selectedOrder.paymentChannel === 'WECHAT' ? '微信支付' : '支付宝'}</p>
-            <p><strong>状态：</strong>{getStatusTag(selectedOrder.status)}</p>
-            <p><strong>创建时间：</strong>{new Date(selectedOrder.createdAt).toLocaleString()}</p>
-            {selectedOrder.reviewNote && <p><strong>审核备注：</strong>{selectedOrder.reviewNote}</p>}
+            <p><strong>{t('payment.orderNo')}：</strong>{selectedOrder.orderNo}</p>
+            <p><strong>{t('payment.payer')}：</strong>{selectedOrder.payerUsername} ({selectedOrder.payerRealName || '-'})</p>
+            <p><strong>{t('payment.payee')}：</strong>{selectedOrder.payeeUsername} ({selectedOrder.payeeRealName || '-'})</p>
+            <p><strong>{t('payment.property')}：</strong>{selectedOrder.propertyTitle}</p>
+            <p><strong>{t('payment.type')}：</strong>{selectedOrder.paymentType === 'DEPOSIT' ? t('payment.deposit') : t('payment.monthlyRent')}</p>
+            <p><strong>{t('payment.amount')}：</strong>¥ {selectedOrder.amount}</p>
+            <p><strong>{t('payment.paymentMethod')}：</strong>{selectedOrder.paymentChannel === 'WECHAT' ? t('payment.wechatPay') : t('payment.alipay')}</p>
+            <p><strong>{t('payment.status.title')}：</strong>{getStatusTag(selectedOrder.status)}</p>
+            <p><strong>{t('payment.createdAt')}：</strong>{new Date(selectedOrder.createdAt).toLocaleString()}</p>
+            {selectedOrder.reviewNote && <p><strong>{t('payment.reviewNote')}：</strong>{selectedOrder.reviewNote}</p>}
 
             {selectedOrder.status === 'LANDLORD_CONFIRMED' && (
               <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
-                <Form.Item name="note" label="备注">
-                  <Input.TextArea rows={3} placeholder="可选填写审核备注" />
+                <Form.Item name="note" label={t('payment.note')}>
+                  <Input.TextArea rows={3} placeholder={t('payment.notePlaceholder')} />
                 </Form.Item>
               </Form>
             )}
