@@ -281,7 +281,6 @@ export function MainLayout() {
               <Button
                 onClick={() => {
                   auth.logout()
-                  navigate('/', { replace: true })
                 }}
                 style={{
                   background: 'rgba(255,255,255,0.15)',

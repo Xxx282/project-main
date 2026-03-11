@@ -2,7 +2,7 @@
  * @Author: Mendax
  * @Date: 2026-02-26 16:33:56
  * @LastEditors: Mendax
- * @LastEditTime: 2026-03-05 15:03:53
+ * @LastEditTime: 2026-03-09 23:28:04
  * @Description: 
  * @FilePath: \project-main\readme.md
 -->
@@ -50,7 +50,6 @@ mvn spring-boot:run
 - [ ] Todo：4. 添加管理页面（实现已租房源管理，如报修、续租等）
 - [ ] Todo：5. 添加辅助功能（如邮箱检验、平台支付、邮箱通知等）
 - [ ] Todo：咨询聊天页面图片发送
+- [ ] 合同页面和流程实现
 
-- [ ] Todo：前端页面中英文切换、可视化图表添加、房源列表图片轮询
-- [ ] Todo：前端页面美化（聊天页、预测页等美化，页面动画过渡等）
 - [ ] 全流程实现

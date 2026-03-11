@@ -35,6 +35,7 @@ export type Dashboard = {
   listings: number
   inquiriesToday: number
   pendingListings: number
+  pendingOrders: number
 }
 
 export async function getDashboard(): Promise<Dashboard> {

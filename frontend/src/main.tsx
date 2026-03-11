@@ -27,15 +27,15 @@ createRoot(document.getElementById('root')!).render(
       }}
     >
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <AuthModalProvider>
-            <BrowserRouter>
+        <BrowserRouter>
+          <AuthProvider>
+            <AuthModalProvider>
               <AntApp>
                 <App />
               </AntApp>
-            </BrowserRouter>
-          </AuthModalProvider>
-        </AuthProvider>
+            </AuthModalProvider>
+          </AuthProvider>
+        </BrowserRouter>
       </QueryClientProvider>
     </ConfigProvider>
   </StrictMode>,

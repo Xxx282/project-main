@@ -3,6 +3,7 @@ package com.rental.modules.admin;
 import com.rental.common.Result;
 import com.rental.modules.admin.dto.Dashboard;
 import com.rental.modules.conversation.service.ConversationService;
+import com.rental.modules.payment.service.PaymentService;
 import com.rental.modules.property.entity.Property;
 import com.rental.modules.property.service.PropertyService;
 import com.rental.modules.user.entity.UserEntity;
@@ -31,6 +32,7 @@ public class AdminController {
     private final PropertyService propertyService;
     private final UserService userService;
     private final ConversationService conversationService;
+    private final PaymentService paymentService;
 
     /**
      * 获取数据看板统计信息
@@ -44,6 +46,7 @@ public class AdminController {
                 .listings(propertyService.countAll())
                 .inquiriesToday(conversationService.getTodayConversationCount())
                 .pendingListings(propertyService.countPending())
+                .pendingOrders(paymentService.countPendingOrders())
                 .build();
         return ResponseEntity.ok(Result.success(dashboard));
     }

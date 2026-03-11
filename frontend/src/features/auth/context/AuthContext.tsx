@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import type { AuthUser } from '../store/authStore'
 import { authStore } from '../store/authStore'
 import { me } from '../api/authApi'
@@ -21,6 +22,7 @@ export function useAuth() {
 export function AuthProvider(props: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null)
   const [loading, setLoading] = useState(true)
+  const navigate = useNavigate()
 
   const refresh = async () => {
     const token = authStore.getToken()
@@ -35,6 +37,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
   const logout = () => {
     authStore.clearToken()
     setUser(null)
+    navigate('/', { replace: true })
   }
 
   useEffect(() => {
