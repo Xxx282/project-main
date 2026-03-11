@@ -295,6 +295,9 @@ CREATE TABLE IF NOT EXISTS messages (
     sender_id BIGINT UNSIGNED NOT NULL COMMENT '发送者ID，外键关联users.id',
     sender_role ENUM('tenant', 'landlord') NOT NULL COMMENT '发送者角色',
     content TEXT NOT NULL COMMENT '消息内容',
+    image_url VARCHAR(500) COMMENT '图片URL，可为空(兼容旧数据)',
+    image_data MEDIUMBLOB COMMENT '图片二进制数据，与聊天消息共用接口',
+    image_content_type VARCHAR(100) COMMENT '图片MIME类型，如 image/jpeg',
     is_read TINYINT(1) NOT NULL DEFAULT 0 COMMENT '是否已读: 0-未读, 1-已读',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '发送时间',
     PRIMARY KEY (id),
@@ -305,6 +308,10 @@ CREATE TABLE IF NOT EXISTS messages (
     CONSTRAINT fk_messages_conversation FOREIGN KEY (conversation_id)
         REFERENCES conversations(id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='消息表';
+
+-- 若 messages 表已存在，可执行以下迁移以支持图片存库：
+-- ALTER TABLE messages ADD COLUMN image_data MEDIUMBLOB NULL COMMENT '图片二进制数据' AFTER image_url;
+-- ALTER TABLE messages ADD COLUMN image_content_type VARCHAR(100) NULL COMMENT '图片MIME类型' AFTER image_data;
 
 -- ============================================
 -- 11. 租房合同表 (rental_contract)

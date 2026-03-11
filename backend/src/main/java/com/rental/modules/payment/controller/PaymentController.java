@@ -74,6 +74,36 @@ public class PaymentController {
     }
 
     /**
+     * 房东获取自己的订单（作为收款者）
+     */
+    @GetMapping("/landlord/my")
+    @PreAuthorize("hasRole('landlord')")
+    @Operation(summary = "获取我的订单（房东）")
+    public ResponseEntity<Result<Page<PaymentOrder>>> getMyOrdersAsLandlord(
+            HttpServletRequest request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Long landlordId = (Long) request.getAttribute("userId");
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<PaymentOrder> orders = paymentService.getMyOrdersAsLandlord(landlordId, pageable);
+        return ResponseEntity.ok(Result.success(orders));
+    }
+
+    /**
+     * 确认收款（房东）
+     */
+    @PostMapping("/landlord/confirm")
+    @PreAuthorize("hasRole('landlord')")
+    @Operation(summary = "房东确认收款")
+    public ResponseEntity<Result<PaymentOrder>> confirmPayment(
+            HttpServletRequest request,
+            @Valid @RequestBody ReviewPaymentRequest reviewRequest) {
+        Long landlordId = (Long) request.getAttribute("userId");
+        PaymentOrder order = paymentService.confirmPayment(landlordId, reviewRequest);
+        return ResponseEntity.ok(Result.success(order));
+    }
+
+    /**
      * 管理员获取待审核订单列表
      */
     @GetMapping("/admin/pending")
@@ -114,10 +144,8 @@ public class PaymentController {
     @PreAuthorize("hasRole('admin')")
     @Operation(summary = "审核订单（同意/拒绝/退款）")
     public ResponseEntity<Result<PaymentOrder>> reviewOrder(
-            HttpServletRequest request,
             @Valid @RequestBody ReviewPaymentRequest reviewRequest) {
-        Long reviewerId = (Long) request.getAttribute("userId");
-        PaymentOrder order = paymentService.reviewOrder(reviewerId, reviewRequest);
+        PaymentOrder order = paymentService.reviewOrder(reviewRequest);
         return ResponseEntity.ok(Result.success(order));
     }
 

@@ -119,7 +119,7 @@ export function TenantPaymentPage() {
 
               <Divider />
 
-              <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+              <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
                 <div style={{ textAlign: 'center', padding: '20px 0' }}>
                   <img 
                     src={QR_CODES[paymentChannel as keyof typeof QR_CODES]} 

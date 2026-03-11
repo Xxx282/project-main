@@ -90,6 +90,33 @@ public class ContractController {
     }
 
     /**
+     * 获取我的合同列表（房东）
+     */
+    @GetMapping("/landlord/my")
+    @PreAuthorize("hasRole('landlord')")
+    @Operation(summary = "获取我的合同列表（房东）")
+    public ResponseEntity<Result<List<RentalContract>>> getMyContractsAsLandlord(HttpServletRequest request) {
+        Long landlordId = (Long) request.getAttribute("userId");
+        List<RentalContract> contracts = contractService.getMyContractsAsLandlord(landlordId);
+        return ResponseEntity.ok(Result.success(contracts));
+    }
+
+    /**
+     * 签署合同（房东电子签名）
+     */
+    @PostMapping("/landlord/sign")
+    @PreAuthorize("hasRole('landlord')")
+    @Operation(summary = "房东签署合同")
+    public ResponseEntity<Result<RentalContract>> signContractAsLandlord(
+            HttpServletRequest request,
+            @Valid @RequestBody SignContractRequest signRequest) {
+        Long landlordId = (Long) request.getAttribute("userId");
+        String clientIp = getClientIp(request);
+        RentalContract contract = contractService.signContractAsLandlord(landlordId, signRequest, clientIp);
+        return ResponseEntity.ok(Result.success(contract));
+    }
+
+    /**
      * 获取客户端IP
      */
     private String getClientIp(HttpServletRequest request) {

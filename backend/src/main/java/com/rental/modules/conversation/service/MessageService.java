@@ -10,9 +10,11 @@ import java.util.List;
 public interface MessageService {
 
     /**
-     * 发送消息
+     * 发送消息（文字与图片共用此接口，图片存库）
+     * @param imageData 图片二进制，可为 null
+     * @param imageContentType 图片 MIME 类型，如 image/jpeg
      */
-    Message sendMessage(Long conversationId, Long senderId, String senderRole, String content);
+    Message sendMessage(Long conversationId, Long senderId, String senderRole, String content, byte[] imageData, String imageContentType);
 
     /**
      * 获取对话的所有消息（按时间正序）

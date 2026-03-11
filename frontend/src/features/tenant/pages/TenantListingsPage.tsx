@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { SettingOutlined, SearchOutlined, FilterOutlined, DownOutlined } from '@ant-design/icons'
+import { SettingOutlined, SearchOutlined, FilterOutlined } from '@ant-design/icons'
 import { PageHeader } from '../../../shared/ui/PageHeader'
 import { getListingImages, listListings } from '../api/tenantApi'
 import type { Listing } from '../../../shared/api/types'
@@ -22,7 +22,7 @@ interface FieldOption {
 const DEFAULT_FIELDS: FieldOption[] = [
   { key: 'cover', title: 'cover', visible: true },
   { key: 'id', title: 'id', visible: true },
-  { key: 'title', title: 'title', visible: true },
+  { key: 'title', title: 'title', visible: false },
   { key: 'cityRegion', title: 'cityRegion', visible: true },
   { key: 'price', title: 'price', visible: true },
   { key: 'layout', title: 'layout', visible: true },
@@ -46,6 +46,7 @@ export function TenantListingsPage() {
   const cardMaxWidth = isGuest ? 1160 : 980
 
   const [settingsModalOpen, setSettingsModalOpen] = useState(false)
+  const [filterOpen, setFilterOpen] = useState(false)
   const [form] = Form.useForm()
 
   const listingsQ = useQuery({
@@ -186,7 +187,19 @@ export function TenantListingsPage() {
                 <Form.Item style={{ marginBottom: 0 }}>
                   <Button
                     size="large"
-                    htmlType="reset"
+                    style={{
+                      height: 48, paddingInline: 24, borderRadius: 24, fontSize: 16,
+                      background: filterOpen ? '#fff' : 'rgba(255,255,255,0.2)',
+                      border: '1px solid rgba(255,255,255,0.5)', color: filterOpen ? '#667eea' : '#fff',
+                    }}
+                    onClick={() => setFilterOpen(!filterOpen)}
+                  >
+                    <FilterOutlined /> 筛选
+                  </Button>
+                </Form.Item>
+                <Form.Item style={{ marginBottom: 0 }}>
+                  <Button
+                    size="large"
                     style={{
                       height: 48, paddingInline: 24, borderRadius: 24, fontSize: 16,
                       background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.5)', color: '#fff',
@@ -201,19 +214,10 @@ export function TenantListingsPage() {
               {/* 折叠高级筛选 */}
               <Collapse
                 ghost
-                style={{ marginTop: 12 }}
-                expandIcon={({ isActive }) => (
-                  <span style={{ color: '#fff', fontSize: 13 }}>
-                    <FilterOutlined /> {t('common.advancedFilter') || '高级筛选'}
-                    <DownOutlined
-                      style={{
-                        marginLeft: 4, fontSize: 11,
-                        transform: isActive ? 'rotate(180deg)' : 'none',
-                        transition: 'transform .25s',
-                      }}
-                    />
-                  </span>
-                )}
+                style={{ marginTop: 0 }}
+                activeKey={filterOpen ? ['filters'] : []}
+                onChange={() => setFilterOpen(!filterOpen)}
+                expandIcon={() => null}
                 items={[{
                   key: 'filters',
                   label: null,

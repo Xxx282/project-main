@@ -53,6 +53,25 @@ public class Message {
     private String content;
 
     /**
+     * 图片URL，可为空（兼容旧数据）
+     */
+    @Column(name = "image_url", length = 500)
+    private String imageUrl;
+
+    /**
+     * 图片二进制数据，存库后与消息共用同一接口返回
+     */
+    @Lob
+    @Column(name = "image_data", columnDefinition = "MEDIUMBLOB")
+    private byte[] imageData;
+
+    /**
+     * 图片MIME类型，如 image/jpeg、image/png
+     */
+    @Column(name = "image_content_type", length = 100)
+    private String imageContentType;
+
+    /**
      * 是否已读: 0-未读, 1-已读
      */
     @Column(name = "is_read", nullable = false)

@@ -2,6 +2,7 @@ package com.rental.common.service;
 
 import com.rental.common.exception.BusinessException;
 import com.rental.modules.contract.entity.RentalContract;
+import com.rental.modules.payment.entity.PaymentOrder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -70,6 +71,49 @@ public class EmailService {
         } catch (Exception e) {
             log.error("发送合同通知邮件失败: to={}, error={}", toEmail, e.getMessage());
             throw new BusinessException("合同通知邮件发送失败");
+        }
+    }
+
+    /**
+     * 发送支付订单待审核邮件（给管理员）
+     */
+    public void sendPaymentReviewEmail(String toEmail, String recipientName, PaymentOrder order, String subject, String body) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(fromEmail);
+            message.setTo(toEmail);
+            message.setSubject(subject);
+            message.setText(
+                "您好 " + recipientName + "，\n\n" +
+                body + "\n\n" +
+                "请登录后台进行审核处理。\n\n" +
+                "--- 租房平台"
+            );
+            mailSender.send(message);
+            log.info("支付待审核邮件发送成功: to={}, orderNo={}", toEmail, order.getOrderNo());
+        } catch (Exception e) {
+            log.error("发送支付待审核邮件失败: to={}, error={}", toEmail, e.getMessage());
+        }
+    }
+
+    /**
+     * 发送支付状态通知邮件（给房东/租客）
+     */
+    public void sendPaymentStatusEmail(String toEmail, String recipientName, PaymentOrder order, String subject, String body) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(fromEmail);
+            message.setTo(toEmail);
+            message.setSubject(subject);
+            message.setText(
+                "您好 " + recipientName + "，\n\n" +
+                body + "\n\n" +
+                "--- 租房平台"
+            );
+            mailSender.send(message);
+            log.info("支付状态通知邮件发送成功: to={}, orderNo={}", toEmail, order.getOrderNo());
+        } catch (Exception e) {
+            log.error("发送支付状态通知邮件失败: to={}, error={}", toEmail, e.getMessage());
         }
     }
 }

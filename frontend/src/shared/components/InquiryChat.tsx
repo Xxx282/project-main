@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react'
 import { Card, Input, Button, Space, Avatar, message, Spin, Typography } from 'antd'
-import { UserOutlined, ArrowLeftOutlined, SendOutlined, MessageOutlined, HomeOutlined } from '@ant-design/icons'
+import { UserOutlined, ArrowLeftOutlined, SendOutlined, MessageOutlined, HomeOutlined, PictureOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { getListing, getLandlordInfo, getTenantInfo } from '../../features/tenant/api/tenantApi'
 import { useAuth } from '../../features/auth/context/AuthContext'
-import { http } from '../api/http'
+import { http, env } from '../api/http'
+import { useTranslation } from 'react-i18next'
 
 const { TextArea } = Input
 
@@ -15,6 +16,11 @@ export type Message = {
   senderId: number
   senderRole: 'tenant' | 'landlord'
   content: string
+  imageUrl?: string
+  /** {t('pages.image')} base64（存库后与消息共用接口返回） */
+  imageData?: string
+  /** {t('pages.image')} MIME 类型 */
+  imageContentType?: string
   isRead: boolean
   createdAt: string
 }
@@ -49,10 +55,42 @@ async function getConversationMessages(conversationId: number): Promise<Message[
   return data.data.messages
 }
 
-// 发送消息
-async function sendMessage(conversationId: number, content: string): Promise<Message> {
-  const { data } = await http.post<{ code: number; data: Message }>(`/conversations/${conversationId}/messages`, { content })
+// 发送消息（文字与{t('pages.image')}共用此接口，{t('pages.image')}存库）
+async function sendMessageApi(conversationId: number, content: string, imageFile?: File): Promise<Message> {
+  const formData = new FormData()
+  formData.append('content', content)
+  if (imageFile) {
+    formData.append('image', imageFile)
+  }
+  const { data } = await http.post<{ code: number; data: Message }>(
+    `/conversations/${conversationId}/messages`,
+    formData,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }
+  )
   return data.data
+}
+
+// 兼容旧数据：{t('pages.image')} URL 转成可访问地址
+function getFullImageUrl(imageUrl: string): string {
+  if (!imageUrl) return ''
+  if (imageUrl.startsWith('http')) return imageUrl
+  const base = env?.apiBaseUrl ?? ''
+  const origin = base ? base.replace(/\/api\/?$/, '') : ''
+  return origin ? `${origin}${imageUrl}` : imageUrl
+}
+
+// 取消息中{t('pages.image')}的展示 src（优先 base64 存库，其次 imageUrl）
+function getMessageImageSrc(msg: Message): string {
+  if (msg.imageData) {
+    const type = msg.imageContentType || 'image/jpeg'
+    return `data:${type};base64,${msg.imageData}`
+  }
+  if (msg.imageUrl) return getFullImageUrl(msg.imageUrl)
+  return ''
 }
 
 export type InquiryChatProps = {
@@ -62,6 +100,7 @@ export type InquiryChatProps = {
 }
 
 export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatProps) {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const auth = useAuth()
@@ -103,21 +142,27 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
     enabled: Boolean(propertyId) && Boolean(userRole === 'landlord' ? conversationQ.data?.tenantId : propertyId),
   })
 
-  // 发送消息 mutation
+  // 发送消息 mutation（文字与{t('pages.image')}共用接口）
   const sendMessageMutation = useMutation({
-    mutationFn: (content: string) => sendMessage(conversationId, content),
+    mutationFn: ({ content, image }: { content: string; image?: File }) =>
+      sendMessageApi(conversationId, content, image),
     onSuccess: () => {
-      message.success('消息已发送')
+      message.success(t('pages.messageSent'))
       queryClient.invalidateQueries({ queryKey: ['conversation', conversationId, 'messages'] })
       queryClient.invalidateQueries({ queryKey: ['conversation', conversationId] })
       setInputMessage('')
+      setSelectedImage(null)
+      setImagePreview(null)
     },
     onError: () => {
-      message.error('发送失败')
+      message.error(t('pages.sendFailed'))
     },
   })
 
   const [inputMessage, setInputMessage] = useState('')
+  const [selectedImage, setSelectedImage] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // 标记已读
   useEffect(() => {
@@ -134,15 +179,35 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
   }, [messagesQ.data])
 
   const handleSendMessage = () => {
-    if (!inputMessage.trim()) {
-      message.warning('请输入消息内容')
+    if (!inputMessage.trim() && !selectedImage) {
+      message.warning(t('pages.pleaseEnterMessage'))
       return
     }
     if (!auth.user) {
-      message.warning('请先登录')
+      message.warning(t('pages.pleaseLoginFirst'))
       return
     }
-    sendMessageMutation.mutate(inputMessage)
+    sendMessageMutation.mutate({ content: inputMessage, image: selectedImage || undefined })
+  }
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        message.warning(t('pages.imageSizeLimit'))
+        return
+      }
+      setSelectedImage(file)
+      setImagePreview(URL.createObjectURL(file))
+    }
+  }
+
+  const handleRemoveImage = () => {
+    setSelectedImage(null)
+    setImagePreview(null)
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -178,7 +243,7 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
         padding: '24px',
       }}>
         <div style={{ maxWidth: 1000, margin: '0 auto' }}>
-          <Space direction="vertical" size={16} style={{ width: '100%' }}>
+          <Space orientation="vertical" size={16} style={{ width: '100%' }}>
             <Button 
               icon={<ArrowLeftOutlined />} 
               onClick={() => navigate(listPath)}
@@ -188,7 +253,7 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
                 border: 'none',
               }}
             >
-              返回咨询列表
+              {t('pages.backToInquiries')}
             </Button>
             <Card
               style={{ 
@@ -199,7 +264,7 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
               }}
             >
               <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
-                咨询信息加载失败
+                {t('pages.consultInfoLoadFailed')}
               </div>
             </Card>
           </Space>
@@ -219,7 +284,7 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
       padding: '24px',
     }}>
       <div style={{ maxWidth: 1000, margin: '0 auto' }}>
-        <Space direction="vertical" size={24} style={{ width: '100%' }}>
+        <Space orientation="vertical" size={24} style={{ width: '100%' }}>
           {/* 返回按钮 */}
           <Button 
             type="primary"
@@ -234,7 +299,7 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
               fontWeight: 600,
             }}
           >
-            返回咨询列表
+            {t('pages.backToInquiries')}
           </Button>
 
           {/* 聊天区域 */}
@@ -260,14 +325,14 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
                 />
                 <div>
                   <div style={{ fontWeight: 600 }}>
-                    {isTenant ? '房东' : '租客'}: {otherPartyQ.data?.username || '-'}
+                    {isTenant ? t('pages.landlord') : t('pages.tenant')}: {otherPartyQ.data?.username || '-'}
                     {otherPartyQ.data?.realName && ` (${otherPartyQ.data.realName})`}
                   </div>
                   <div style={{ fontSize: 12, color: '#999', display: 'flex', alignItems: 'center', gap: 4 }}>
                     <HomeOutlined />
                     <span>{listingQ.data?.title}</span>
                     <span style={{ marginLeft: 8, color: '#667eea', fontWeight: 600 }}>
-                      ₹{listingQ.data?.price}/月
+                      {t('common.yuanPerMonth').replace('/月', '')}{listingQ.data?.price}
                     </span>
                   </div>
                 </div>
@@ -290,7 +355,7 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
                 }}>
                   <MessageOutlined style={{ fontSize: 64, marginBottom: 16, color: '#d9d9d9' }} />
                   <Typography.Text style={{ fontSize: 16 }}>
-                    暂无聊天记录，请发送消息开始咨询
+                    {t('pages.noChatRecords')}
                   </Typography.Text>
                 </div>
               ) : (
@@ -319,9 +384,28 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
                           }}
                         >
                           <div style={{ fontSize: 12, marginBottom: 4, opacity: 0.8 }}>
-                            {msg.senderRole === 'tenant' ? '租客' : '房东'}
+                            {msg.senderRole === 'tenant' ? t('pages.tenant') : t('pages.landlord')}
                           </div>
-                          <div style={{ fontSize: 15, lineHeight: 1.5 }}>{msg.content}</div>
+                          {getMessageImageSrc(msg) && (
+                            <img
+                              src={getMessageImageSrc(msg)}
+                              alt={t('pages.image')}
+                              style={{
+                                maxWidth: '100%',
+                                borderRadius: '8px',
+                                marginBottom: msg.content ? '8px' : 0,
+                                cursor: 'pointer',
+                              }}
+                              onClick={() => {
+                                const src = getMessageImageSrc(msg)
+                                if (msg.imageData) {
+                                  const w = window.open('', '_blank')
+                                  if (w) w.document.write(`<img src="${src}" alt="${t('pages.image')}" style="max-width:100%" />`)
+                                } else window.open(src, '_blank')
+                              }}
+                            />
+                          )}
+                          {msg.content && <div style={{ fontSize: 15, lineHeight: 1.5 }}>{msg.content}</div>}
                           <div style={{ fontSize: 11, textAlign: 'right', marginTop: 6, opacity: 0.7 }}>
                             {new Date(msg.createdAt).toLocaleString()}
                           </div>
@@ -335,39 +419,80 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
             </div>
 
             {/* 输入区域 */}
-            <div style={{ 
-              padding: '16px', 
-              borderTop: '1px solid #f0f0f0', 
-              display: 'flex', 
-              gap: 12,
+            <div style={{
+              padding: '16px',
+              borderTop: '1px solid #f0f0f0',
               background: '#fff',
             }}>
-              <TextArea
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                onKeyDown={handleKeyPress}
-                placeholder="输入消息内容..."
-                autoSize={{ minRows: 1, maxRows: 4 }}
-                style={{ flex: 1 }}
-                size="large"
-              />
-              <Button
-                type="primary"
-                icon={<SendOutlined />}
-                onClick={handleSendMessage}
-                loading={sendMessageMutation.isPending}
-                size="large"
-                style={{
-                  background: 'linear-gradient(135deg, #4facfe 0%, #667eea 50%, #8b5cf6 100%)',
-                  border: 'none',
-                  borderRadius: '8px',
-                  boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
-                  height: 'auto',
-                  padding: '0 24px',
-                }}
-              >
-                发送
-              </Button>
+              {/* {t('pages.image')}预览区域 */}
+              {imagePreview && (
+                <div style={{ marginBottom: '12px', position: 'relative', display: 'inline-block' }}>
+                  <img
+                    src={imagePreview}
+                    alt={t('pages.image')}
+                    style={{ maxHeight: '100px', borderRadius: '8px', border: '1px solid #d9d9d9' }}
+                  />
+                  <Button
+                    type="text"
+                    danger
+                    size="small"
+                    onClick={handleRemoveImage}
+                    style={{ position: 'absolute', top: -8, right: -8 }}
+                  >
+                    ×
+                  </Button>
+                </div>
+              )}
+              <div style={{ display: 'flex', gap: 12, alignItems: 'flex-end' }}>
+                <input
+                  type="file"
+                  accept="image/jpeg,image/jpg,image/png,image/webp"
+                  onChange={handleImageSelect}
+                  ref={fileInputRef}
+                  style={{ display: 'none' }}
+                  id="chat-image-upload"
+                />
+                <label htmlFor="chat-image-upload">
+                  <Button
+                    type="text"
+                    icon={<PictureOutlined />}
+                    size="large"
+                    style={{ color: '#667eea' }}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      fileInputRef.current?.click()
+                    }}
+                  >
+                    {t('pages.image')}
+                  </Button>
+                </label>
+                <TextArea
+                  value={inputMessage}
+                  onChange={(e) => setInputMessage(e.target.value)}
+                  onKeyDown={handleKeyPress}
+                  placeholder="输入消息内容..."
+                  autoSize={{ minRows: 1, maxRows: 4 }}
+                  style={{ flex: 1 }}
+                  size="large"
+                />
+                <Button
+                  type="primary"
+                  icon={<SendOutlined />}
+                  onClick={handleSendMessage}
+                  loading={sendMessageMutation.isPending}
+                  size="large"
+                  style={{
+                    background: 'linear-gradient(135deg, #4facfe 0%, #667eea 50%, #8b5cf6 100%)',
+                    border: 'none',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
+                    height: 'auto',
+                    padding: '0 24px',
+                  }}
+                >
+                  发送
+                </Button>
+              </div>
             </div>
           </Card>
         </Space>

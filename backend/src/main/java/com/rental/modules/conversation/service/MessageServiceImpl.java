@@ -27,8 +27,9 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     @Transactional
-    public Message sendMessage(Long conversationId, Long senderId, String senderRole, String content) {
-        log.info("发送消息: conversationId={}, senderId={}, role={}", conversationId, senderId, senderRole);
+    public Message sendMessage(Long conversationId, Long senderId, String senderRole, String content, byte[] imageData, String imageContentType) {
+        boolean hasImage = imageData != null && imageData.length > 0;
+        log.info("发送消息: conversationId={}, senderId={}, role={}, hasImage={}", conversationId, senderId, senderRole, hasImage);
 
         // 验证对话是否存在
         Conversation conversation = conversationRepository.findById(conversationId)
@@ -39,19 +40,26 @@ public class MessageServiceImpl implements MessageService {
             throw new BusinessException(ResultCode.MESSAGE_SEND_ERROR, "对话已关闭，无法发送消息");
         }
 
-        // 创建消息
-        Message message = Message.builder()
+        // 创建消息（图片存库，与文字共用接口）
+        Message.MessageBuilder builder = Message.builder()
                 .conversationId(conversationId)
                 .senderId(senderId)
                 .senderRole(Message.SenderRole.valueOf(senderRole))
                 .content(content)
-                .isRead(false)
-                .build();
-
-        message = messageRepository.save(message);
+                .isRead(false);
+        if (hasImage) {
+            builder.imageData(imageData).imageContentType(imageContentType != null ? imageContentType : "image/jpeg");
+        }
+        Message message = messageRepository.save(builder.build());
 
         // 更新对话的最后消息和未读数
-        String preview = content.length() > 500 ? content.substring(0, 500) : content;
+        String preview = content;
+        if (hasImage) {
+            preview = "[图片] " + content;
+        }
+        if (preview.length() > 500) {
+            preview = preview.substring(0, 500);
+        }
         conversation.setLastMessage(preview);
         conversation.setLastMessageAt(LocalDateTime.now());
 

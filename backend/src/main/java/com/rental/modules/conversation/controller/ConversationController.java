@@ -18,9 +18,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -37,6 +39,9 @@ public class ConversationController {
 
     private final ConversationService conversationService;
     private final MessageService messageService;
+
+    private static final long MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
+    private static final List<String> ALLOWED_IMAGE_TYPES = List.of("image/jpeg", "image/jpg", "image/png", "image/webp");
 
     /**
      * 发起对话（租客发送第一条消息）
@@ -157,21 +162,46 @@ public class ConversationController {
     }
 
     /**
-     * 发送消息
+     * 发送消息（文字与图片共用此接口，图片存库）
+     * 请求格式：multipart/form-data，content 必填，image 可选
      */
-    @PostMapping("/{id}/messages")
+    @PostMapping(value = "/{id}/messages", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAnyRole('landlord', 'tenant')")
-    @Operation(summary = "发送消息")
+    @Operation(summary = "发送消息", description = "支持纯文字或文字+图片，图片直接存库")
     public ResponseEntity<Result<Message>> sendMessage(
             @PathVariable Long id,
-            @Valid @RequestBody SendMessageRequest requestBody,
+            @RequestParam("content") String content,
+            @RequestParam(value = "image", required = false) MultipartFile image,
             HttpServletRequest httpRequest) {
         Long userId = (Long) httpRequest.getAttribute("userId");
         String role = (String) httpRequest.getAttribute("role");
+        boolean hasImage = image != null && !image.isEmpty();
 
-        log.info("发送消息: conversationId={}, userId={}, role={}", id, userId, role);
+        log.info("发送消息: conversationId={}, userId={}, role={}, hasImage={}", id, userId, role, hasImage);
 
-        Message message = messageService.sendMessage(id, userId, role, requestBody.getContent());
+        byte[] imageData = null;
+        String imageContentType = null;
+        if (hasImage && image != null) {
+            if (image.getSize() > MAX_IMAGE_SIZE) {
+                throw new com.rental.common.exception.BusinessException(
+                        com.rental.common.ResultCode.MESSAGE_SEND_ERROR, "图片大小不能超过5MB");
+            }
+            String contentType = image.getContentType();
+            if (contentType == null || !ALLOWED_IMAGE_TYPES.contains(contentType.toLowerCase())) {
+                throw new com.rental.common.exception.BusinessException(
+                        com.rental.common.ResultCode.MESSAGE_SEND_ERROR, "仅支持 jpg、png、webp 格式");
+            }
+            try {
+                imageData = image.getBytes();
+                imageContentType = contentType;
+            } catch (java.io.IOException e) {
+                log.error("读取图片失败", e);
+                throw new com.rental.common.exception.BusinessException(
+                        com.rental.common.ResultCode.MESSAGE_SEND_ERROR, "图片读取失败");
+            }
+        }
+
+        Message message = messageService.sendMessage(id, userId, role, content, imageData, imageContentType);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Result.success(message));
@@ -236,12 +266,6 @@ public class ConversationController {
 
         @NotBlank(message = "消息内容不能为空")
         private String message;
-    }
-
-    @Data
-    public static class SendMessageRequest {
-        @NotBlank(message = "消息内容不能为空")
-        private String content;
     }
 
     @Data

@@ -14,7 +14,11 @@ export function AdminPaymentsPage() {
   // 待审核订单
   const pendingQuery = useQuery({
     queryKey: ['admin', 'payments', 'pending'],
-    queryFn: () => getPendingPayments(0, 20),
+    queryFn: async () => {
+      const data = await getPendingPayments(0, 20)
+      console.log('[AdminPayments] getPendingPayments 返回:', data)
+      return data
+    },
     enabled: activeTab === 'pending',
   })
 
@@ -57,8 +61,9 @@ export function AdminPaymentsPage() {
 
   const getStatusTag = (status: string) => {
     const map: Record<string, { color: string; text: string }> = {
-      PENDING: { color: 'orange', text: '待审核' },
-      SUCCESS: { color: 'green', text: '已支付' },
+      PENDING: { color: 'orange', text: '待房东确认' },
+      LANDLORD_CONFIRMED: { color: 'blue', text: '待管理员审核' },
+      SUCCESS: { color: 'green', text: '已完成' },
       REJECTED: { color: 'red', text: '已拒绝' },
       REFUNDED: { color: 'default', text: '已退款' },
     }
@@ -107,7 +112,7 @@ export function AdminPaymentsPage() {
           <Button type="link" size="small" onClick={() => openReviewModal(record)}>
             详情
           </Button>
-          {record.status === 'PENDING' && (
+          {record.status === 'LANDLORD_CONFIRMED' && (
             <>
               <Button type="link" size="small" onClick={() => {
                 setSelectedOrder(record)
@@ -173,14 +178,14 @@ export function AdminPaymentsPage() {
 
       {/* 审核弹窗 */}
       <Modal
-        title={selectedOrder?.status === 'PENDING' ? '审核订单' : '订单详情'}
+        title={selectedOrder?.status === 'LANDLORD_CONFIRMED' ? '审核订单' : '订单详情'}
         open={reviewModalVisible}
         onCancel={() => {
           setReviewModalVisible(false)
           setSelectedOrder(null)
           form.resetFields()
         }}
-        footer={selectedOrder?.status === 'PENDING' ? [
+        footer={selectedOrder?.status === 'LANDLORD_CONFIRMED' ? [
           <Button key="reject" danger onClick={() => handleReview('REJECT')}>
             退回
           </Button>,
@@ -204,12 +209,9 @@ export function AdminPaymentsPage() {
             <p><strong>支付方式：</strong>{selectedOrder.paymentChannel === 'WECHAT' ? '微信支付' : '支付宝'}</p>
             <p><strong>状态：</strong>{getStatusTag(selectedOrder.status)}</p>
             <p><strong>创建时间：</strong>{new Date(selectedOrder.createdAt).toLocaleString()}</p>
-            {selectedOrder.paidAt && <p><strong>支付时间：</strong>{new Date(selectedOrder.paidAt).toLocaleString()}</p>}
-            {selectedOrder.reviewedAt && <p><strong>审核时间：</strong>{new Date(selectedOrder.reviewedAt).toLocaleString()}</p>}
-            {selectedOrder.transactionId && <p><strong>交易号：</strong>{selectedOrder.transactionId}</p>}
             {selectedOrder.reviewNote && <p><strong>审核备注：</strong>{selectedOrder.reviewNote}</p>}
 
-            {selectedOrder.status === 'PENDING' && (
+            {selectedOrder.status === 'LANDLORD_CONFIRMED' && (
               <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
                 <Form.Item name="note" label="备注">
                   <Input.TextArea rows={3} placeholder="可选填写审核备注" />

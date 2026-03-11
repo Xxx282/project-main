@@ -101,6 +101,49 @@ public class ContractService {
     }
 
     /**
+     * 查询我的合同列表（房东）
+     */
+    public List<RentalContract> getMyContractsAsLandlord(Long landlordId) {
+        return contractRepository.findByLandlordIdOrderByCreatedAtDesc(landlordId);
+    }
+
+    /**
+     * 签署合同（房东电子签名）
+     */
+    @Transactional
+    public RentalContract signContractAsLandlord(Long landlordId, SignContractRequest request, String clientIp) {
+        log.info("房东签署合同: contractId={}, landlordId={}", request.getContractId(), landlordId);
+
+        RentalContract contract = contractRepository.findById(request.getContractId())
+                .orElseThrow(() -> new BusinessException("合同不存在"));
+
+        if (!contract.getLandlordId().equals(landlordId)) {
+            throw new BusinessException("无权操作此合同");
+        }
+
+        if (RentalContract.STATUS_COMPLETED.equals(contract.getStatus())) {
+            throw new BusinessException("合同已完成签署");
+        }
+
+        if (!RentalContract.STATUS_SIGNED.equals(contract.getStatus())) {
+            throw new BusinessException("租客尚未签署合同");
+        }
+
+        contract.setLandlordSignature(request.getSignature());
+        contract.setLandlordSignedAt(LocalDateTime.now());
+        contract.setLandlordIp(clientIp);
+        contract.setStatus(RentalContract.STATUS_COMPLETED);
+
+        contract = contractRepository.save(contract);
+        log.info("房东签署合同成功: contractNo={}", contract.getContractNo());
+
+        // 发送通知给管理员和租客
+        sendLandlordSignedNotifications(contract);
+
+        return contract;
+    }
+
+    /**
      * 查询合同详情
      */
     public RentalContract getContractById(Long contractId, Long userId) {
@@ -154,6 +197,71 @@ public class ContractService {
         } catch (Exception e) {
             log.error("发送合同签署通知失败: contractNo={}, err={}", contract.getContractNo(), e.getMessage());
         }
+    }
+
+    /**
+     * 房东签署合同后，通知管理员和租客
+     */
+    private void sendLandlordSignedNotifications(RentalContract contract) {
+        try {
+            // 查询管理员列表
+            List<UserEntity> admins = userRepository.findByRole(UserEntity.UserRole.admin);
+
+            String subject = "【租房平台】租房合同已完成签署 - " + contract.getContractNo();
+            String body = buildLandlordSignedBody(contract);
+
+            // 发送给所有管理员
+            for (UserEntity admin : admins) {
+                try {
+                    emailService.sendContractSignedEmail(admin.getEmail(), admin.getUsername(), contract, body);
+                    log.info("房东签署通知已发送给管理员: email={}", admin.getEmail());
+                } catch (Exception e) {
+                    log.error("发送通知给管理员失败: email={}, err={}", admin.getEmail(), e.getMessage());
+                }
+            }
+
+            // 发送给租客
+            userRepository.findById(contract.getTenantId()).ifPresent(tenant -> {
+                try {
+                    emailService.sendContractSignedEmail(tenant.getEmail(), tenant.getUsername(), contract, body);
+                    log.info("房东签署通知已发送给租客: email={}", tenant.getEmail());
+                } catch (Exception e) {
+                    log.error("发送通知给租客失败: email={}, err={}", tenant.getEmail(), e.getMessage());
+                }
+            });
+        } catch (Exception e) {
+            log.error("发送房东签署通知失败: contractNo={}, err={}", contract.getContractNo(), e.getMessage());
+        }
+    }
+
+    /**
+     * 构建房东签署通知邮件正文
+     */
+    private String buildLandlordSignedBody(RentalContract contract) {
+        return String.format(
+                "租房合同签署完成通知\n\n" +
+                "合同编号：%s\n" +
+                "房源：%s\n" +
+                "地址：%s\n" +
+                "租客：%s\n" +
+                "房东：%s\n" +
+                "月租金：¥%.2f\n" +
+                "押金：¥%.2f\n" +
+                "租期：%s 至 %s\n" +
+                "房东签署时间：%s\n\n" +
+                "合同双方已完成签署，正式生效。\n\n" +
+                "--- 租房平台",
+                contract.getContractNo(),
+                contract.getPropertyTitle() != null ? contract.getPropertyTitle() : "-",
+                contract.getPropertyAddress() != null ? contract.getPropertyAddress() : "-",
+                contract.getTenantRealName() != null ? contract.getTenantRealName() : contract.getTenantUsername(),
+                contract.getLandlordRealName() != null ? contract.getLandlordRealName() : contract.getLandlordUsername(),
+                contract.getMonthlyRent(),
+                contract.getDeposit(),
+                contract.getLeaseStart(),
+                contract.getLeaseEnd(),
+                contract.getLandlordSignedAt() != null ? contract.getLandlordSignedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : "-"
+        );
     }
 
     /**

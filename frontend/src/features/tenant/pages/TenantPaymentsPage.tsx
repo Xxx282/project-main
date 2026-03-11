@@ -1,7 +1,7 @@
 import { Table, Tag, Space, Card } from 'antd'
 import { useQuery } from '@tanstack/react-query'
 import { PageHeader } from '../../../shared/ui/PageHeader'
-import { getMyPayments, type PaymentOrder } from '../../payment/api/paymentApi'
+import { getMyPayments } from '../../payment/api/paymentApi'
 
 export function TenantPaymentsPage() {
   const { data, isLoading } = useQuery({
@@ -11,8 +11,9 @@ export function TenantPaymentsPage() {
 
   const getStatusTag = (status: string) => {
     const map: Record<string, { color: string; text: string }> = {
-      PENDING: { color: 'orange', text: '待审核' },
-      SUCCESS: { color: 'green', text: '已支付' },
+      PENDING: { color: 'orange', text: '待房东确认' },
+      LANDLORD_CONFIRMED: { color: 'blue', text: '待管理员审核' },
+      SUCCESS: { color: 'green', text: '已完成' },
       REJECTED: { color: 'red', text: '已拒绝' },
       REFUNDED: { color: 'default', text: '已退款' },
     }

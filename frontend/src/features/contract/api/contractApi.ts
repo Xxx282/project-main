@@ -17,7 +17,8 @@ export interface RentalContract {
   deposit: number
   leaseStart: string
   leaseEnd: string
-  status: 'PENDING_SIGN' | 'SIGNED'
+  // 后端枚举：pending_sign / signed / completed / cancelled
+  status: 'pending_sign' | 'signed' | 'completed' | 'cancelled'
   tenantSignature?: string
   signedAt?: string
   tenantIp?: string
@@ -68,6 +69,18 @@ export async function getContractById(id: number): Promise<RentalContract> {
 // 管理员获取所有合同
 export async function getAllContracts(): Promise<RentalContract[]> {
   const response = await http.get('/api/contracts/admin/all')
+  return response.data.data
+}
+
+// 房东获取我的合同列表
+export async function getLandlordContracts(): Promise<RentalContract[]> {
+  const response = await http.get('/api/contracts/landlord/my')
+  return response.data.data
+}
+
+// 房东签署合同
+export async function signContractAsLandlord(data: SignContractRequest): Promise<RentalContract> {
+  const response = await http.post('/api/contracts/landlord/sign', data)
   return response.data.data
 }
 

@@ -94,7 +94,7 @@ public class PaymentOrder {
     private BigDecimal amount;
 
     /**
-     * 订单状态：PENDING（待审核）、SUCCESS（已支付）、REJECTED（已拒绝）、REFUNDED（已退款）
+     * 订单状态：PENDING（待房东确认）、LANDLORD_CONFIRMED（房东已确认，待管理员审核）、SUCCESS（已完成）、REJECTED（已拒绝）、REFUNDED（已退款）
      */
     @Column(nullable = false, length = 20)
     @Builder.Default
@@ -105,30 +105,6 @@ public class PaymentOrder {
      */
     @Column(name = "payment_channel", length = 20)
     private String paymentChannel;
-
-    /**
-     * 第三方交易号（模拟）
-     */
-    @Column(name = "transaction_id", length = 64)
-    private String transactionId;
-
-    /**
-     * 支付时间
-     */
-    @Column(name = "paid_at")
-    private LocalDateTime paidAt;
-
-    /**
-     * 审核时间
-     */
-    @Column(name = "reviewed_at")
-    private LocalDateTime reviewedAt;
-
-    /**
-     * 审核人ID（管理员）
-     */
-    @Column(name = "reviewer_id")
-    private Long reviewerId;
 
     /**
      * 审核备注
@@ -160,6 +136,7 @@ public class PaymentOrder {
      * 状态常量
      */
     public static final String STATUS_PENDING = "PENDING";
+    public static final String STATUS_LANDLORD_CONFIRMED = "LANDLORD_CONFIRMED";
     public static final String STATUS_SUCCESS = "SUCCESS";
     public static final String STATUS_REJECTED = "REJECTED";
     public static final String STATUS_REFUNDED = "REFUNDED";
