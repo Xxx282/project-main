@@ -34,7 +34,7 @@ const COLORS = {
 }
 
 export function LandlordContractSignPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const contractId = Number(searchParams.get('contractId'))
@@ -62,10 +62,10 @@ export function LandlordContractSignPage() {
       signContractAsLandlord({ contractId, signature }),
     onSuccess: () => {
       setSigned(true)
-      message.success('合同签署成功！')
+      message.success(t('pages.signSuccess'))
       queryClient.invalidateQueries({ queryKey: ['landlord', 'contracts'] })
     },
-    onError: (e: any) => message.error(e?.response?.data?.message || '签署失败，请重试'),
+    onError: (e: any) => message.error(e?.response?.data?.message || t('pages.signFailed')),
   })
 
   // Canvas 初始化
@@ -199,18 +199,28 @@ export function LandlordContractSignPage() {
         .clear-btn:hover { border-color: ${COLORS.warn} !important; color: ${COLORS.warn} !important; }
       `}</style>
 
-      {/* 顶部 */}
-      <div style={{ maxWidth: 820, margin: '0 auto 32px', textAlign: 'center' }}>
+      {/* 顶部（含语言切换） */}
+      <div style={{ maxWidth: 820, margin: '0 auto 32px', textAlign: 'center', position: 'relative' }}>
+        <div style={{ position: 'absolute', top: 0, right: 0 }}>
+          <Button
+            size="small"
+            onClick={() => {
+              const next = i18n.language === 'zh-CN' ? 'en-US' : 'zh-CN'
+              i18n.changeLanguage(next)
+              localStorage.setItem('language', next)
+            }}
+          >{i18n.language === 'zh-CN' ? 'EN' : '中文'}</Button>
+        </div>
         <div style={{
           display: 'inline-flex', alignItems: 'center', gap: 8,
           background: COLORS.accentGlow, border: `1px solid ${COLORS.accent}`,
           borderRadius: 20, padding: '4px 18px', fontSize: 12,
           letterSpacing: 3, color: COLORS.accent, marginBottom: 16,
-        }}>⚖ 电子合同</div>
+        }}>⚖ {t('pages.electronicContractBadge')}</div>
         <h1 style={{ fontSize: 28, fontWeight: 800, margin: '0 0 8px', letterSpacing: 3, color: '#fff' }}>
-          房东签署合同
+          {t('pages.landlordSignsContractTitle')}
         </h1>
-        <div style={{ color: COLORS.muted, fontSize: 13 }}>请仔细核对合同信息后签署 · {new Date().toLocaleDateString('zh-CN')}</div>
+        <div style={{ color: COLORS.muted, fontSize: 13 }}>{t('pages.landlordSignPrompt')} · {new Date().toLocaleDateString(i18n.language === 'zh-CN' ? 'zh-CN' : 'en-US')}</div>
       </div>
 
       {/* 合同卡片 */}
@@ -256,7 +266,7 @@ export function LandlordContractSignPage() {
               fontSize: 14, fontWeight: 700, color: COLORS.accent,
               letterSpacing: 1, borderLeft: `3px solid ${COLORS.accent}`,
               paddingLeft: 10, marginBottom: 20,
-            }}>房东电子签名</div>
+            }}>{t('pages.landlordSignature')}</div>
 
             <div style={{
               background: COLORS.card,
@@ -294,12 +304,12 @@ export function LandlordContractSignPage() {
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 16, flexWrap: 'wrap', gap: 12 }}>
                 <Button onClick={clearCanvas} className="clear-btn">
-                  清除重签
+                  {t('pages.clearResign')}
                 </Button>
 
                 <Space>
                   <Button onClick={handleBack}>
-                    返回
+                    {t('pages.back')}
                   </Button>
                   <Button
                     type="primary"
@@ -308,7 +318,7 @@ export function LandlordContractSignPage() {
                     disabled={!hasStroke}
                     className="sign-btn"
                   >
-                    {signMutation.isPending ? '提交中…' : '✍ 确认签署'}
+                    {signMutation.isPending ? t('pages.processing') : t('pages.confirmSignBtn')}
                   </Button>
                 </Space>
               </div>
@@ -323,8 +333,7 @@ export function LandlordContractSignPage() {
                 color: COLORS.warn,
                 lineHeight: 1.8,
               }}>
-                ⚠ 签署声明：本人已核对合同内容，确认信息真实无误，自愿签署本租房合同，
-                本次电子签名具有与手写签名同等的法律效力。
+                {t('pages.signStatement')}
               </div>
             </div>
           </div>
