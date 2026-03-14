@@ -33,4 +33,14 @@ public interface AuthService {
      * 验证用户名是否已存在
      */
     boolean isUsernameExists(String username);
+
+    /**
+     * 请求密码重置：向邮箱发送重置链接
+     */
+    void requestPasswordReset(String email);
+
+    /**
+     * 根据 token 重置密码
+     */
+    void resetPassword(String email, String token, String newPassword);
 }

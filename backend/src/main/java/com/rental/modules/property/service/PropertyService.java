@@ -36,6 +36,11 @@ public interface PropertyService {
      */
     Page<Property> searchByKeyword(String keyword, Property.PropertyStatus status, Pageable pageable);
 
+    /**
+     * AI 智能搜索：从自然语言中解析城市、户型、价格等条件，结合数据库筛选
+     */
+    Page<Property> searchBySmartQuery(String query, Property.PropertyStatus status, Pageable pageable);
+
     Optional<Property> findById(Long id);
 
     Property findByIdOrThrow(Long id);
@@ -75,4 +80,14 @@ public interface PropertyService {
      * 统计待审核房源数量
      */
     long countPending();
+
+    /**
+     * 查询相似房源（根据城市、区域、户型等条件）
+     */
+    List<Property> findSimilarProperties(String city, String region, Integer bedrooms, Integer limit);
+
+    /**
+     * 查找最接近的房源（根据输入条件，返回数据库中最匹配的一个）
+     */
+    Property findClosestProperty(String city, Integer bedrooms, Integer area);
 }

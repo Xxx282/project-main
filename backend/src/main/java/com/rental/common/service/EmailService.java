@@ -49,4 +49,29 @@ public class EmailService {
             throw new BusinessException("邮件发送失败，请稍后重试");
         }
     }
+
+    /**
+     * 发送密码重置邮件（包含重置链接）
+     */
+    public void sendPasswordResetEmail(String toEmail, String username, String resetLink) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(fromEmail);
+            message.setTo(toEmail);
+            message.setSubject("【租房平台】找回密码");
+            message.setText(String.format(
+                "您好 %s，\n\n" +
+                "您正在申请重置密码。请点击以下链接完成重置（链接 1 小时内有效）：\n\n" +
+                "%s\n\n" +
+                "如果不是您本人操作，请忽略此邮件。\n\n" +
+                "--- 租房平台",
+                username, resetLink
+            ));
+            mailSender.send(message);
+            log.info("密码重置邮件发送成功: to={}", toEmail);
+        } catch (Exception e) {
+            log.error("发送密码重置邮件失败: to={}, error={}", toEmail, e.getMessage());
+            throw new BusinessException("邮件发送失败，请稍后重试");
+        }
+    }
 }

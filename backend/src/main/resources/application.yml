@@ -26,7 +26,7 @@ spring:
     username: root
     # 推荐用环境变量注入，避免把真实密码提交到仓库
     # Windows PowerShell 启动前设置：$env:DB_PASSWORD="你的密码"
-    password: ${DB_PASSWORD:root}
+    password: ${DB_PASSWORD:040104}
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: 10
@@ -76,6 +76,17 @@ app:
       retry:
         max-attempts: 3
         delay: 1000
+
+  # AI 服务配置
+  # provider: ollama（本地免费）| openai（云 API 付费）
+  ai:
+    enabled: ${AI_ENABLED:true}
+    provider: ${AI_PROVIDER:ollama}
+    api:
+      key: ${AI_API_KEY:}
+      url: ${AI_API_URL:https://api.deepseek.com/v1/chat/completions}
+    ollama-url: ${OLLAMA_URL:http://localhost:11434}
+    model: ${AI_MODEL:qwen3:4b}
 
   # 图片上传配置
   upload:

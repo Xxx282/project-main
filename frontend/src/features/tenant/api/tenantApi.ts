@@ -46,6 +46,19 @@ export async function listListings(query: ListingsQuery): Promise<Listing[]> {
   return data.data
 }
 
+// AI 智能搜索（返回 AI 总结 + 房源列表）
+export type AiSearchResponse = {
+  aiAnswer: string
+  properties: Listing[]
+  criteria?: { city?: string; bedrooms?: number; minPrice?: number; maxPrice?: number }
+  totalFound: number
+}
+
+export async function aiSearch(query: string, limit = 20): Promise<AiSearchResponse> {
+  const { data } = await http.post<SingleResponse<AiSearchResponse>>('/ai/search', { query, limit })
+  return data.data
+}
+
 // 城市统计类型
 export type CityStats = [string, number][]
 

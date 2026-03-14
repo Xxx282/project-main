@@ -65,9 +65,9 @@ public class PropertyController {
             propertyStatus = Property.PropertyStatus.valueOf(status);
         }
 
-        // 如果有关键词搜索，优先使用关键词搜索
+        // 如果有关键词/自然语言，使用 AI 智能搜索（基于数据库的智能解析）
         if (q != null && !q.trim().isEmpty()) {
-            Page<Property> listings = propertyService.searchByKeyword(q.trim(), propertyStatus, pageable);
+            Page<Property> listings = propertyService.searchBySmartQuery(q.trim(), propertyStatus, pageable);
             return ResponseEntity.ok(Result.success(listings.getContent()));
         }
 

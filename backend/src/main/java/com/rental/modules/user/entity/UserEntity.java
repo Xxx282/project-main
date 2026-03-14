@@ -58,6 +58,14 @@ public class UserEntity {
     private LocalDateTime verificationCodeExpiredAt;
     // ========== 邮箱验证字段 ==========
 
+    // ========== 密码重置字段 ==========
+    @Column(name = "password_reset_token", length = 64)
+    private String passwordResetToken;
+
+    @Column(name = "password_reset_token_expired_at")
+    private LocalDateTime passwordResetTokenExpiredAt;
+    // ========== 密码重置字段 ==========
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

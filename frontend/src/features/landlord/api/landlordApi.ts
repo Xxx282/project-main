@@ -53,6 +53,57 @@ export type PricePredictResponse = {
   upperBound?: number
 }
 
+export type SimilarProperty = {
+  id: number
+  title: string
+  city: string
+  region: string
+  bedrooms: number
+  bathrooms: number
+  area: number
+  price: number
+  decoration: string
+}
+
+export type ClosestProperty = {
+  id: number
+  title: string
+  city: string
+  region: string
+  address: string
+  bedrooms: number
+  bathrooms: number
+  area: number
+  price: number
+  totalFloors: number
+  decoration: string
+  description: string
+  status: string
+  viewCount: number
+  landlordUsername: string
+}
+
+export async function getSimilarProperties(city?: string, region?: string, bedrooms?: number, limit?: number): Promise<SimilarProperty[]> {
+  const params = new URLSearchParams()
+  if (city) params.append('city', city)
+  if (region) params.append('region', region)
+  if (bedrooms) params.append('bedrooms', String(bedrooms))
+  if (limit) params.append('limit', String(limit))
+
+  const { data } = await http.get<{ data: SimilarProperty[] }>(`/ml/similar?${params.toString()}`)
+  return data.data
+}
+
+export async function getClosestProperty(city: string, bedrooms: number, area: number): Promise<ClosestProperty | null> {
+  const params = new URLSearchParams()
+  params.append('city', city)
+  params.append('bedrooms', String(bedrooms))
+  params.append('area', String(area))
+
+  const { data } = await http.get<{ data: ClosestProperty | null }>(`/ml/closest?${params.toString()}`)
+  return data.data
+}
+
 export async function listMyListings(): Promise<Listing[]> {
   const { data } = await http.get<ListResponse<Listing>>('/listings/mine')
   return data.data

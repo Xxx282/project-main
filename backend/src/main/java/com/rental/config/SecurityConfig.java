@@ -48,6 +48,9 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/ml/status").permitAll()
+                        .requestMatchers("/ml/closest").permitAll()
+                        // AI 服务公开访问
+                        .requestMatchers("/ai/**").permitAll()
                         // 健康检查
                         .requestMatchers("/actuator/health").permitAll()
                         // 静态资源（图片等）公开访问

@@ -4,9 +4,9 @@ import { useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { SettingOutlined, SearchOutlined } from '@ant-design/icons'
+import { SettingOutlined, SearchOutlined, RobotOutlined } from '@ant-design/icons'
 import { PageHeader } from '../../../shared/ui/PageHeader'
-import { getListingImages, listListings } from '../api/tenantApi'
+import { getListingImages, listListings, aiSearch } from '../api/tenantApi'
 import type { Listing } from '../../../shared/api/types'
 import { useAuth } from '../../auth/context/AuthContext'
 
@@ -48,17 +48,32 @@ export function TenantListingsPage() {
   const [settingsModalOpen, setSettingsModalOpen] = useState(false)
   const [form] = Form.useForm()
 
+  const q = params.get('q') || undefined
+  const useAiSearch = !!q?.trim()
+
   const listingsQ = useQuery({
     queryKey: ['tenant', 'listings', Object.fromEntries(params)],
-    queryFn: () =>
-      listListings({
-        q: params.get('q') || undefined,
+    queryFn: async () => {
+      if (useAiSearch) {
+        try {
+          const res = await aiSearch(q.trim(), 50)
+          return { listings: res.properties, aiAnswer: res.aiAnswer }
+        } catch {
+          // AI 服务不可用时回退到普通搜索
+          const listings = await listListings({ q })
+          return { listings, aiAnswer: null }
+        }
+      }
+      const listings = await listListings({
+        q,
         city: params.get('city') || undefined,
         region: params.get('region') || undefined,
         bedrooms: params.get('bedrooms') ? Number(params.get('bedrooms')) : undefined,
         minPrice: params.get('minPrice') ? Number(params.get('minPrice')) : undefined,
         maxPrice: params.get('maxPrice') ? Number(params.get('maxPrice')) : undefined,
-      }),
+      })
+      return { listings, aiAnswer: null }
+    },
   })
 
   const STORAGE_KEY = 'listings_columns'
@@ -135,7 +150,7 @@ export function TenantListingsPage() {
         <Space orientation="vertical" size={16} style={{ width: '100%' }}>
           <PageHeader title={t('pages.listings')} align="center" />
 
-          {/* 关键词搜索面板 */}
+          {/* AI 智能搜索面板 */}
           <Card
             style={{
               width: '100%',
@@ -160,10 +175,10 @@ export function TenantListingsPage() {
             setParams(next)
           }}
         >
-          <Form.Item name="q" style={{ marginBottom: 0, flex: 1, maxWidth: 500 }}>
+          <Form.Item name="q" style={{ marginBottom: 0, flex: 1, maxWidth: 560 }}>
             <Input
               size="large"
-              placeholder={t('pages.searchListings')}
+              placeholder={t('pages.aiSearchPlaceholder') || t('pages.searchListings')}
               allowClear
               style={{
                 width: '100%',
@@ -212,7 +227,37 @@ export function TenantListingsPage() {
             </Space>
           </Form.Item>
             </Form>
+            <div style={{ textAlign: 'center', marginTop: 8, fontSize: 12, color: 'rgba(255,255,255,0.85)' }}>
+              {t('pages.aiSearchHint')}
+            </div>
           </Card>
+
+          {/* AI 搜索总结（仅当有搜索词且有 AI 回答时显示） */}
+          {listingsQ.data?.aiAnswer && (
+            <Card
+              size="small"
+              style={{
+                width: '100%',
+                borderRadius: 12,
+                border: '1px solid #e6f4ff',
+                background: 'linear-gradient(135deg, #e6f7ff 0%, #f0f5ff 100%)',
+              }}
+            >
+              <Space align="start" size={12}>
+                <RobotOutlined style={{ fontSize: 24, color: '#1890ff', marginTop: 2 }} />
+                <div>
+                  <Typography.Text strong style={{ fontSize: 13, color: '#0958d9' }}>
+                    {t('pages.aiSearchResult') || 'AI 搜索解读'}
+                  </Typography.Text>
+                  <Typography.Paragraph
+                    style={{ marginBottom: 0, marginTop: 4, whiteSpace: 'pre-wrap' }}
+                  >
+                    {listingsQ.data.aiAnswer}
+                  </Typography.Paragraph>
+                </div>
+              </Space>
+            </Card>
+          )}
 
           <Card
             title={t('pages.listings')}
@@ -233,7 +278,7 @@ export function TenantListingsPage() {
               rowKey="id"
               loading={listingsQ.isLoading}
               columns={columns}
-              dataSource={listingsQ.data ?? []}
+              dataSource={listingsQ.data?.listings ?? []}
               size="middle"
               pagination={{ pageSize: 4, showSizeChanger: false, placement: ['bottomCenter'] }}
             />

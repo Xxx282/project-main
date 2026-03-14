@@ -19,8 +19,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Random;
+import java.util.UUID;
 
 /**
  * 认证服务实现
@@ -38,6 +41,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Value("${app.jwt.expiration}")
     private Long jwtExpiration;
+
+    @Value("${app.base-url:http://localhost:5173}")
+    private String baseUrl;
 
     @Override
     public LoginResponse login(LoginRequest request) {
@@ -183,6 +189,41 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public boolean isUsernameExists(String username) {
         return userRepository.existsByUsername(username);
+    }
+
+    @Override
+    @Transactional
+    public void requestPasswordReset(String email) {
+        UserEntity user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new BusinessException("该邮箱未注册"));
+        String token = UUID.randomUUID().toString().replace("-", "");
+        user.setPasswordResetToken(token);
+        user.setPasswordResetTokenExpiredAt(LocalDateTime.now().plusHours(1));
+        userRepository.save(user);
+        String resetLink = baseUrl + "/reset-password?token=" + token + "&email=" + URLEncoder.encode(email, StandardCharsets.UTF_8);
+        emailService.sendPasswordResetEmail(user.getEmail(), user.getUsername(), resetLink);
+        log.info("密码重置邮件已发送: email={}", email);
+    }
+
+    @Override
+    @Transactional
+    public void resetPassword(String email, String token, String newPassword) {
+        if (token == null || token.isBlank()) {
+            throw new BusinessException("重置链接无效");
+        }
+        UserEntity user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new BusinessException("用户不存在"));
+        if (user.getPasswordResetToken() == null || !user.getPasswordResetToken().equals(token)) {
+            throw new BusinessException("重置链接无效或已失效");
+        }
+        if (user.getPasswordResetTokenExpiredAt() == null || user.getPasswordResetTokenExpiredAt().isBefore(LocalDateTime.now())) {
+            throw new BusinessException("重置链接已过期，请重新申请");
+        }
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setPasswordResetToken(null);
+        user.setPasswordResetTokenExpiredAt(null);
+        userRepository.save(user);
+        log.info("密码重置成功: email={}", email);
     }
 
     /**

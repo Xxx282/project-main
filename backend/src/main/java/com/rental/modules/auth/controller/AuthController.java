@@ -73,4 +73,28 @@ public class AuthController {
         boolean exists = authService.isUsernameExists(username);
         return ResponseEntity.ok(Result.success(Map.of("exists", exists)));
     }
+
+    @PostMapping("/forgot-password")
+    @Operation(summary = "忘记密码：发送重置链接到邮箱")
+    public ResponseEntity<Result<Map<String, String>>> forgotPassword(@RequestBody Map<String, String> body) {
+        String email = body.get("email");
+        if (email == null || email.isBlank()) {
+            return ResponseEntity.badRequest().body(Result.error("请填写邮箱"));
+        }
+        authService.requestPasswordReset(email.trim());
+        return ResponseEntity.ok(Result.success(Map.of("message", "重置链接已发送至您的邮箱，请查收")));
+    }
+
+    @PostMapping("/reset-password")
+    @Operation(summary = "根据链接中的 token 重置密码")
+    public ResponseEntity<Result<Map<String, String>>> resetPassword(@RequestBody Map<String, String> body) {
+        String email = body.get("email");
+        String token = body.get("token");
+        String newPassword = body.get("newPassword");
+        if (email == null || email.isBlank() || token == null || token.isBlank() || newPassword == null || newPassword.isBlank()) {
+            return ResponseEntity.badRequest().body(Result.error("请填写完整信息"));
+        }
+        authService.resetPassword(email.trim(), token.trim(), newPassword);
+        return ResponseEntity.ok(Result.success(Map.of("message", "密码已重置，请使用新密码登录")));
+    }
 }

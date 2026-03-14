@@ -83,6 +83,30 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
             Pageable pageable);
 
     /**
+     * 智能搜索：筛选条件 + 标题关键词
+     */
+    @Query("SELECT p FROM Property p WHERE " +
+           "(:city IS NULL OR p.city = :city) AND " +
+           "(:region IS NULL OR p.region = :region) AND " +
+           "(:minPrice IS NULL OR p.price >= :minPrice) AND " +
+           "(:maxPrice IS NULL OR p.price <= :maxPrice) AND " +
+           "(:bedrooms IS NULL OR p.bedrooms = :bedrooms) AND " +
+           "(:status IS NULL OR p.status = :status) AND " +
+           "(:keyword IS NULL OR :keyword = '' OR LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+    Page<Property> findByFiltersAndKeyword(
+            @Param("city") String city,
+            @Param("region") String region,
+            @Param("minPrice") BigDecimal minPrice,
+            @Param("maxPrice") BigDecimal maxPrice,
+            @Param("bedrooms") Integer bedrooms,
+            @Param("status") Property.PropertyStatus status,
+            @Param("keyword") String keyword,
+            Pageable pageable);
+
+    @Query("SELECT DISTINCT p.city FROM Property p WHERE p.status = :status ORDER BY p.city")
+    List<String> findDistinctCitiesByStatus(@Param("status") Property.PropertyStatus status);
+
+    /**
      * 增加浏览次数
      */
     @Modifying
@@ -116,4 +140,19 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
      */
     @Query("SELECT p.city, COUNT(p) FROM Property p WHERE p.status = :status GROUP BY p.city")
     List<Object[]> countByCityGroupByStatus(@Param("status") Property.PropertyStatus status);
+
+    /**
+     * 查询相似房源（相同城市、区域、户型且状态为可租的房源）
+     */
+    @Query("SELECT p FROM Property p WHERE p.status = :status " +
+           "AND (:city IS NULL OR p.city = :city) " +
+           "AND (:region IS NULL OR p.region = :region) " +
+           "AND (:bedrooms IS NULL OR p.bedrooms = :bedrooms) " +
+           "ORDER BY p.price ASC")
+    List<Property> findSimilarProperties(
+            @Param("status") Property.PropertyStatus status,
+            @Param("city") String city,
+            @Param("region") String region,
+            @Param("bedrooms") Integer bedrooms
+    );
 }

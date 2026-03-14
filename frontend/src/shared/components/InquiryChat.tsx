@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Card, Input, Button, Space, Avatar, message, Spin, Typography } from 'antd'
-import { UserOutlined, ArrowLeftOutlined, SendOutlined, MessageOutlined, HomeOutlined } from '@ant-design/icons'
+import { UserOutlined, ArrowLeftOutlined, SendOutlined, MessageOutlined, HomeOutlined, RobotOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { getListing, getLandlordInfo, getTenantInfo } from '../../features/tenant/api/tenantApi'
@@ -52,6 +52,17 @@ async function getConversationMessages(conversationId: number): Promise<Message[
 // 发送消息
 async function sendMessage(conversationId: number, content: string): Promise<Message> {
   const { data } = await http.post<{ code: number; data: Message }>(`/conversations/${conversationId}/messages`, { content })
+  return data.data
+}
+
+// AI 智能回复建议（租客咨询房东场景）
+async function getAiReplySuggestion(params: {
+  listingTitle: string
+  listingPrice: string
+  listingDescription?: string
+  recentMessages: string
+}): Promise<string> {
+  const { data } = await http.post<{ code: number; data: string }>('/ai/chat/suggest', params)
   return data.data
 }
 
@@ -118,6 +129,7 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
   })
 
   const [inputMessage, setInputMessage] = useState('')
+  const [aiSuggestLoading, setAiSuggestLoading] = useState(false)
 
   // 标记已读
   useEffect(() => {
@@ -149,6 +161,30 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       handleSendMessage()
+    }
+  }
+
+  // 租客：获取 AI 智能回复建议
+  const handleAiSuggest = async () => {
+    if (!listingQ.data) return
+    setAiSuggestLoading(true)
+    try {
+      const recentMessages = (messagesQ.data ?? [])
+        .slice(-10)
+        .map((m) => `${m.senderRole === 'tenant' ? '租客' : '房东'}: ${m.content}`)
+        .join('\n')
+      const suggestion = await getAiReplySuggestion({
+        listingTitle: listingQ.data.title || '',
+        listingPrice: String(listingQ.data.price ?? ''),
+        listingDescription: listingQ.data.description || '',
+        recentMessages,
+      })
+      setInputMessage((prev) => (prev ? `${prev}\n${suggestion}` : suggestion))
+      message.success('已填入 AI 回复建议，可编辑后发送')
+    } catch {
+      message.error('AI 建议获取失败，请稍后重试')
+    } finally {
+      setAiSuggestLoading(false)
     }
   }
 
@@ -338,36 +374,52 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
             <div style={{ 
               padding: '16px', 
               borderTop: '1px solid #f0f0f0', 
-              display: 'flex', 
-              gap: 12,
               background: '#fff',
             }}>
-              <TextArea
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                onKeyDown={handleKeyPress}
-                placeholder="输入消息内容..."
-                autoSize={{ minRows: 1, maxRows: 4 }}
-                style={{ flex: 1 }}
-                size="large"
-              />
-              <Button
-                type="primary"
-                icon={<SendOutlined />}
-                onClick={handleSendMessage}
-                loading={sendMessageMutation.isPending}
-                size="large"
-                style={{
-                  background: 'linear-gradient(135deg, #4facfe 0%, #667eea 50%, #8b5cf6 100%)',
-                  border: 'none',
-                  borderRadius: '8px',
-                  boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
-                  height: 'auto',
-                  padding: '0 24px',
-                }}
-              >
-                发送
-              </Button>
+              {isTenant && (
+                <div style={{ marginBottom: 8 }}>
+                  <Button
+                    type="link"
+                    icon={<RobotOutlined />}
+                    loading={aiSuggestLoading}
+                    onClick={handleAiSuggest}
+                    style={{ padding: 0, color: '#667eea', fontSize: 13 }}
+                  >
+                    AI 智能回复
+                  </Button>
+                  <Typography.Text type="secondary" style={{ fontSize: 12, marginLeft: 8 }}>
+                    根据当前对话生成回复建议，可编辑后发送
+                  </Typography.Text>
+                </div>
+              )}
+              <div style={{ display: 'flex', gap: 12 }}>
+                <TextArea
+                  value={inputMessage}
+                  onChange={(e) => setInputMessage(e.target.value)}
+                  onKeyDown={handleKeyPress}
+                  placeholder="输入消息内容..."
+                  autoSize={{ minRows: 1, maxRows: 4 }}
+                  style={{ flex: 1 }}
+                  size="large"
+                />
+                <Button
+                  type="primary"
+                  icon={<SendOutlined />}
+                  onClick={handleSendMessage}
+                  loading={sendMessageMutation.isPending}
+                  size="large"
+                  style={{
+                    background: 'linear-gradient(135deg, #4facfe 0%, #667eea 50%, #8b5cf6 100%)',
+                    border: 'none',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
+                    height: 'auto',
+                    padding: '0 24px',
+                  }}
+                >
+                  发送
+                </Button>
+              </div>
             </div>
           </Card>
         </Space>
