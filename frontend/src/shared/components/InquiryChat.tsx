@@ -393,7 +393,7 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
                 </div>
               </div>
             }
-            bodyStyle={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 }}
+            styles={{ body: { flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 } }}
           >
             {/* 聊天记录区域 */}
             <div style={{ flex: 1, overflow: 'auto', padding: '16px', background: '#fafafa' }}>

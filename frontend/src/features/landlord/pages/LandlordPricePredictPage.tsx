@@ -71,6 +71,7 @@ export function LandlordPricePredictPage() {
 
       try {
         predictResult = await pricePredict(params)
+        console.log('[页面] 预测结果:', predictResult)
       } catch (e) {
         console.error('预测失败:', e)
       }
@@ -427,7 +428,7 @@ export function LandlordPricePredictPage() {
                   minHeight: 400,
                   overflow: 'hidden',
                 }}
-                bodyStyle={{ overflow: 'hidden' }}
+                styles={{ body: { overflow: 'hidden' } }}
               >
                 {loading ? (
                   <div style={{ 
@@ -492,7 +493,7 @@ export function LandlordPricePredictPage() {
                           boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                           marginBottom: 16,
                         }}
-                        bodyStyle={{ padding: 16 }}
+                        styles={{ body: { padding: 16 } }}
                       >
                         <Typography.Text strong style={{ fontSize: 15, color: '#1a1a1a' }}>
                           {t('pages.mlPrediction') || '价格区间'}
@@ -568,7 +569,7 @@ export function LandlordPricePredictPage() {
                         boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
                         marginBottom: 16,
                       }}
-                      bodyStyle={{ padding: '20px 24px' }}
+                      styles={{ body: { padding: '20px 24px' } }}
                     >
                       <div style={{ marginBottom: 16 }}>
                         <TableOutlined style={{ marginRight: 8, color: '#667eea' }} />
@@ -652,7 +653,7 @@ export function LandlordPricePredictPage() {
                             borderRadius: 12,
                             marginBottom: 16,
                           }}
-                          bodyStyle={{ padding: 12 }}
+                          styles={{ body: { padding: 12 } }}
                         >
                           <div style={{ marginBottom: 12 }}>
                             <Typography.Text strong style={{ color: '#667eea', fontSize: 14 }}>
@@ -765,7 +766,7 @@ export function LandlordPricePredictPage() {
                             borderRadius: '12px',
                             border: '1px solid #b7eb8f',
                           }}
-                          bodyStyle={{ padding: '24px 28px' }}
+                          styles={{ body: { padding: '24px 28px' } }}
                         >
                           <div style={{ marginBottom: 20 }}>
                             <Typography.Title level={5} style={{ color: '#52c41a', margin: 0, display: 'inline' }}>

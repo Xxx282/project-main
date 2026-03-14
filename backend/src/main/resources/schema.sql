@@ -139,44 +139,7 @@ CREATE TABLE IF NOT EXISTS rent_predictions (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='租金预测结果表';
 
 -- ============================================
--- 5. 租赁成交表 (lease_transactions)
--- 用途: 存储最终成交的租赁记录
--- ============================================
-CREATE TABLE IF NOT EXISTS lease_transactions (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '成交记录主键ID',
-    property_id BIGINT UNSIGNED NOT NULL COMMENT '房源ID，外键关联properties.id',
-    tenant_id BIGINT UNSIGNED NOT NULL COMMENT '租客ID，外键关联users.id',
-    landlord_id BIGINT UNSIGNED NOT NULL COMMENT '房东ID，外键关联users.id（冗余字段，便于查询）',
-    final_price DECIMAL(10,2) NOT NULL COMMENT '最终成交租金（元/月）',
-    deposit_amount DECIMAL(10,2) DEFAULT NULL COMMENT '实际押金金额（元）',
-    start_date DATE NOT NULL COMMENT '租赁开始日期',
-    end_date DATE NOT NULL COMMENT '租赁结束日期',
-    lease_months INT UNSIGNED NOT NULL COMMENT '租赁月数',
-    transaction_status ENUM('pending', 'active', 'completed', 'cancelled') NOT NULL DEFAULT 'pending' COMMENT '交易状态: pending(待确认) / active(进行中) / completed(已完成) / cancelled(已取消)',
-    contract_number VARCHAR(100) DEFAULT NULL COMMENT '合同编号',
-    signed_at TIMESTAMP DEFAULT NULL COMMENT '合同签署时间',
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '成交记录创建时间',
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '记录更新时间',
-    PRIMARY KEY (id),
-    KEY idx_property_id (property_id),
-    KEY idx_tenant_id (tenant_id),
-    KEY idx_landlord_id (landlord_id),
-    KEY idx_start_date (start_date),
-    KEY idx_end_date (end_date),
-    KEY idx_transaction_status (transaction_status),
-    KEY idx_created_at (created_at),
-    CONSTRAINT fk_lease_transactions_property FOREIGN KEY (property_id)
-        REFERENCES properties(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT fk_lease_transactions_tenant FOREIGN KEY (tenant_id)
-        REFERENCES users(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT fk_lease_transactions_landlord FOREIGN KEY (landlord_id)
-        REFERENCES users(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT chk_lease_dates CHECK (end_date > start_date),
-    CONSTRAINT chk_lease_price CHECK (final_price > 0)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='租赁成交记录表';
-
--- ============================================
--- 6. 租客偏好设置表 (tenant_preferences)
+-- 5. 租客偏好设置表 (tenant_preferences)
 -- 用途: 存储租客的租房偏好设置（预算、区域、户型）
 -- ============================================
 CREATE TABLE IF NOT EXISTS tenant_preferences (
@@ -214,10 +177,6 @@ ALTER TABLE properties ADD INDEX idx_landlord_status (landlord_id, status);
 -- 为咨询表添加复合索引（已废弃）
 -- ALTER TABLE inquiries ADD INDEX idx_tenant_created (tenant_id, created_at);
 -- ALTER TABLE inquiries ADD INDEX idx_landlord_status_created (landlord_id, status, created_at);
-
--- 为租赁成交表添加复合索引（统计分析场景）
-ALTER TABLE lease_transactions ADD INDEX idx_status_dates (transaction_status, start_date, end_date);
-ALTER TABLE lease_transactions ADD INDEX idx_property_tenant (property_id, tenant_id);
 
 -- 为租金预测表添加复合索引（模型评估场景）
 ALTER TABLE rent_predictions ADD INDEX idx_property_version (property_id, model_version);

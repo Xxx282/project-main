@@ -85,7 +85,7 @@ Reference	20
 
 EXECUTIVE SUMMARY
 Our proposal outlines the development of an Intelligent Housing Rental System powered by machine learning, designed to address key inefficiencies in the current rental market. The system will provide personalized property recommendations for tenants and data-driven rental pricing for landlords, leveraging advanced algorithms to improve matching accuracy and operational efficiency. The project responds to clear market needs: tenants struggle to find suitable properties quickly, while landlords often set prices based on subjective judgment. By integrating machine learning models for recommendation and price prediction, the system aims to reduce search time and limit pricing deviations to within market rates.
-Then, Key deliverables include a fully functional web application with tenant, landlord, and admin modules, supported by a machine learning engine and a secure MySQL database. The system will be developed using modern technologies such as Java/Spring Boot, React/Vue.js, and Python-based ML libraries, and will follow an Agile/Scrum methodology to ensure flexibility and alignment with client expectations. The project team consists of four specialized roles: Machine Learning Engineer, Front-end and Back-end Developers, and a Database/Testing Specialist. A structured 15-sprint plan ensures phased delivery¡ªfrom requirements analysis to final handover¡ªwith regular client and mentor reviews to maintain quality and relevance. As an academic project, the system will be developed using open-source tools at minimal cost, emphasizing practical innovation and educational value. Upon completion, the system will serve as a scalable, intelligent solution for rental platforms and agencies seeking to enhance user satisfaction and market competitiveness.
+Then, Key deliverables include a fully functional web application with tenant, landlord, and admin modules, supported by a machine learning engine and a secure MySQL database. The system will be developed using modern technologies such as Java/Spring Boot, React/Vue.js, and Python-based ML libraries, and will follow an Agile/Scrum methodology to ensure flexibility and alignment with client expectations. The project team consists of four specialized roles: Machine Learning Engineer, Front-end and Back-end Developers, and a Database/Testing Specialist. A structured 15-sprint plan ensures phased deliveryï¿½ï¿½from requirements analysis to final handoverï¿½ï¿½with regular client and mentor reviews to maintain quality and relevance. As an academic project, the system will be developed using open-source tools at minimal cost, emphasizing practical innovation and educational value. Upon completion, the system will serve as a scalable, intelligent solution for rental platforms and agencies seeking to enhance user satisfaction and market competitiveness.
 1. 
 Terms of Reference
 1.1 Purpose of Project
@@ -120,26 +120,75 @@ This project aims to develop a fully functional, machine learning-based intellig
 3.2 Deliverables
 The Table1 lists the key outputs of the project, including documentation, system components, and functional modules. It ensures all parties have a clear understanding of the expected results, such as the machine learning model, front-end interface, and user manuals.
 Table1 Diliberables
-DeliverablesContentRequirements analysis reportDocument detailing functional and non-functional requirements.System design documentTechnical blueprints including architecture, API specs, and database design.Machine learning model reportReport on model selection, training, performance metrics, and validation.Testing reportDocumentation of test cases, results from functional/performance/UAT testing, and optimization records.Front-end interfaceUser interfaces built with React/Vue.js for tenants, landlords, and administrators.Back-end systemServer-side logic and APIs developed using Java and Spring Boot.Machine learning model packageCode, trained models, and dependencies for the recommendation and price prediction features.DatabaseA implemented MySQL database storing user, listing, and transaction data.User manualAn operational guide for end-users (tenants and landlords) on how to use the system.Technical handover documentDocumentation for system deployment, maintenance, and future.
+Deliverables
+Content
+Requirements analysis report
+Document detailing functional and non-functional requirements.
+System design document
+Technical blueprints including architecture, API specs, and database design.
+Machine learning model report
+Report on model selection, training, performance metrics, and validation.
+Testing report
+Documentation of test cases, results from functional/performance/UAT testing, and optimization records.
+Front-end interface
+User interfaces built with React/Vue.js for tenants, landlords, and administrators.
+Back-end system
+Server-side logic and APIs developed using Java and Spring Boot.
+Machine learning model package
+Code, trained models, and dependencies for the recommendation and price prediction features.
+Database
+A implemented MySQL database storing user, listing, and transaction data.
+User manual
+An operational guide for end-users (tenants and landlords) on how to use the system.
+Technical handover document
+Documentation for system deployment, maintenance, and future.
 
 3.3 Scope of the Project
 The Table2 outlines the high-level functional modules and components included in the system. It defines the boundaries of the project, covering tenant, landlord, admin, and machine learning modules to ensure focused development.
 Table2 The high-level requirements
-ModuleComponentsTenant ModuleUser registration, preference setting, personalized recommendation browsing, listing comparison, inquiry submission.Landlord ModuleListing publication, tenant inquiry management, listing performance analysis.Admin ModuleUser management, listing review, data dashboard.Machine Learning ModuleCollaborative filtering-based recommendation algorithm, multiple linear regression/gradient boosting-based price prediction model.SecurityUser data encrypted.
+Module
+Components
+Tenant Module
+User registration, preference setting, personalized recommendation browsing, listing comparison, inquiry submission.
+Landlord Module
+Listing publication, tenant inquiry management, listing performance analysis.
+Admin Module
+User management, listing review, data dashboard.
+Machine Learning Module
+Collaborative filtering-based recommendation algorithm, multiple linear regression/gradient boosting-based price prediction model.
+Security
+User data encrypted.
 
 3.4 Technical Infrastructure and Skills Required
 Table3, the essential technologies, tools, and skills needed for the project are summarized. It includes development environments, programming languages, frameworks, and datasets, providing a clear technical roadmap for implementation. Here, the essential technologies, tools, and skills needed for the project are summarized. It includes development environments, programming languages, frameworks, and datasets, providing a clear technical roadmap for implementation.
 Table3 Technical Infrastructure and Skills Required
-CategorySpecific Items / SkillsDevelopment ToolsIntelliJ IDEA, VS Code, Jupyter NotebookTechnologiesJava, React/Vue.js, Python, MySQLLibraries/FrameworksScikit-learn, TensorFlow, Spring Boot, Ant DesignDatasetsKaggle USA Housing Listings, client-provided historical transaction dataProgrammingJava, Python, JavaScript/HTML/CSSMachine LearningRegression algorithms, collaborative filtering, data preprocessingDatabaseMySQL query optimization, data modelingProject ManagementAgile methodology, WBS planning, risk management
+Category
+Specific Items / Skills
+Development Tools
+IntelliJ IDEA, VS Code, Jupyter Notebook
+Technologies
+Java, React/Vue.js, Python, MySQL
+Libraries/Frameworks
+Scikit-learn, TensorFlow, Spring Boot, Ant Design
+Datasets
+Kaggle USA Housing Listings, client-provided historical transaction data
+Programming
+Java, Python, JavaScript/HTML/CSS
+Machine Learning
+Regression algorithms, collaborative filtering, data preprocessing
+Database
+MySQL query optimization, data modeling
+Project Management
+Agile methodology, WBS planning, risk management
 
 4. 
 Skills Analysis
 4.1 IT-specific skills
 The development team possesses a strong foundation in programming, data analysis, and software engineering. Team members are proficient in Python, Java, and SQL, and are capable of utilizing machine learning libraries such as Scikit-learn, Pandas, NumPy, and XGBoost to perform predictive modeling and data-driven analysis. The team also demonstrates competence in backend frameworks such as Flask and Django, enabling seamless integration between machine learning models and web applications. In addition, familiarity with Git and GitHub ensures effective version control and collaboration throughout the development process.
 4.2 Personal, professional, and technical capabilities
-The team exhibits strong analytical thinking and problem-solving abilities, which are essential for developing an intelligent housing rental prediction model. Members demonstrate professional communication, teamwork, and time management skills, allowing efficient coordination between the front-end, back-end, and data analysis groups. Technically, the team is capable of performing data preprocessing, feature selection, model training, and deployment, and translating analytical results into practical insights that support the system¡¯s intelligent recommendation and pricing functions.
+The team exhibits strong analytical thinking and problem-solving abilities, which are essential for developing an intelligent housing rental prediction model. Members demonstrate professional communication, teamwork, and time management skills, allowing efficient coordination between the front-end, back-end, and data analysis groups. Technically, the team is capable of performing data preprocessing, feature selection, model training, and deployment, and translating analytical results into practical insights that support the systemï¿½ï¿½s intelligent recommendation and pricing functions.
 4.3 Knowledge gap analysis
-Although the team demonstrates strong technical proficiency, several practical knowledge gaps have been identified in the current stage of model development. Firstly, the team requires deeper understanding of feature engineering and data preprocessing techniques, such as feature selection, outlier handling, and categorical encoding, which play a crucial role in improving prediction accuracy on the Kaggle housing dataset. Secondly, while the team is experienced in implementing standard machine learning algorithms such as Random Forest, there is limited experience with model optimization and hyperparameter tuning, particularly in determining suitable parameter ranges and avoiding overfitting. Thirdly, the understanding of model evaluation and interpretability methods, including the use of SHAP values or feature importance visualization, needs to be strengthened to provide transparent reasoning behind the model¡¯s rental price predictions. Finally, the team needs further practice in model deployment using Flask APIs and ensuring smooth interaction between the prediction service and the system backend. Addressing these knowledge gaps will enhance both the technical robustness and the real-world applicability of the intelligent rental price prediction model.
+Although the team demonstrates strong technical proficiency, several practical knowledge gaps have been identified in the current stage of model development. Firstly, the team requires deeper understanding of feature engineering and data preprocessing techniques, such as feature selection, outlier handling, and categorical encoding, which play a crucial role in improving prediction accuracy on the Kaggle housing dataset. Secondly, while the team is experienced in implementing standard machine learning algorithms such as Random Forest, there is limited experience with model optimization and hyperparameter tuning, particularly in determining suitable parameter ranges and avoiding overfitting. Thirdly, the understanding of model evaluation and interpretability methods, including the use of SHAP values or feature importance visualization, needs to be strengthened to provide transparent reasoning behind the modelï¿½ï¿½s rental price predictions. Finally, the team needs further practice in model deployment using Flask APIs and ensuring smooth interaction between the prediction service and the system backend. Addressing these knowledge gaps will enhance both the technical robustness and the real-world applicability of the intelligent rental price prediction model.
 4.4 
 Skills improvement plan
 To address the identified knowledge gaps, the development team plans to improve its technical and analytical skills through continuous consultation with supervisors and self-directed learning from online academic resources. The team will regularly discuss algorithm optimization strategies and model evaluation approaches with the instructor to ensure that the implementation aligns with both technical standards and project requirements. At the same time, team members will make use of open online tutorials, educational videos, and documentation related to Scikit-learn, Flask, and XGBoost to strengthen their understanding of model deployment, interpretability, and hyperparameter tuning. Each iteration of model improvement will be documented, compared, and analyzed to accumulate practical experience. This gradual, feedback-driven learning process will help the team develop stronger technical independence and ensure the robustness and reliability of the machine learning component within the overall system.
@@ -147,22 +196,34 @@ To address the identified knowledge gaps, the development team plans to improve 
 5. 
 Team Roles
 5.1 Machine Learning Algorithm
-This project aims to develop an intelligent rental price prediction model serving as the analytical core of the housing rental system. The Kaggle USA Housing Listings dataset, containing approximately 380,000 records and attributes such as region, number of bedrooms, bathrooms, area, latitude, longitude, and price, will be used for model development. The model¡¯s objective is to predict rental prices based on property attributes, providing data-driven support for intelligent pricing and recommendation.
+This project aims to develop an intelligent rental price prediction model serving as the analytical core of the housing rental system. The Kaggle USA Housing Listings dataset, containing approximately 380,000 records and attributes such as region, number of bedrooms, bathrooms, area, latitude, longitude, and price, will be used for model development. The modelï¿½ï¿½s objective is to predict rental prices based on property attributes, providing data-driven support for intelligent pricing and recommendation.
 The development pipeline will include data preprocessing, baseline modeling, and optimization and deployment. In the first stage, the dataset will be cleaned, normalized, and enriched with derived features such as price-per-square-foot and region-encoded variables. A Random Forest model will be implemented as the baseline, chosen for its robustness on tabular data (Wang, 2024). After establishing baseline performance, the team will optimize the model using XGBoost, incorporating feature importance analysis and hyperparameter tuning to improve accuracy. The optimized model will be deployed via Flask API, enabling real-time communication between the backend and the predictive model.
-Performance will be evaluated using Mean Absolute Error (MAE) and R? metrics, ensuring the model¡¯s reliability and interpretability. Visualization of predicted versus actual prices and feature importance plots will be used to analyze model behavior and confirm the optimization effect.
+Performance will be evaluated using Mean Absolute Error (MAE) and R? metrics, ensuring the modelï¿½ï¿½s reliability and interpretability. Visualization of predicted versus actual prices and feature importance plots will be used to analyze model behavior and confirm the optimization effect.
 5.2 Front-end Development
 The responsibilities included the design and development of responsive user interfaces with a focus on continuous user experience optimization. Tasking with presenting complex information clearly through data visualization and ensuring efficient and stable connectivity between the front-end and back-end APIs.
 5.3 Back-end Development
 The backend development leader will be responsible for building the core business logic and server-side architecture of the entire system. Their main responsibilities include designing and implementing a RESTful API architecture based on Spring Boot, ensuring efficient and secure communication between the frontend, machine learning APIs, and database; The specific work involves using Spring Security to implement a complete user registration, login, and permission management module, developing core API interfaces (such as property acquisition and filtering, price prediction, personalized recommendations, etc.), and integrating machine learning microservices as the system center, while collaborating with database administrators to optimize data query performance. The technology stack will mainly use Java, Spring Boot, Spring Security, and RESTful APIs.
 
 5.4 Database (MySQL) and System Testing
-When designing the database table structure, the focus will be on constructing a structured storage system around the core business scenarios of the system, specifically including several key tables. The Users table concentrates on user information management, not only storing basic customer information such as tenants and landlords, but also adding differentiated fields according to user roles; the Properties table comprehensively records fundamental property information and attributes; the RentPredictions table is dedicated to storing rent prediction results produced by machine learning models, including key influencing factors, facilitating the tracking of model iteration effects and optimization directions; the LeaseTransaction table retains the final delivery confirmation information, ensuring the traceability of transaction closure and providing a data basis for subsequent market analysis and dispute resolution.
+When designing the database table structure, the focus will be on constructing a structured storage system around the core business scenarios of the system, specifically including several key tables. The Users table concentrates on user information management, not only storing basic customer information such as tenants and landlords, but also adding differentiated fields according to user roles; the Properties table comprehensively records fundamental property information and attributes; the RentPredictions table is dedicated to storing rent prediction results produced by machine learning models, including key influencing factors, facilitating the tracking of model iteration effects and optimization directions.
 
 6.Team Schedule
 6.1 Work Schedule
 Table 4 provides a detailed plan for the team's weekly work time allocation, specifying the exact duration and arrangement for offline collaboration, online follow-ups, and issue communication, ensuring time protection for the team to efficiently advance the project. Offline collaboration focuses on in-depth development tasks, allowing members to concentrate on solving complex technical problems, while the remaining time is flexibly managed for individual assigned tasks, balancing efficiency and flexibility.
 Table4  Weekly Work Hours Allocation
-Time CategoryHoursSpecific ArrangementsOffline Work4-5Every Sunday from 9:00 to 17:00, on-site focused development tasksOnline Task Follow-Up6-8Daily 19:40-20:00 online brief stand-up meeting to sync task progress; the rest of the time is flexibly used to handle assigned tasks.Issue Communication2Every Wednesday from 18:00 to 20:00, time is reserved for addressing client requirement changes or resolving technical issues. A 24-hour prior appointment is required for communication.6.2 Mentor Meeting Schedule
+Time Category
+Hours
+Specific Arrangements
+Offline Work
+4-5
+Every Sunday from 9:00 to 17:00, on-site focused development tasks
+Online Task Follow-Up
+6-8
+Daily 19:40-20:00 online brief stand-up meeting to sync task progress; the rest of the time is flexibly used to handle assigned tasks.
+Issue Communication
+2
+Every Wednesday from 18:00 to 20:00, time is reserved for addressing client requirement changes or resolving technical issues. A 24-hour prior appointment is required for communication.
+6.2 Mentor Meeting Schedule
 Mentor meetings are held regularly, mainly in person. The meeting contents include submitting last week's progress report, receiving technical guidance, and confirming the priorities of next week's tasks as well as synchronizing risk response plans. Before the meeting, the person in charge organizes the meeting agenda and progress materials and sends them to the mentor via DingTalk.
  6.3 Client Meeting Schedule
 Customer meetings will be held regularly, primarily in person; if in-person meetings are not feasible, they will be conducted online via Tencent Meeting. The meeting content mainly includes collecting customer feedback and confirming requirement details to avoid requirement deviations. 
@@ -221,32 +282,47 @@ Figure5 Risk management process
 
 
 8.3 Data Source
-The dataset utilized in this project is derived from Kaggle¡¯s ¡°USA Housing Listings¡± dataset compiled by Austin Reese (2023), which can be accessed at https://www.kaggle.com/datasets/austinreese/usa-housing-listings
+The dataset utilized in this project is derived from Kaggleï¿½ï¿½s ï¿½ï¿½USA Housing Listingsï¿½ï¿½ dataset compiled by Austin Reese (2023), which can be accessed at https://www.kaggle.com/datasets/austinreese/usa-housing-listings
 . This dataset provides approximately 380,000 real housing records collected from various regions of the United States. It contains detailed attributes such as property type, number of bedrooms and bathrooms, square footage, geographic coordinates (latitude and longitude), and listing prices.
 In this research, the dataset serves as the primary foundation for the machine learning module, supporting both model training and evaluation. Prior to model implementation, the dataset undergoes data cleaning and preprocessing to remove missing or inconsistent values and to normalize the features for model input. Categorical variables such as property type are encoded, and numerical variables are standardized to ensure uniformity across samples. The processed data is then used to develop and validate the rental price prediction model, which learns the relationships between property features and market pricing trends.
-Moreover, the dataset provides a representative benchmark for simulating housing recommendation scenarios within the prototype system, enabling the algorithm to deliver data-driven, contextually relevant suggestions to end users. The use of this dataset strictly adheres to Kaggle¡¯s open data license agreement, and all collected information is employed exclusively for academic and research purposes, without any commercial intent.
+Moreover, the dataset provides a representative benchmark for simulating housing recommendation scenarios within the prototype system, enabling the algorithm to deliver data-driven, contextually relevant suggestions to end users. The use of this dataset strictly adheres to Kaggleï¿½ï¿½s open data license agreement, and all collected information is employed exclusively for academic and research purposes, without any commercial intent.
 
 9. 
 Project Plan
 9.1 Requirement Analysis & Planning
-This initial phase focuses on clarifying project scope and laying a solid planning foundation. In Stage 1, the team will conduct a comprehensive market survey¡ªanalyzing the strengths, shortcomings, and key features of existing housing rental systems to identify gaps the new system will address. Concurrently, the team will hold structured meetings with the client to elicit detailed requirements, including functional needs and non-functional needs. In Stage 2, the team will synthesize survey and client input into a formal requirements analysis report, finalize the project schedule (with clear task allocation for each role), and establish a risk register to document potential challenges and initial mitigation strategies. This phase also involves aligning with the university¡¯s proposal assessment requirements¡ªincorporating the requirements report and project plan into the proposal document for submission. The completion of this phase depends on client confirmation of requirements and mentor approval of the initial plan.
+This initial phase focuses on clarifying project scope and laying a solid planning foundation. In Stage 1, the team will conduct a comprehensive market surveyï¿½ï¿½analyzing the strengths, shortcomings, and key features of existing housing rental systems to identify gaps the new system will address. Concurrently, the team will hold structured meetings with the client to elicit detailed requirements, including functional needs and non-functional needs. In Stage 2, the team will synthesize survey and client input into a formal requirements analysis report, finalize the project schedule (with clear task allocation for each role), and establish a risk register to document potential challenges and initial mitigation strategies. This phase also involves aligning with the universityï¿½ï¿½s proposal assessment requirementsï¿½ï¿½incorporating the requirements report and project plan into the proposal document for submission. The completion of this phase depends on client confirmation of requirements and mentor approval of the initial plan.
 9.2 System Design
-Building on the approved requirements, this phase translates functional needs into technical blueprints. In Stage 3, the team will design the system architecture: the front-end team will create wireframes for the tenant portal, landlord portal, and admin dashboard, ensuring interfaces align with user habits; the back-end team will outline API specifications and design the database structure¡ªcreating an ER diagram to store user data, property features, and historical transaction records. In Stage 4, the machine learning specialist will finalize the model design: selecting algorithms for personalized recommendation and rental price prediction, and defining data preprocessing steps. The deliverables of this phase include front-end wireframes, API documentation, database ER diagrams, and a machine learning model design report¡ªall requiring mentor review to ensure alignment with technical feasibility standards.
+Building on the approved requirements, this phase translates functional needs into technical blueprints. In Stage 3, the team will design the system architecture: the front-end team will create wireframes for the tenant portal, landlord portal, and admin dashboard, ensuring interfaces align with user habits; the back-end team will outline API specifications and design the database structureï¿½ï¿½creating an ER diagram to store user data, property features, and historical transaction records. In Stage 4, the machine learning specialist will finalize the model design: selecting algorithms for personalized recommendation and rental price prediction, and defining data preprocessing steps. The deliverables of this phase include front-end wireframes, API documentation, database ER diagrams, and a machine learning model design reportï¿½ï¿½all requiring mentor review to ensure alignment with technical feasibility standards.
 9.3 Development & Implementation
-This is the core execution phase, focusing on building and integrating all system modules. From Stage 5 to 7, the front-end team will implement the interface: developing components for user registration/login, preference setting, listing display, and price prediction result visualization; ensuring responsive design to support both desktop and mobile browsers. Concurrently, the back-end team will develop APIs: implementing user authentication logic, listing CRUD operations, and data transmission interfaces that connect to the machine learning module. From Stage 8 to 9, the machine learning specialist will implement the models: preprocessing data, training recommendation and price prediction models using datasets, and validating model performance with metrics like precision and RMSE. In Stage 10, the team will integrate front-end, back-end, and machine learning modules: ensuring front-end interfaces can call back-end APIs to fetch personalized recommendations and price predictions, and resolving integration issues through iterative testing. This phase also aligns with the university¡¯s mid-project review¡ªpreparing a demo of the integrated modules and a progress report to showcase development outcomes.
+This is the core execution phase, focusing on building and integrating all system modules. From Stage 5 to 7, the front-end team will implement the interface: developing components for user registration/login, preference setting, listing display, and price prediction result visualization; ensuring responsive design to support both desktop and mobile browsers. Concurrently, the back-end team will develop APIs: implementing user authentication logic, listing CRUD operations, and data transmission interfaces that connect to the machine learning module. From Stage 8 to 9, the machine learning specialist will implement the models: preprocessing data, training recommendation and price prediction models using datasets, and validating model performance with metrics like precision and RMSE. In Stage 10, the team will integrate front-end, back-end, and machine learning modules: ensuring front-end interfaces can call back-end APIs to fetch personalized recommendations and price predictions, and resolving integration issues through iterative testing. This phase also aligns with the universityï¿½ï¿½s mid-project reviewï¿½ï¿½preparing a demo of the integrated modules and a progress report to showcase development outcomes.
 9.4 Testing & Optimization
-This phase focuses on ensuring system quality and performance. In Stage 11, the team will conduct functional testing: verifying that all modules work as required and cross-checking against the requirements document to identify gaps. In Stage 12, performance testing will be executed: measuring system response time and conducting load testing to confirm the system can handle concurrent user requests. The machine learning specialist will also optimize model performance¡ªadjusting algorithms if accuracy falls below targets. In Stage 13, the team will conduct User Acceptance Testing with the client: inviting tenants and landlords to test the system, collecting feedback on usability and functionality, and making final adjustments. The deliverable of this phase is a comprehensive testing report¡ªincluding test cases, results, and optimization records¡ªrequired for mentor review before final delivery.
+This phase focuses on ensuring system quality and performance. In Stage 11, the team will conduct functional testing: verifying that all modules work as required and cross-checking against the requirements document to identify gaps. In Stage 12, performance testing will be executed: measuring system response time and conducting load testing to confirm the system can handle concurrent user requests. The machine learning specialist will also optimize model performanceï¿½ï¿½adjusting algorithms if accuracy falls below targets. In Stage 13, the team will conduct User Acceptance Testing with the client: inviting tenants and landlords to test the system, collecting feedback on usability and functionality, and making final adjustments. The deliverable of this phase is a comprehensive testing reportï¿½ï¿½including test cases, results, and optimization recordsï¿½ï¿½required for mentor review before final delivery.
 9.5 Delivery & Handover
-This final phase focuses on formalizing deliverables and transferring the system to the client. In Stage 14, the team will compile all project documentation: finalizing the user manual, technical handover documents, and the project portfolio¡ªaligned with university assessment requirements for the final poster and portfolio. The team will also prepare a training session for the client¡¯s staff, covering system operation, basic troubleshooting, and how to leverage machine learning outputs. In Stage 15, the team will formally hand over the system: deploying the finalized software to the client¡¯s environment, conducting the training session, and collecting client sign-off on deliverables. Additionally, the team will complete the university¡¯s reflective report¡ªdocumenting lessons learned and individual contributions. The completion of this phase marks the project¡¯s closure, with all deliverables submitted to both the client and the university for final assessment.
+This final phase focuses on formalizing deliverables and transferring the system to the client. In Stage 14, the team will compile all project documentation: finalizing the user manual, technical handover documents, and the project portfolioï¿½ï¿½aligned with university assessment requirements for the final poster and portfolio. The team will also prepare a training session for the clientï¿½ï¿½s staff, covering system operation, basic troubleshooting, and how to leverage machine learning outputs. In Stage 15, the team will formally hand over the system: deploying the finalized software to the clientï¿½ï¿½s environment, conducting the training session, and collecting client sign-off on deliverables. Additionally, the team will complete the universityï¿½ï¿½s reflective reportï¿½ï¿½documenting lessons learned and individual contributions. The completion of this phase marks the projectï¿½ï¿½s closure, with all deliverables submitted to both the client and the university for final assessment.
 
 
 10. Cost Estimation
 This project is conducted for academic and research purposes, primarily using open-source software and student-owned hardware. As a result, the total financial expenditure is minimal. Software tools such as Python, Scikit-learn, Flask, XGBoost, MySQL, and Pycharm are freely available under open-source or academic licenses. Cloud environments such as Google Colab may be optionally used for model training and testing.
 Table5 The Cost
-CategoryResource DescriptionEstimated Cost (RMB)SoftwarePython, Flask, Scikit-learn, XGBoost, MySQL, Pycharm0HardwarePersonal laptops7000*4Human ResourceFour members ¡Á 500 hours (academic only)0Total Estimated Cost28,000 RMBThe total project cost is estimated at approximately 28,000 RMB, covering optional cloud services and electricity expenses. All other components rely on free educational or open-source software, ensuring that the project remains sustainable, non-commercial, and aligned with academic integrity standards.
+Category
+Resource Description
+Estimated Cost (RMB)
+Software
+Python, Flask, Scikit-learn, XGBoost, MySQL, Pycharm
+0
+Hardware
+Personal laptops
+7000*4
+Human Resource
+Four members ï¿½ï¿½ 500 hours (academic only)
+0
+Total Estimated Cost
+
+28,000 RMB
+The total project cost is estimated at approximately 28,000 RMB, covering optional cloud services and electricity expenses. All other components rely on free educational or open-source software, ensuring that the project remains sustainable, non-commercial, and aligned with academic integrity standards.
 
 Reference
-1. Schwaber, K., & Sutherland, J. (2020). The Scrum guide: The definitive guide to Scrum. Scrum.org. (Used to guide Agile Scrum implementation, ensuring alignment with the Project Document¡¯s timeline and team structure.)
+1. Schwaber, K., & Sutherland, J. (2020). The Scrum guide: The definitive guide to Scrum. Scrum.org. (Used to guide Agile Scrum implementation, ensuring alignment with the Project Documentï¿½ï¿½s timeline and team structure.)
 2. Zhang, Z. (n.d.). Topic 9 - Design and Implementation of an Intelligent Housing Rental System based on Machine Learning_Project Proposal Form.
 3. Wang, S., Wang, H., & Li, J. (2022). A hybrid machine learning approach for real estate price prediction considering spatial heterogeneity. Expert Systems with Applications, 195, 116569.
 4. Wang, J., & Chen, X. (2023. Enhancing personalized recommendation in online rental platforms using hybrid deep learning and context-aware filtering.?Knowledge-Based Systems, 280, 111023.
@@ -265,7 +341,7 @@ While all due care and diligence will be expected to be taken by the students, (
 
 This inherently means that the client assumes a degree of risk.  This is part of an arrangement, which is intended to be of mutual benefit.  On completion of the project it is hoped that the client will receive a professionally documented and soundly constructed working software application, some part thereof, or other appropriate set of IT artefacts, while the students are exposed to live external environments and problems, in a realistic project and customer context.
 
-In consequence of the above, the students, acting in their assigned professional capacities and the Auckland University of Technology, disclaim responsibility and offer no warranty in respect of the ¡°technology solution¡± or services delivered, (e.g. a ¡°software application¡± and its associated documentation),both in relation to their use and results from their use.
+In consequence of the above, the students, acting in their assigned professional capacities and the Auckland University of Technology, disclaim responsibility and offer no warranty in respect of the ï¿½ï¿½technology solutionï¿½ï¿½ or services delivered, (e.g. a ï¿½ï¿½software applicationï¿½ï¿½ and its associated documentation),both in relation to their use and results from their use.
 
 
 

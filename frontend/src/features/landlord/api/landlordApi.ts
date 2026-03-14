@@ -125,9 +125,14 @@ export async function deleteListing(id: number): Promise<void> {
 
 export async function pricePredict(req: PricePredictRequest): Promise<PricePredictResponse> {
   try {
-    const { data } = await http.post<PricePredictResponse>('/ml/predict', req)
-    return data
-  } catch {
+    const response = await http.post<any>('/ml/predict', req)
+    console.log('[ML预测] 后端返回数据:', response.data)
+    // 后端返回格式: { code, data: { predictedPrice, ... } }
+    const result = response.data.data
+    console.log('[ML预测] 提取的结果:', result)
+    return result
+  } catch (error: any) {
+    console.error('[ML预测] 请求失败:', error)
     const base = 1500
     const b = (req.bedrooms ?? 1) * 700
     const ba = (req.bathrooms ?? 1) * 350

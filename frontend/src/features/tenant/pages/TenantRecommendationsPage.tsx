@@ -119,7 +119,7 @@ export function TenantRecommendationsPage() {
         boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
         transition: 'all 0.3s ease',
       }}
-      bodyStyle={{ padding: 24 }}
+      styles={{ body: { padding: 24 } }}
       onClick={() => {
         // 拖动过程中（包括刚结束的极短时间内）不响应点击，避免误进详情
         if (dragPreventClickRef.current) return
@@ -221,7 +221,7 @@ export function TenantRecommendationsPage() {
               boxShadow: '0 18px 45px rgba(15, 23, 42, 0.08)',
               border: '1px solid #e5e7eb',
             }}
-            bodyStyle={{ padding: 32 }}
+            styles={{ body: { padding: 32 } }}
           >
             {/* 结果统计说明 */}
             <div style={{ marginBottom: 16, textAlign: 'center' }}>

@@ -81,7 +81,7 @@ def api_v1_predict(payload: NewPredictRequest):
     
     return {
         "predictedPrice": pred,
-        "currency": "INR",
+        "currency": "CNY",
         "confidence": confidence,
         "lowerBound": lower_bound,
         "upperBound": upper_bound,

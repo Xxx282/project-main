@@ -376,7 +376,7 @@ export function TenantListingsPage() {
               boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)',
               border: '1px solid #f3f4f6',
             }}
-            bodyStyle={{ padding: '16px', fontSize: 18 }}
+            styles={{ body: { padding: '16px', fontSize: 18 } }}
           >
             <Table<Listing>
               rowKey="id"

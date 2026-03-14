@@ -83,37 +83,6 @@ export function TenantListingDetailPage() {
         extra={
           <Space>
             {auth.user && (
-              <>
-                <Button
-                  type="primary"
-                  icon={<DollarOutlined />}
-                  onClick={() => {
-                    if (!listingQ.data) return
-                    navigate(`/tenant/contract?propertyId=${propertyId}&payeeId=${listingQ.data.landlordId}`)
-                  }}
-                >
-                  {t('pages.pay')}
-                </Button>
-                <Button
-                  type="primary"
-                  icon={<MessageOutlined />}
-                  onClick={async () => {
-                    if (!listingQ.data) return
-                    try {
-                      // 获取或创建对话（如果有已有对话则返回，没有则创建）
-                      const conversation = await getOrCreateConversation(propertyId, listingQ.data!.landlordId!)
-                      // 跳转到对话页面
-                      navigate(`/tenant/chats/${conversation.id}`)
-                    } catch (error) {
-                      message.error(t('pages.consultFailed'))
-                    }
-                  }}
-                >
-                  {t('pages.consultLandlord')}
-                </Button>
-              </>
-            )}
-            {auth.user ? (
               <Button
                 type={favoriteQ.data ? 'primary' : 'default'}
                 danger={favoriteQ.data}
@@ -123,7 +92,7 @@ export function TenantListingDetailPage() {
               >
                 {favoriteQ.data ? t('pages.favorited') : t('pages.favorite')}
               </Button>
-            ) : null}
+            )}
           </Space>
         }
       />
