@@ -43,7 +43,7 @@ export function LandlordOrdersPage() {
   const contractItems: OrderItem[] = contracts.map((c: RentalContract) => ({
     type: 'contract',
     id: c.id,
-    title: c.propertyTitle || `房源 #${c.propertyId}`,
+    title: c.propertyTitle || `${t('common.property')} #${c.propertyId}`,
     counterparty: c.tenantRealName || c.tenantUsername || '-',
     amount: c.monthlyRent,
     status: c.status,
@@ -55,7 +55,7 @@ export function LandlordOrdersPage() {
   const paymentItems: OrderItem[] = payments.map((p: PaymentOrder) => ({
     type: 'payment',
     id: p.id,
-    title: p.propertyTitle || `房源 #${p.propertyId}`,
+    title: p.propertyTitle || `${t('common.property')} #${p.propertyId}`,
     counterparty: p.payerRealName || p.payerUsername || '-',
     amount: p.amount,
     status: p.status,
@@ -218,6 +218,7 @@ export function LandlordOrdersPage() {
 
 // ===== 签名组件 =====
 function SignContractButton({ contract, onSign }: { contract: RentalContract; onSign: (sig: string) => void }) {
+  const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [hasStroke, setHasStroke] = useState(false)
@@ -445,15 +446,15 @@ function ConfirmPaymentButton({
               <>
                 <div style={{ fontSize: 48, marginBottom: 16 }}>✍️</div>
                 <div style={{ fontSize: 16, fontWeight: 500, marginBottom: 8, color: '#1890ff' }}>
-                  租客已签署合同，等待您签署
+                  {t('pages.tenantSignedWaitingLandlord')}
                 </div>
                 <div style={{ color: '#666', marginBottom: 24 }}>
-                  请先签署合同，再确认收款
+                  {t('pages.pleaseSignFirst')}
                 </div>
                 <div style={{ background: '#f5f5f5', padding: 12, borderRadius: 8, textAlign: 'left' }}>
-                  <div><strong>合同编号：</strong>{displayContract.contractNo}</div>
-                  <div><strong>房源：</strong>{displayContract.propertyTitle}</div>
-                  <div><strong>租金：</strong>¥ {displayContract.monthlyRent?.toLocaleString()}/月</div>
+                  <div><strong>{t('pages.contractNo')}：</strong>{displayContract.contractNo}</div>
+                  <div><strong>{t('pages.propertyTitle')}：</strong>{displayContract.propertyTitle}</div>
+                  <div><strong>{t('pages.monthlyRentLabel')}：</strong>¥ {displayContract.monthlyRent?.toLocaleString()}/{t('common.yuanPerMonth').split(' ')[0]}</div>
                 </div>
               </>
             ) : (
@@ -461,19 +462,18 @@ function ConfirmPaymentButton({
               <>
                 <div style={{ fontSize: 48, marginBottom: 16 }}>📄</div>
                 <div style={{ fontSize: 16, fontWeight: 500, marginBottom: 8, color: '#faad14' }}>
-                  该租客尚未签订租房合同
+                  {t('pages.noContractYet')}
                 </div>
                 <div style={{ color: '#666', marginBottom: 24 }}>
-                  请先完成合同签订，再确认收款
+                  {t('pages.pleaseCreateContractFirst')}
                 </div>
                 <div style={{ background: '#fff7e6', border: '1px solid #ffd591', borderRadius: 8, padding: 16, textAlign: 'left' }}>
                   <div style={{ color: '#d46b08', fontWeight: 500, marginBottom: 8 }}>
-                    暂无可签署的合同
+                    {t('pages.noContractAvailable')}
                   </div>
                   <div style={{ color: '#666', fontSize: 13, lineHeight: 1.8 }}>
-                    该租客尚未在平台创建租房合同，请联系租客先<br/>
-                    <strong>前往房源页面发起签约</strong>，完成合同签署后<br/>
-                    您才能确认收款。
+                    {t('pages.tenantNoContract')}<br/>
+                    <strong>{t('pages.goToListingPage')}</strong>，{t('pages.afterSignConfirmPayment')}
                   </div>
                 </div>
               </>
