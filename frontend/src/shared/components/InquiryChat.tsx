@@ -185,7 +185,7 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
       queryClient.invalidateQueries({ queryKey: ['conversation', conversationId] })
     },
     onError: (err: any) => {
-      message.error(err?.response?.data?.message || '撤回失败')
+      message.error(err?.response?.data?.message || t('pages.recallFailed'))
     },
   })
 
@@ -255,7 +255,7 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
     try {
       const recentMessages = (messagesQ.data ?? [])
         .slice(-10)
-        .map((m) => `${m.senderRole === 'tenant' ? '租客' : '房东'}: ${m.content}`)
+        .map((m) => `${m.senderRole === 'tenant' ? t('pages.tenant') : t('pages.landlord')}: ${m.content}`)
         .join('\n')
       const suggestion = await getAiReplySuggestion({
         listingTitle: listingQ.data.title || '',
@@ -264,9 +264,9 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
         recentMessages,
       })
       setInputMessage((prev) => (prev ? `${prev}\n${suggestion}` : suggestion))
-      message.success('已填入 AI 回复建议，可编辑后发送')
+      message.success(t('pages.aiSuggestionFilled'))
     } catch {
-      message.error('AI 建议获取失败，请稍后重试')
+      message.error(t('pages.aiSuggestionFailed'))
     } finally {
       setAiSuggestLoading(false)
     }
@@ -423,7 +423,7 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
                     const menuItems = isMe && !isRecalled ? [
                       {
                         key: 'recall',
-                        label: '撤回消息',
+                        label: t('pages.recallMessage'),
                         icon: <DeleteOutlined />,
                         onClick: () => recallMutation.mutate(msg.id),
                       },
@@ -547,10 +547,10 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
                     onClick={handleAiSuggest}
                     style={{ padding: 0, color: '#667eea', fontSize: 13 }}
                   >
-                    AI 智能回复
+                    {t('pages.aiReplySuggestion')}
                   </Button>
                   <Typography.Text type="secondary" style={{ fontSize: 12, marginLeft: 8 }}>
-                    根据当前对话生成回复建议，可编辑后发送
+                    {t('pages.aiSuggestionDescription')}
                   </Typography.Text>
                 </div>
               )}
@@ -581,7 +581,7 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
                   onKeyDown={handleKeyPress}
-                  placeholder="。。。"
+                  placeholder={t('pages.placeholder')}
                   autoSize={{ minRows: 1, maxRows: 4 }}
                   style={{ flex: 1 }}
                   size="large"

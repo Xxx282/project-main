@@ -5,6 +5,7 @@ import { Table, Tag, Button, Modal, Input, message, Card, Space, Drawer } from '
 import { PageHeader } from '../../../shared/ui/PageHeader'
 import { getLandlordContracts, signContractAsLandlord, type RentalContract } from '../../contract/api/contractApi'
 import { getLandlordPayments, confirmPayment, type PaymentOrder } from '../../payment/api/paymentApi'
+import { useTranslation } from 'react-i18next'
 
 // 合并订单项类型
 interface OrderItem {
@@ -19,6 +20,7 @@ interface OrderItem {
 }
 
 export function LandlordOrdersPage() {
+  const { t } = useTranslation()
   const queryClient = useQueryClient()
   const navigate = useNavigate()
 
@@ -89,39 +91,39 @@ export function LandlordOrdersPage() {
   const signMutation = useMutation({
     mutationFn: signContractAsLandlord,
     onSuccess: () => {
-      message.success('合同签署成功！')
+      message.success(t('pages.signSuccess'))
       queryClient.invalidateQueries({ queryKey: ['landlord', 'contracts'] })
     },
-    onError: (e: any) => message.error(e?.response?.data?.message || '签署失败'),
+    onError: (e: any) => message.error(e?.response?.data?.message || t('pages.signFailed')),
   })
 
   // 支付确认 mutation
   const confirmMutation = useMutation({
     mutationFn: confirmPayment,
     onSuccess: () => {
-      message.success('确认收款成功！')
+      message.success(t('pages.paymentConfirmed'))
       queryClient.invalidateQueries({ queryKey: ['landlord', 'payments'] })
     },
-    onError: (e: any) => message.error(e?.response?.data?.message || '操作失败'),
+    onError: (e: any) => message.error(e?.response?.data?.message || t('pages.operationFailed')),
   })
 
   const getStatusTag = (item: OrderItem) => {
     if (item.type === 'contract') {
       const map: Record<string, { color: string; text: string }> = {
-        pending_sign: { color: 'orange', text: '待租客签署' },
-        signed: { color: 'blue', text: '待房东签署' },
-        completed: { color: 'green', text: '已完成' },
-        cancelled: { color: 'red', text: '已取消' },
+        pending_sign: { color: 'orange', text: t('pages.pendingTenantSign') },
+        signed: { color: 'blue', text: t('pages.pendingLandlordSign') },
+        completed: { color: 'green', text: t('pages.completed') },
+        cancelled: { color: 'red', text: t('pages.cancelled') },
       }
       const s = map[item.status] || { color: 'default', text: item.status }
       return <Tag color={s.color}>{s.text}</Tag>
     } else {
       const map: Record<string, { color: string; text: string }> = {
-        PENDING: { color: 'orange', text: '待确认' },
-        LANDLORD_CONFIRMED: { color: 'blue', text: '待管理员审核' },
-        SUCCESS: { color: 'green', text: '已完成' },
-        REJECTED: { color: 'red', text: '已拒绝' },
-        REFUNDED: { color: 'default', text: '已退款' },
+        PENDING: { color: 'orange', text: t('pages.pendingConfirm') },
+        LANDLORD_CONFIRMED: { color: 'blue', text: t('pages.pendingAdminReview') },
+        SUCCESS: { color: 'green', text: t('pages.completed') },
+        REJECTED: { color: 'red', text: t('pages.rejected') },
+        REFUNDED: { color: 'default', text: t('pages.refunded') },
       }
       const s = map[item.status] || { color: 'default', text: item.status }
       return <Tag color={s.color}>{s.text}</Tag>
@@ -130,10 +132,10 @@ export function LandlordOrdersPage() {
 
   const getTypeTag = (item: OrderItem) => {
     if (item.type === 'contract') {
-      return <Tag color="purple">合同</Tag>
+      return <Tag color="purple">{t('pages.contract')}</Tag>
     } else {
       const payment = item.data as PaymentOrder
-      return <Tag color="blue">{payment.paymentType === 'DEPOSIT' ? '押金' : '月租'}</Tag>
+      return <Tag color="blue">{payment.paymentType === 'DEPOSIT' ? t('pages.deposit') : t('pages.monthlyRent')}</Tag>
     }
   }
 
@@ -161,13 +163,13 @@ export function LandlordOrdersPage() {
   }
 
   const columns = [
-    { title: '类型', key: 'type', render: (_: any, r: OrderItem) => getTypeTag(r), width: 80 },
-    { title: '标题', dataIndex: 'title', key: 'title', ellipsis: true },
-    { title: '对方', dataIndex: 'counterparty', key: 'counterparty', width: 120 },
-    { title: '金额', dataIndex: 'amount', key: 'amount', render: (v: number) => `¥ ${v?.toLocaleString()}`, width: 120 },
-    { title: '状态', key: 'status', render: (_: any, r: OrderItem) => getStatusTag(r), width: 100 },
-    { title: '时间', dataIndex: 'createdAt', key: 'createdAt', render: (d: string) => new Date(d).toLocaleString(), width: 170 },
-    { title: '操作', key: 'action', render: (_: any, r: OrderItem) => getActionButton(r), width: 120 },
+    { title: t('pages.type'), key: 'type', render: (_: any, r: OrderItem) => getTypeTag(r), width: 80 },
+    { title: t('pages.title'), dataIndex: 'title', key: 'title', ellipsis: true },
+    { title: t('pages.counterparty'), dataIndex: 'counterparty', key: 'counterparty', width: 120 },
+    { title: t('pages.amount'), dataIndex: 'amount', key: 'amount', render: (v: number) => `¥ ${v?.toLocaleString()}`, width: 120 },
+    { title: t('pages.status'), key: 'status', render: (_: any, r: OrderItem) => getStatusTag(r), width: 100 },
+    { title: t('pages.time'), dataIndex: 'createdAt', key: 'createdAt', render: (d: string) => new Date(d).toLocaleString(), width: 170 },
+    { title: t('pages.operation'), key: 'action', render: (_: any, r: OrderItem) => getActionButton(r), width: 120 },
   ]
 
   const isLoading = contractsQ.isLoading || paymentsQ.isLoading
@@ -175,11 +177,11 @@ export function LandlordOrdersPage() {
   return (
     <Space orientation="vertical" size={16} style={{ width: '100%' }}>
       <PageHeader
-        title="订单管理"
-        subtitle="管理合同签署和支付确认"
+        title={t('pages.ordersManagement')}
+        subtitle={t('pages.orderDetails')}
       />
 
-      <Card title="待完成订单" extra={<Tag color="orange">{pendingItems.length} 条</Tag>}>
+      <Card title={t('pages.pendingOrders')} extra={<Tag color="orange">{pendingItems.length} {t('pages.item')}</Tag>}>
         <Table
           columns={columns}
           dataSource={pendingItems}
@@ -190,7 +192,7 @@ export function LandlordOrdersPage() {
       </Card>
 
       {awaitingAdminItems.length > 0 && (
-        <Card title="待管理员审核" extra={<Tag color="blue">{awaitingAdminItems.length} 条</Tag>}>
+        <Card title={t('pages.awaitingAdminOrders')} extra={<Tag color="blue">{awaitingAdminItems.length} {t('pages.item')}</Tag>}>
           <Table
             columns={columns.slice(0, -1)}
             dataSource={awaitingAdminItems}
@@ -201,7 +203,7 @@ export function LandlordOrdersPage() {
         </Card>
       )}
 
-      <Card title="已完成订单" extra={<Tag color="green">{completedItems.length} 条</Tag>}>
+      <Card title={t('pages.completedOrders')} extra={<Tag color="green">{completedItems.length} {t('pages.item')}</Tag>}>
         <Table
           columns={columns.slice(0, -1)}
           dataSource={completedItems}
@@ -275,7 +277,7 @@ function SignContractButton({ contract, onSign }: { contract: RentalContract; on
   }
 
   const handleSign = () => {
-    if (!hasStroke) { message.warning('请先完成手写签名'); return }
+    if (!hasStroke) { message.warning(t('pages.pleaseSignFirst')); return }
     const sig = canvasRef.current!.toDataURL('image/png')
     setOpen(false)
     onSign(sig)
@@ -283,9 +285,9 @@ function SignContractButton({ contract, onSign }: { contract: RentalContract; on
 
   return (
     <>
-      <Button type="primary" data-contract-id={contract.id} onClick={() => setOpen(true)}>签署合同</Button>
+      <Button type="primary" data-contract-id={contract.id} onClick={() => setOpen(true)}>{t('pages.signContract')}</Button>
       <Drawer
-        title="房东签署合同"
+        title={t('pages.landlordSignsContract')}
         placement="bottom"
         height={350}
         open={open}
@@ -334,6 +336,7 @@ function ConfirmPaymentButton({
   onSignContract: (contractId: number) => void
   onConfirm: (note: string) => void
 }) {
+  const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const [note, setNote] = useState('')
   const [loading, setLoading] = useState(false)
@@ -405,30 +408,30 @@ function ConfirmPaymentButton({
 
   return (
     <>
-      <Button type="primary" onClick={handleClick}>确认收款</Button>
+      <Button type="primary" onClick={handleClick}>{t('pages.confirmPayment')}</Button>
       <Modal
-        title={showContractPrompt ? '请先签订合同' : '确认收款'}
+        title={showContractPrompt ? t('pages.pleaseSignFirst') : t('pages.confirmPayment')}
         open={open}
         onCancel={() => setOpen(false)}
         footer={
           showContractPrompt ? (
             <Space>
-              <Button onClick={() => setOpen(false)}>取消</Button>
+              <Button onClick={() => setOpen(false)}>{t('common.cancel')}</Button>
               {displayContract ? (
                 <Button type="primary" onClick={handleSignContract}>
-                  立即签署合同
+                  {t('pages.signNow')}
                 </Button>
               ) : (
                 <Button type="primary" disabled>
-                  无待签署合同
+                  {t('pages.noContractToSign')}
                 </Button>
               )}
             </Space>
           ) : (
             <Space>
-              <Button onClick={() => setOpen(false)}>取消</Button>
+              <Button onClick={() => setOpen(false)}>{t('common.cancel')}</Button>
               <Button type="primary" onClick={handleConfirm} loading={loading}>
-                确认收款
+                {t('pages.confirmPayment')}
               </Button>
             </Space>
           )
@@ -479,21 +482,21 @@ function ConfirmPaymentButton({
         ) : (
           <>
             <div style={{ marginBottom: 16 }}>
-              <div style={{ color: '#666', marginBottom: 8 }}>订单信息</div>
+              <div style={{ color: '#666', marginBottom: 8 }}>{t('pages.orderInfo')}</div>
               <div style={{ background: '#f5f5f5', padding: 12, borderRadius: 8 }}>
-                <div>订单号：{order.orderNo}</div>
-                <div>付款人：{order.payerRealName || order.payerUsername}</div>
-                <div>金额：¥ {order.amount?.toLocaleString()}</div>
-                <div>类型：{order.paymentType === 'DEPOSIT' ? '押金' : '月租'}</div>
+                <div>{t('pages.orderNo')}：{order.orderNo}</div>
+                <div>{t('pages.payerName')}：{order.payerRealName || order.payerUsername}</div>
+                <div>{t('pages.amount')}：¥ {order.amount?.toLocaleString()}</div>
+                <div>{t('pages.type')}：{order.paymentType === 'DEPOSIT' ? t('pages.deposit') : t('pages.monthlyRent')}</div>
               </div>
             </div>
             <div>
-              <div style={{ color: '#666', marginBottom: 8 }}>备注（可选）</div>
+              <div style={{ color: '#666', marginBottom: 8 }}>{t('pages.note')}（{t('pages.optionalNote')}）</div>
               <Input.TextArea
                 rows={3}
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
-                placeholder="输入备注信息..."
+                placeholder={t('pages.enterNotePlaceholder')}
               />
             </div>
           </>

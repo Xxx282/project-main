@@ -1,4 +1,4 @@
-import { Button, Card, Form, Image, Input, Space, Table, Modal, Checkbox, Typography, InputNumber, Select, Collapse } from 'antd'
+import { Button, Card, Form, Image, Input, Space, Table, Modal, Checkbox, Typography, InputNumber, Select, Collapse, Tag } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import { useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
@@ -29,6 +29,15 @@ const DEFAULT_FIELDS: FieldOption[] = [
   { key: 'decorationOrientation', title: 'decorationOrientation', visible: true },
 ]
 
+// 预设城市选项（可勾选）
+const CITY_OPTIONS = [
+  { value: '杭州', labelKey: 'pages.cityHangzhou' },
+  { value: '上海', labelKey: 'pages.cityShanghai' },
+  { value: '北京', labelKey: 'pages.cityBeijing' },
+  { value: '深圳', labelKey: 'pages.cityShenzhen' },
+  { value: '广州', labelKey: 'pages.cityGuangzhou' },
+]
+
 // 构建缩略图 URL - 与图片画廊保持一致逻辑
 const buildImageUrl = (imageUrl: string) => {
   if (!imageUrl) return ''
@@ -51,16 +60,56 @@ export function TenantListingsPage() {
 
   const listingsQ = useQuery({
     queryKey: ['tenant', 'listings', Object.fromEntries(params)],
-    queryFn: () =>
-      listListings({
+    queryFn: () => {
+      const cities = params.get('city')?.split(',').filter(Boolean) ?? []
+      return listListings({
         q: params.get('q') || undefined,
-        city: params.get('city') || undefined,
+        city: cities.length === 1 ? cities[0] : undefined,
         region: params.get('region') || undefined,
         bedrooms: params.get('bedrooms') ? Number(params.get('bedrooms')) : undefined,
         minPrice: params.get('minPrice') ? Number(params.get('minPrice')) : undefined,
         maxPrice: params.get('maxPrice') ? Number(params.get('maxPrice')) : undefined,
-      }),
+        page: 0,
+        size: 50,
+      })
+    },
   })
+
+  // 解析城市、房型、朝向、装修多选（用于筛选，勾选即生效）
+  const cityFilter = useMemo(
+    () => params.get('city')?.split(',').filter(Boolean) ?? [],
+    [params]
+  )
+  const bedroomFilter = useMemo(
+    () => params.get('bedrooms')?.split(',').filter(Boolean).map(Number).filter(Boolean) ?? [],
+    [params]
+  )
+  const orientationFilter = useMemo(
+    () => params.get('orientation')?.split(',').filter(Boolean) ?? [],
+    [params]
+  )
+  const decorationFilter = useMemo(
+    () => params.get('decoration')?.split(',').filter(Boolean) ?? [],
+    [params]
+  )
+
+  const filteredListings = useMemo(() => {
+    const list = listingsQ.data ?? []
+    return list.filter((item) => {
+      if (cityFilter.length && item.city && !cityFilter.includes(item.city)) return false
+      if (bedroomFilter.length && item.bedrooms && !bedroomFilter.includes(item.bedrooms)) return false
+      if (orientationFilter.length && item.orientation && !orientationFilter.includes(item.orientation)) return false
+      if (decorationFilter.length && item.decoration && !decorationFilter.includes(item.decoration)) return false
+      return true
+    })
+  }, [listingsQ.data, cityFilter, bedroomFilter, orientationFilter, decorationFilter])
+
+  const updateFilterParam = (key: string, values: string[]) => {
+    const next = new URLSearchParams(params)
+    if (values.length) next.set(key, values.join(','))
+    else next.delete(key)
+    setParams(next)
+  }
 
   const STORAGE_KEY = 'listings_columns'
 
@@ -87,12 +136,12 @@ export function TenantListingsPage() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(fields))
   }
 
-  // 动态生成列配置（改为卡片式行布局）
+  // 动态生成列配置（改为卡片式行布局，仅保留房源列表，不显示重复表头）
   const columns = useMemo(() => {
     const settings = loadColumnSettings()
     const cols: ColumnsType<Listing> = [
       {
-        title: t('common.listingInfo'),
+        title: '', // 只保留上方「房源列表」标题，此处不再显示「房源信息」
         render: (_, row) => <ListingRow listing={row} settings={settings} />,
       },
     ]
@@ -147,16 +196,25 @@ export function TenantListingsPage() {
             }}
           >
             <Form
+              key={params.toString()}
               layout="vertical"
-              initialValues={Object.fromEntries(params)}
+              initialValues={{
+                ...Object.fromEntries(params),
+                city: cityFilter as string[],
+                bedrooms: bedroomFilter as string[],
+                orientation: orientationFilter as string[],
+                decoration: decorationFilter as string[],
+              }}
               onFinish={(v) => {
                 const next = new URLSearchParams()
                 if (v.q) next.set('q', v.q)
-                if (v.city) next.set('city', v.city)
                 if (v.region) next.set('region', v.region)
-                if (v.bedrooms != null) next.set('bedrooms', String(v.bedrooms))
                 if (v.minPrice != null) next.set('minPrice', String(v.minPrice))
                 if (v.maxPrice != null) next.set('maxPrice', String(v.maxPrice))
+                if (Array.isArray(v.city) && v.city.length) next.set('city', v.city.join(','))
+                if (Array.isArray(v.bedrooms) && v.bedrooms.length) next.set('bedrooms', v.bedrooms.join(','))
+                if (Array.isArray(v.orientation) && v.orientation.length) next.set('orientation', v.orientation.join(','))
+                if (Array.isArray(v.decoration) && v.decoration.length) next.set('decoration', v.decoration.join(','))
                 setParams(next)
               }}
             >
@@ -167,7 +225,7 @@ export function TenantListingsPage() {
                     size="large"
                     placeholder={t('pages.searchListings')}
                     allowClear
-                    style={{ height: 48, borderRadius: 24, fontSize: 16 }}
+                    style={{ height: 48, borderRadius: 24, fontSize: 18 }}
                     prefix={<SearchOutlined style={{ color: '#999', fontSize: 18 }} />}
                   />
                 </Form.Item>
@@ -177,7 +235,7 @@ export function TenantListingsPage() {
                     htmlType="submit"
                     size="large"
                     style={{
-                      height: 48, paddingInline: 32, borderRadius: 24, fontSize: 16,
+                      height: 48, paddingInline: 32, borderRadius: 24, fontSize: 18,
                       background: '#fff', color: '#667eea', fontWeight: 600, border: 'none',
                     }}
                   >
@@ -188,7 +246,7 @@ export function TenantListingsPage() {
                   <Button
                     size="large"
                     style={{
-                      height: 48, paddingInline: 24, borderRadius: 24, fontSize: 16,
+                      height: 48, paddingInline: 24, borderRadius: 24, fontSize: 18,
                       background: filterOpen ? '#fff' : 'rgba(255,255,255,0.2)',
                       border: '1px solid rgba(255,255,255,0.5)', color: filterOpen ? '#667eea' : '#fff',
                     }}
@@ -201,17 +259,17 @@ export function TenantListingsPage() {
                   <Button
                     size="large"
                     style={{
-                      height: 48, paddingInline: 24, borderRadius: 24, fontSize: 16,
+                      height: 48, paddingInline: 24, borderRadius: 24, fontSize: 18,
                       background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.5)', color: '#fff',
                     }}
-                    onClick={() => setParams(new URLSearchParams())}
+                    onClick={() => { setParams(new URLSearchParams()); setFilterOpen(false); }}
                   >
                     {t('common.reset')}
                   </Button>
                 </Form.Item>
               </div>
 
-              {/* 折叠高级筛选 */}
+              {/* 红圈内：贝壳式多维筛选 */}
               <Collapse
                 ghost
                 style={{ marginTop: 0 }}
@@ -223,76 +281,81 @@ export function TenantListingsPage() {
                   label: null,
                   style: { padding: 0 },
                   children: (
-                    <div style={{
-                      display: 'grid',
-                      gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-                      gap: 12,
-                      padding: '12px 0 4px',
-                    }}>
-                      {/* 城市 */}
-                      <Form.Item name="city" label={
-                        <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 13 }}>{t('pages.city') || '城市'}</span>
-                      } style={{ marginBottom: 0 }}>
-                        <Input
-                          placeholder={t('pages.city') || '城市'}
-                          allowClear
-                          style={{ borderRadius: 8 }}
-                        />
-                      </Form.Item>
+                    <div style={{ padding: '16px 0 8px', color: '#fff' }}>
+                      {/* 第一行：位置（城市勾选，同朝向样式） */}
+                      <div style={{ marginBottom: 16 }}>
+                        <div style={{ color: 'rgba(255,255,255,0.9)', fontSize: 15, fontWeight: 600, marginBottom: 8 }}>{t('pages.filterLocation')}</div>
+                        <Form.Item name="city" style={{ marginBottom: 0 }}>
+                          <Checkbox.Group
+                            options={CITY_OPTIONS.map((c) => ({ value: c.value, label: t(c.labelKey) }))}
+                            style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}
+                            onChange={(vals) => updateFilterParam('city', (vals as string[]) || [])}
+                          />
+                        </Form.Item>
+                      </div>
 
-                      {/* 区域 */}
-                      <Form.Item name="region" label={
-                        <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 13 }}>{t('pages.region') || '区域'}</span>
-                      } style={{ marginBottom: 0 }}>
-                        <Input
-                          placeholder={t('pages.region') || '区域'}
-                          allowClear
-                          style={{ borderRadius: 8 }}
-                        />
-                      </Form.Item>
+                      {/* 第二行：房型 */}
+                      <div style={{ marginBottom: 16 }}>
+                        <div style={{ color: 'rgba(255,255,255,0.9)', fontSize: 15, fontWeight: 600, marginBottom: 8 }}>{t('pages.filterRoomType')}</div>
+                        <Form.Item name="bedrooms" style={{ marginBottom: 0 }}>
+                          <Checkbox.Group
+                            options={[
+                              { value: '1', label: t('pages.roomType1') },
+                              { value: '2', label: t('pages.roomType2') },
+                              { value: '3', label: t('pages.roomType3') },
+                              { value: '4', label: t('pages.roomType4') },
+                              { value: '5', label: t('pages.roomType5Plus') },
+                            ]}
+                            style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}
+                            onChange={(vals) => updateFilterParam('bedrooms', (vals as string[]) || [])}
+                          />
+                        </Form.Item>
+                      </div>
 
-                      {/* 卧室数 */}
-                      <Form.Item name="bedrooms" label={
-                        <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 13 }}>{t('pages.bedroomCountLabel') || '卧室数'}</span>
-                      } style={{ marginBottom: 0 }}>
-                        <Select
-                          placeholder={t('pages.bedroomCountLabel') || '不限'}
-                          allowClear
-                          style={{ borderRadius: 8, width: '100%' }}
-                          options={[
-                            { value: 1, label: t('pages.room1') },
-                            { value: 2, label: t('pages.room2') },
-                            { value: 3, label: t('pages.room3') },
-                            { value: 4, label: t('pages.room4Plus') },
-                          ]}
-                        />
-                      </Form.Item>
+                      {/* 第三行：朝向 */}
+                      <div style={{ marginBottom: 16 }}>
+                        <div style={{ color: 'rgba(255,255,255,0.9)', fontSize: 15, fontWeight: 600, marginBottom: 8 }}>{t('pages.filterOrientation')}</div>
+                        <Form.Item name="orientation" style={{ marginBottom: 0 }}>
+                          <Checkbox.Group
+                            options={[
+                              { value: 'south', label: t('pages.orientationSouth') },
+                              { value: 'north', label: t('pages.orientationNorth') },
+                              { value: 'east', label: t('pages.orientationEast') },
+                              { value: 'west', label: t('pages.orientationWest') },
+                            ]}
+                            style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}
+                            onChange={(vals) => updateFilterParam('orientation', (vals as string[]) || [])}
+                          />
+                        </Form.Item>
+                      </div>
 
-                      {/* 最低价格 */}
-                      <Form.Item name="minPrice" label={
-                        <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 13 }}>{t('pages.minPrice') || '最低租金（元/月）'}</span>
-                      } style={{ marginBottom: 0 }}>
-                        <InputNumber
-                          placeholder="0"
-                          min={0}
-                          step={500}
-                          style={{ width: '100%', borderRadius: 8 }}
-                          prefix="¥"
-                        />
-                      </Form.Item>
+                      {/* 第四行：装修 */}
+                      <div style={{ marginBottom: 8 }}>
+                        <div style={{ color: 'rgba(255,255,255,0.9)', fontSize: 15, fontWeight: 600, marginBottom: 8 }}>{t('pages.filterDecoration')}</div>
+                        <Form.Item name="decoration" style={{ marginBottom: 0 }}>
+                          <Checkbox.Group
+                            options={[
+                              { value: 'rough', label: t('common.rough') },
+                              { value: 'simple', label: t('common.simple') },
+                              { value: 'fine', label: t('common.fine') },
+                              { value: 'luxury', label: t('common.luxury') },
+                            ]}
+                            style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}
+                            onChange={(vals) => updateFilterParam('decoration', (vals as string[]) || [])}
+                          />
+                        </Form.Item>
+                      </div>
 
-                      {/* 最高价格 */}
-                      <Form.Item name="maxPrice" label={
-                        <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 13 }}>{t('pages.maxPrice') || '最高租金（元/月）'}</span>
-                      } style={{ marginBottom: 0 }}>
-                        <InputNumber
-                          placeholder="99999"
-                          min={0}
-                          step={500}
-                          style={{ width: '100%', borderRadius: 8 }}
-                          prefix="¥"
-                        />
-                      </Form.Item>
+                      {/* 价格 */}
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center', marginTop: 12 }}>
+                        <Form.Item name="minPrice" label={<span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 14 }}>{t('pages.minPrice')}</span>} style={{ marginBottom: 0 }}>
+                          <InputNumber placeholder="0" min={0} step={500} style={{ width: 120, borderRadius: 8 }} prefix="¥" />
+                        </Form.Item>
+                        <span style={{ color: 'rgba(255,255,255,0.7)' }}>-</span>
+                        <Form.Item name="maxPrice" label={<span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 14 }}>{t('pages.maxPrice')}</span>} style={{ marginBottom: 0 }}>
+                          <InputNumber placeholder="99999" min={0} step={500} style={{ width: 120, borderRadius: 8 }} prefix="¥" />
+                        </Form.Item>
+                      </div>
                     </div>
                   ),
                 }]}
@@ -313,14 +376,15 @@ export function TenantListingsPage() {
               boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)',
               border: '1px solid #f3f4f6',
             }}
-            bodyStyle={{ padding: '12px' }}
+            bodyStyle={{ padding: '16px', fontSize: 18 }}
           >
             <Table<Listing>
               rowKey="id"
               loading={listingsQ.isLoading}
               columns={columns}
-              dataSource={listingsQ.data ?? []}
+              dataSource={filteredListings}
               size="middle"
+              showHeader={false}
               pagination={{ pageSize: 4, showSizeChanger: false, placement: ['bottomCenter'] }}
             />
           </Card>
@@ -383,6 +447,17 @@ function ListingRow({ listing, settings }: { listing: Listing; settings: FieldOp
     (listing.decoration === 'luxury' && t('common.luxury')) ||
     undefined
 
+  // 卡片标签：装修、朝向（与筛选维度对应）
+  const tagLabels: string[] = []
+  if (listing.decoration === 'fine') tagLabels.push(t('pages.tagFine'))
+  else if (listing.decoration === 'luxury') tagLabels.push(t('pages.tagLuxury'))
+  else if (listing.decoration === 'simple') tagLabels.push(t('pages.tagSimple'))
+  else if (listing.decoration === 'rough') tagLabels.push(t('pages.tagRough'))
+  if (listing.orientation === 'south') tagLabels.push(t('pages.orientationSouth'))
+  else if (listing.orientation === 'north') tagLabels.push(t('pages.orientationNorth'))
+  else if (listing.orientation === 'east') tagLabels.push(t('pages.orientationEast'))
+  else if (listing.orientation === 'west') tagLabels.push(t('pages.orientationWest'))
+
   const handleClick = () => {
     navigate(`/tenant/listings/${listing.id}`)
   }
@@ -426,12 +501,12 @@ function ListingRow({ listing, settings }: { listing: Listing; settings: FieldOp
           paddingBottom: 8,
         }}
       >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             {show('title') && (
               <span
                 style={{
-                  fontSize: 16,
+                  fontSize: 18,
                   fontWeight: 600,
                   color: '#111827',
                 }}
@@ -441,7 +516,7 @@ function ListingRow({ listing, settings }: { listing: Listing; settings: FieldOp
             )}
           </div>
 
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, fontSize: 13, color: '#4b5563' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, fontSize: 16, color: '#4b5563' }}>
             {show('layout') && (
               <span>
                 {(listing.bedrooms ?? '-')}{t('common.bedrooms')} {(listing.bathrooms ?? '-')}{t('common.bathrooms')}
@@ -456,10 +531,19 @@ function ListingRow({ listing, settings }: { listing: Listing; settings: FieldOp
           </div>
 
           {show('decorationOrientation') && (decorationLabel || orientationLabel) && (
-            <div style={{ fontSize: 12, color: '#9ca3af' }}>
+            <div style={{ fontSize: 14, color: '#9ca3af' }}>
               {decorationLabel}
               {decorationLabel && orientationLabel && ' / '}
               {orientationLabel}
+            </div>
+          )}
+          {tagLabels.length > 0 && (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
+              {tagLabels.map((label) => (
+                <Tag key={label} color="blue" style={{ marginRight: 0, fontSize: 15 }}>
+                  {label}
+                </Tag>
+              ))}
             </div>
           )}
         </div>
@@ -467,20 +551,20 @@ function ListingRow({ listing, settings }: { listing: Listing; settings: FieldOp
         {show('price') && (
           <div
             style={{
-              minWidth: 120,
+              minWidth: 140,
               textAlign: 'right',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
               alignItems: 'flex-end',
-              gap: 4,
+              gap: 6,
             }}
           >
-            <Typography.Text strong style={{ color: '#f97316', fontSize: 26 }}>
+            <Typography.Text strong style={{ color: '#f97316', fontSize: 28 }}>
               ¥ {listing.price}
             </Typography.Text>
-            <span style={{ fontSize: 12, color: '#9ca3af' }}>{t('common.yuanPerMonth')}</span>
-            <span style={{ fontSize: 12, color: '#3b82f6' }}>{t('common.viewDetails')}</span>
+            <span style={{ fontSize: 15, color: '#9ca3af' }}>{t('common.yuanPerMonth')}</span>
+            <span style={{ fontSize: 15, color: '#3b82f6' }}>{t('common.viewDetails')}</span>
           </div>
         )}
       </div>
@@ -523,7 +607,7 @@ function ListingThumbnail({ propertyId }: { propertyId: number }) {
           preview={false}
         />
       ) : (
-        <span style={{ color: '#9ca3af', fontSize: 12 }}>{t('common.noImage')}</span>
+        <span style={{ color: '#9ca3af', fontSize: 15 }}>{t('common.noImage')}</span>
       )}
     </div>
   )

@@ -15,8 +15,8 @@ body {
 }
 
 html {
-  /* 略微放大全局基础字号，配合 antd token 的 fontSize=16 使用 */
-  font-size: 16px;
+  /* 全局基础字号，已放大以提升可读性 */
+  font-size: 18px;
 }
 
 body {

@@ -1,11 +1,13 @@
 import { InquiriesList } from '../../../shared/components/InquiriesList'
+import { useTranslation } from 'react-i18next'
 
 export function LandlordInquiriesPage() {
+  const { t } = useTranslation()
   return (
     <InquiriesList
       role="landlord"
-      title="咨询管理"
-      subtitle="与租客的对话列表"
+      title={t('pages.landlordInquiries')}
+      subtitle={t('pages.landlordInquiriesSubtitle')}
       chatPath="/landlord/inquiries"
       queryKey={['landlord', 'inquiries']}
     />
