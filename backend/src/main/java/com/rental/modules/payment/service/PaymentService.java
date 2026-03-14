@@ -2,6 +2,8 @@ package com.rental.modules.payment.service;
 
 import com.rental.common.exception.BusinessException;
 import com.rental.common.service.EmailService;
+import com.rental.modules.contract.entity.RentalContract;
+import com.rental.modules.contract.repository.RentalContractRepository;
 import com.rental.modules.payment.dto.CreatePaymentRequest;
 import com.rental.modules.payment.dto.ReviewPaymentRequest;
 import com.rental.modules.payment.entity.PaymentOrder;
@@ -34,6 +36,7 @@ public class PaymentService {
     private final UserRepository userRepository;
     private final PropertyRepository propertyRepository;
     private final EmailService emailService;
+    private final RentalContractRepository contractRepository;
 
     /**
      * 创建支付订单
@@ -117,6 +120,17 @@ public class PaymentService {
         // 检查订单状态
         if (!order.getStatus().equals(PaymentOrder.STATUS_PENDING)) {
             throw new BusinessException("只能处理待处理的订单");
+        }
+
+        // 验证合同是否已签署完成
+        long completedContractCount = contractRepository.countByPropertyIdAndTenantIdAndLandlordIdAndStatus(
+                order.getPropertyId(),
+                order.getPayerId(),
+                landlordId,
+                RentalContract.ContractStatus.completed);
+
+        if (completedContractCount == 0) {
+            throw new BusinessException("该订单对应的合同尚未签署完成，无法确认收款");
         }
 
         String action = request.getAction().toUpperCase();

@@ -25,10 +25,10 @@ public interface RentalContractRepository extends JpaRepository<RentalContract, 
     List<RentalContract> findByLandlordIdOrderByCreatedAtDesc(Long landlordId);
 
     /**
-     * 根据房源ID和租客ID查询最新未签合同
+     * 根据房源ID、租客ID、房东ID查询已完成合同数量
      */
-    Optional<RentalContract> findTopByPropertyIdAndTenantIdAndStatusOrderByCreatedAtDesc(
-            Long propertyId, Long tenantId, String status);
+    long countByPropertyIdAndTenantIdAndLandlordIdAndStatus(
+            Long propertyId, Long tenantId, Long landlordId, RentalContract.ContractStatus status);
 
     /**
      * 根据合同编号查询

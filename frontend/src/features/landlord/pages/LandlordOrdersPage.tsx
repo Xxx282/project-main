@@ -363,8 +363,8 @@ function ConfirmPaymentButton({
       c.status === 'completed'
   )
 
-  // 使用更宽松的匹配：有待签署的合同（租客已签，等房东签）
-  const hasPendingContract = !!tenantSignedContract || !!contractByProperty
+  // 更严格的验证：合同必须完成签署才能确认收款
+  const hasSignedContract = !!tenantSignedContract || !!contractByProperty
 
   // 显示用的合同信息
   const displayContract = tenantSignedContract || contractByProperty
@@ -374,7 +374,7 @@ function ConfirmPaymentButton({
       // 合同已完成，直接确认收款
       setShowContractPrompt(false)
       setOpen(true)
-    } else if (hasPendingContract) {
+    } else if (hasSignedContract) {
       // 租客已签署，等房东签署合同
       setShowContractPrompt(true)
       setOpen(true)

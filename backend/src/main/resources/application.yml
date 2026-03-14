@@ -26,7 +26,7 @@ spring:
     username: root
     # 推荐用环境变量注入，避免把真实密码提交到仓库
     # Windows PowerShell 启动前设置：$env:DB_PASSWORD="你的密码"
-    password: ${DB_PASSWORD:040104}
+    password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: 10

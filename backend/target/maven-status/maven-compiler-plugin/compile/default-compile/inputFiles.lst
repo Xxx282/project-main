@@ -5,12 +5,17 @@ C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\config\Cors
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\auth\controller\AuthController.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\contract\dto\SignContractRequest.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\favorite\service\FavoriteServiceImpl.java
+C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\ai\service\AiSearchServiceImpl.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\conversation\entity\Message.java
+C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\ai\controller\AiController.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\auth\dto\RegisterRequest.java
+C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\ai\prompt\PromptTemplates.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\conversation\service\MessageService.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\common\util\JwtUtil.java
+C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\ai\dto\SearchCriteria.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\ml\dto\RecommendationRequest.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\config\MlServiceConfig.java
+C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\ai\dto\AiSearchResponse.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\conversation\repository\MessageRepository.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\RentalApplication.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\ml\dto\PricePredictionRequest.java
@@ -39,6 +44,7 @@ C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\security\Jw
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\contract\controller\ContractController.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\conversation\service\MessageServiceImpl.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\config\WebConfig.java
+C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\ai\service\AiSearchService.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\contract\repository\RentalContractRepository.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\auth\dto\LoginRequest.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\property\repository\PropertyRepository.java
@@ -46,6 +52,7 @@ C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\con
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\payment\dto\CreatePaymentRequest.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\security\UserDetailsServiceImpl.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\config\SecurityConfig.java
+C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\ai\config\AiConfig.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\tenant\repository\TenantPreferenceRepository.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\tenant\controller\TenantController.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\payment\entity\PaymentOrder.java
@@ -60,6 +67,7 @@ C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\pay
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\ml\service\MlService.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\ml\controller\MlController.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\config\SwaggerConfig.java
+C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\ai\dto\AiSearchRequest.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\common\ResultCode.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\admin\dto\Dashboard.java
 C:\Users\18200\Desktop\project-main\backend\src\main\java\com\rental\modules\contract\service\ContractService.java
