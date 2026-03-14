@@ -1,12 +1,12 @@
-import { Button, Card, Form, Image, Input, Space, Table, Modal, Checkbox, Typography } from 'antd'
+import { Button, Card, Form, Image, Input, Space, Table, Modal, Checkbox, Typography, InputNumber, Select, Collapse } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import { useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { SettingOutlined, SearchOutlined, RobotOutlined } from '@ant-design/icons'
+import { SettingOutlined, SearchOutlined, FilterOutlined } from '@ant-design/icons'
 import { PageHeader } from '../../../shared/ui/PageHeader'
-import { getListingImages, listListings, aiSearch } from '../api/tenantApi'
+import { getListingImages, listListings } from '../api/tenantApi'
 import type { Listing } from '../../../shared/api/types'
 import { useAuth } from '../../auth/context/AuthContext'
 
@@ -22,7 +22,7 @@ interface FieldOption {
 const DEFAULT_FIELDS: FieldOption[] = [
   { key: 'cover', title: 'cover', visible: true },
   { key: 'id', title: 'id', visible: true },
-  { key: 'title', title: 'title', visible: true },
+  { key: 'title', title: 'title', visible: false },
   { key: 'cityRegion', title: 'cityRegion', visible: true },
   { key: 'price', title: 'price', visible: true },
   { key: 'layout', title: 'layout', visible: true },
@@ -46,34 +46,20 @@ export function TenantListingsPage() {
   const cardMaxWidth = isGuest ? 1160 : 980
 
   const [settingsModalOpen, setSettingsModalOpen] = useState(false)
+  const [filterOpen, setFilterOpen] = useState(false)
   const [form] = Form.useForm()
-
-  const q = params.get('q') || undefined
-  const useAiSearch = !!q?.trim()
 
   const listingsQ = useQuery({
     queryKey: ['tenant', 'listings', Object.fromEntries(params)],
-    queryFn: async () => {
-      if (useAiSearch) {
-        try {
-          const res = await aiSearch(q.trim(), 50)
-          return { listings: res.properties, aiAnswer: res.aiAnswer }
-        } catch {
-          // AI 服务不可用时回退到普通搜索
-          const listings = await listListings({ q })
-          return { listings, aiAnswer: null }
-        }
-      }
-      const listings = await listListings({
-        q,
+    queryFn: () =>
+      listListings({
+        q: params.get('q') || undefined,
         city: params.get('city') || undefined,
         region: params.get('region') || undefined,
         bedrooms: params.get('bedrooms') ? Number(params.get('bedrooms')) : undefined,
         minPrice: params.get('minPrice') ? Number(params.get('minPrice')) : undefined,
         maxPrice: params.get('maxPrice') ? Number(params.get('maxPrice')) : undefined,
-      })
-      return { listings, aiAnswer: null }
-    },
+      }),
   })
 
   const STORAGE_KEY = 'listings_columns'
@@ -150,7 +136,7 @@ export function TenantListingsPage() {
         <Space orientation="vertical" size={16} style={{ width: '100%' }}>
           <PageHeader title={t('pages.listings')} align="center" />
 
-          {/* AI 智能搜索面板 */}
+          {/* 搜索 + 高级筛选面板 */}
           <Card
             style={{
               width: '100%',
@@ -160,104 +146,159 @@ export function TenantListingsPage() {
               background: 'linear-gradient(135deg, #4facfe 0%, #667eea 50%, #8b5cf6 100%)',
             }}
           >
-        <Form
-          layout="inline"
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: 12,
-          }}
-          initialValues={Object.fromEntries(params)}
-          onFinish={(v) => {
-            const next = new URLSearchParams()
-            if (v.q) next.set('q', v.q)
-            setParams(next)
-          }}
-        >
-          <Form.Item name="q" style={{ marginBottom: 0, flex: 1, maxWidth: 560 }}>
-            <Input
-              size="large"
-              placeholder={t('pages.aiSearchPlaceholder') || t('pages.searchListings')}
-              allowClear
-              style={{
-                width: '100%',
-                height: 48,
-                borderRadius: 24,
-                fontSize: 16,
-              }}
-              prefix={<SearchOutlined style={{ color: '#999', fontSize: 18 }} />}
-            />
-          </Form.Item>
-          <Form.Item style={{ marginBottom: 0 }}>
-            <Space size={12}>
-              <Button
-                type="primary"
-                htmlType="submit"
-                size="large"
-                style={{
-                  height: 48,
-                  paddingInline: 32,
-                  borderRadius: 24,
-                  fontSize: 16,
-                  background: '#fff',
-                  color: '#667eea',
-                  fontWeight: 600,
-                }}
-              >
-                {t('common.search')}
-              </Button>
-              <Button
-                size="large"
-                style={{
-                  height: 48,
-                  paddingInline: 24,
-                  borderRadius: 24,
-                  fontSize: 16,
-                  background: 'rgba(255,255,255,0.2)',
-                  border: '1px solid rgba(255,255,255,0.5)',
-                  color: '#fff',
-                }}
-                onClick={() => {
-                  setParams(new URLSearchParams())
-                }}
-              >
-                {t('common.reset')}
-              </Button>
-            </Space>
-          </Form.Item>
-            </Form>
-            <div style={{ textAlign: 'center', marginTop: 8, fontSize: 12, color: 'rgba(255,255,255,0.85)' }}>
-              {t('pages.aiSearchHint')}
-            </div>
-          </Card>
-
-          {/* AI 搜索总结（仅当有搜索词且有 AI 回答时显示） */}
-          {listingsQ.data?.aiAnswer && (
-            <Card
-              size="small"
-              style={{
-                width: '100%',
-                borderRadius: 12,
-                border: '1px solid #e6f4ff',
-                background: 'linear-gradient(135deg, #e6f7ff 0%, #f0f5ff 100%)',
+            <Form
+              layout="vertical"
+              initialValues={Object.fromEntries(params)}
+              onFinish={(v) => {
+                const next = new URLSearchParams()
+                if (v.q) next.set('q', v.q)
+                if (v.city) next.set('city', v.city)
+                if (v.region) next.set('region', v.region)
+                if (v.bedrooms != null) next.set('bedrooms', String(v.bedrooms))
+                if (v.minPrice != null) next.set('minPrice', String(v.minPrice))
+                if (v.maxPrice != null) next.set('maxPrice', String(v.maxPrice))
+                setParams(next)
               }}
             >
-              <Space align="start" size={12}>
-                <RobotOutlined style={{ fontSize: 24, color: '#1890ff', marginTop: 2 }} />
-                <div>
-                  <Typography.Text strong style={{ fontSize: 13, color: '#0958d9' }}>
-                    {t('pages.aiSearchResult') || 'AI 搜索解读'}
-                  </Typography.Text>
-                  <Typography.Paragraph
-                    style={{ marginBottom: 0, marginTop: 4, whiteSpace: 'pre-wrap' }}
+              {/* 关键词搜索行 */}
+              <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 0 }}>
+                <Form.Item name="q" style={{ marginBottom: 0, flex: 1 }}>
+                  <Input
+                    size="large"
+                    placeholder={t('pages.searchListings')}
+                    allowClear
+                    style={{ height: 48, borderRadius: 24, fontSize: 16 }}
+                    prefix={<SearchOutlined style={{ color: '#999', fontSize: 18 }} />}
+                  />
+                </Form.Item>
+                <Form.Item style={{ marginBottom: 0 }}>
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    size="large"
+                    style={{
+                      height: 48, paddingInline: 32, borderRadius: 24, fontSize: 16,
+                      background: '#fff', color: '#667eea', fontWeight: 600, border: 'none',
+                    }}
                   >
-                    {listingsQ.data.aiAnswer}
-                  </Typography.Paragraph>
-                </div>
-              </Space>
-            </Card>
-          )}
+                    {t('common.search')}
+                  </Button>
+                </Form.Item>
+                <Form.Item style={{ marginBottom: 0 }}>
+                  <Button
+                    size="large"
+                    style={{
+                      height: 48, paddingInline: 24, borderRadius: 24, fontSize: 16,
+                      background: filterOpen ? '#fff' : 'rgba(255,255,255,0.2)',
+                      border: '1px solid rgba(255,255,255,0.5)', color: filterOpen ? '#667eea' : '#fff',
+                    }}
+                    onClick={() => setFilterOpen(!filterOpen)}
+                  >
+                    <FilterOutlined /> {t('pages.filter')}
+                  </Button>
+                </Form.Item>
+                <Form.Item style={{ marginBottom: 0 }}>
+                  <Button
+                    size="large"
+                    style={{
+                      height: 48, paddingInline: 24, borderRadius: 24, fontSize: 16,
+                      background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.5)', color: '#fff',
+                    }}
+                    onClick={() => setParams(new URLSearchParams())}
+                  >
+                    {t('common.reset')}
+                  </Button>
+                </Form.Item>
+              </div>
+
+              {/* 折叠高级筛选 */}
+              <Collapse
+                ghost
+                style={{ marginTop: 0 }}
+                activeKey={filterOpen ? ['filters'] : []}
+                onChange={() => setFilterOpen(!filterOpen)}
+                expandIcon={() => null}
+                items={[{
+                  key: 'filters',
+                  label: null,
+                  style: { padding: 0 },
+                  children: (
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                      gap: 12,
+                      padding: '12px 0 4px',
+                    }}>
+                      {/* 城市 */}
+                      <Form.Item name="city" label={
+                        <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 13 }}>{t('pages.city') || '城市'}</span>
+                      } style={{ marginBottom: 0 }}>
+                        <Input
+                          placeholder={t('pages.city') || '城市'}
+                          allowClear
+                          style={{ borderRadius: 8 }}
+                        />
+                      </Form.Item>
+
+                      {/* 区域 */}
+                      <Form.Item name="region" label={
+                        <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 13 }}>{t('pages.region') || '区域'}</span>
+                      } style={{ marginBottom: 0 }}>
+                        <Input
+                          placeholder={t('pages.region') || '区域'}
+                          allowClear
+                          style={{ borderRadius: 8 }}
+                        />
+                      </Form.Item>
+
+                      {/* 卧室数 */}
+                      <Form.Item name="bedrooms" label={
+                        <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 13 }}>{t('pages.bedroomCountLabel') || '卧室数'}</span>
+                      } style={{ marginBottom: 0 }}>
+                        <Select
+                          placeholder={t('pages.bedroomCountLabel') || '不限'}
+                          allowClear
+                          style={{ borderRadius: 8, width: '100%' }}
+                          options={[
+                            { value: 1, label: t('pages.room1') },
+                            { value: 2, label: t('pages.room2') },
+                            { value: 3, label: t('pages.room3') },
+                            { value: 4, label: t('pages.room4Plus') },
+                          ]}
+                        />
+                      </Form.Item>
+
+                      {/* 最低价格 */}
+                      <Form.Item name="minPrice" label={
+                        <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 13 }}>{t('pages.minPrice') || '最低租金（元/月）'}</span>
+                      } style={{ marginBottom: 0 }}>
+                        <InputNumber
+                          placeholder="0"
+                          min={0}
+                          step={500}
+                          style={{ width: '100%', borderRadius: 8 }}
+                          prefix="¥"
+                        />
+                      </Form.Item>
+
+                      {/* 最高价格 */}
+                      <Form.Item name="maxPrice" label={
+                        <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 13 }}>{t('pages.maxPrice') || '最高租金（元/月）'}</span>
+                      } style={{ marginBottom: 0 }}>
+                        <InputNumber
+                          placeholder="99999"
+                          min={0}
+                          step={500}
+                          style={{ width: '100%', borderRadius: 8 }}
+                          prefix="¥"
+                        />
+                      </Form.Item>
+                    </div>
+                  ),
+                }]}
+              />
+            </Form>
+          </Card>
 
           <Card
             title={t('pages.listings')}
@@ -278,7 +319,7 @@ export function TenantListingsPage() {
               rowKey="id"
               loading={listingsQ.isLoading}
               columns={columns}
-              dataSource={listingsQ.data?.listings ?? []}
+              dataSource={listingsQ.data ?? []}
               size="middle"
               pagination={{ pageSize: 4, showSizeChanger: false, placement: ['bottomCenter'] }}
             />

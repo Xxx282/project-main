@@ -25,6 +25,7 @@ type TopNavKey =
   | 'landlord_predict'
   | 'landlord_inquiries'
   | 'landlord_favorites'
+  | 'landlord_orders'
   | 'admin_dashboard'
   | 'admin_users'
   | 'admin_listings'
@@ -58,6 +59,8 @@ function keyToPath(key: TopNavKey): string {
       return '/landlord/predict'
     case 'landlord_inquiries':
       return '/landlord/inquiries'
+    case 'landlord_orders':
+      return '/landlord/orders'
     case 'landlord_favorites':
       return '/landlord/favorites'
     case 'admin_dashboard':
@@ -93,6 +96,8 @@ function pathToKey(pathname: string): TopNavKey {
   if (pathname.startsWith('/landlord/all-listings')) return 'landlord_all_listings'
   if (pathname.startsWith('/landlord/predict')) return 'landlord_predict'
   if (pathname.startsWith('/landlord/inquiries')) return 'landlord_inquiries'
+  if (pathname.startsWith('/landlord/orders')) return 'landlord_orders'
+  if (pathname.startsWith('/landlord/favorites')) return 'landlord_favorites'
   if (pathname.startsWith('/landlord')) return 'landlord_listings'
 
   if (pathname.startsWith('/admin/users')) return 'admin_users'
@@ -119,6 +124,7 @@ function getRoleMenu(t: (key: string) => string): Record<UserRole, { key: TopNav
       // { key: 'home', label: t('nav.home') },
       { key: 'landlord_all_listings', label: t('nav.listings') },
       { key: 'landlord_listings', label: t('nav.publish') },
+      { key: 'landlord_orders', label: t('pages.ordersManagement') },
       { key: 'landlord_favorites', label: t('nav.favorites') },
       { key: 'landlord_predict', label: t('nav.prediction') },
       { key: 'landlord_inquiries', label: t('nav.consultation') },
@@ -281,7 +287,6 @@ export function MainLayout() {
               <Button
                 onClick={() => {
                   auth.logout()
-                  navigate('/', { replace: true })
                 }}
                 style={{
                   background: 'rgba(255,255,255,0.15)',

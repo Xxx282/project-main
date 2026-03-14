@@ -33,6 +33,11 @@ export function AdminDashboardPage() {
             <Statistic title="待审核房源" value={q.data?.pendingListings ?? 0} loading={q.isLoading} />
           </Card>
         </Col>
+        <Col xs={24} sm={12} md={6}>
+          <Card>
+            <Statistic title="待审核订单" value={q.data?.pendingOrders ?? 0} loading={q.isLoading} />
+          </Card>
+        </Col>
       </Row>
     </Space>
   )

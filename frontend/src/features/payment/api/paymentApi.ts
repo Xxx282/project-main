@@ -14,12 +14,8 @@ export interface PaymentOrder {
   propertyTitle?: string
   paymentType: 'DEPOSIT' | 'RENT'
   amount: number
-  status: 'PENDING' | 'SUCCESS' | 'REJECTED' | 'REFUNDED'
+  status: 'PENDING' | 'LANDLORD_CONFIRMED' | 'SUCCESS' | 'REJECTED' | 'REFUNDED'
   paymentChannel: 'WECHAT' | 'ALIPAY'
-  transactionId?: string
-  paidAt?: string
-  reviewedAt?: string
-  reviewerId?: number
   reviewNote?: string
   createdAt: string
   updatedAt: string
@@ -37,7 +33,7 @@ export interface CreatePaymentRequest {
 // 审核请求
 export interface ReviewPaymentRequest {
   orderId: number
-  action: 'APPROVE' | 'REJECT' | 'REFUND'
+  action: 'APPROVE' | 'REJECT' | 'REFUND' | 'CONFIRM'
   note?: string
 }
 
@@ -110,4 +106,23 @@ export async function reviewPayment(data: ReviewPaymentRequest): Promise<Payment
 export async function getPendingCount(): Promise<number> {
   const response = await http.get('/api/payments/admin/pending-count')
   return response.data.data.count
+}
+
+// ===== 房东接口 =====
+
+// 房东获取我的订单（收款）
+export async function getLandlordPayments(
+  page = 0,
+  size = 10
+): Promise<PageResponse<PaymentOrder>> {
+  const response = await http.get('/api/payments/landlord/my', {
+    params: { page, size }
+  })
+  return response.data.data
+}
+
+// 房东确认收款
+export async function confirmPayment(data: ReviewPaymentRequest): Promise<PaymentOrder> {
+  const response = await http.post('/api/payments/landlord/confirm', data)
+  return response.data.data
 }

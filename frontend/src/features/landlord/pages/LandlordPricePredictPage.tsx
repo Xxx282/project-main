@@ -123,7 +123,7 @@ export function LandlordPricePredictPage() {
       padding: '24px',
     }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-        <Space direction="vertical" size={24} style={{ width: '100%' }}>
+        <Space orientation="vertical" size={24} style={{ width: '100%' }}>
           {/* 页面标题 */}
           <Card 
             style={{ 

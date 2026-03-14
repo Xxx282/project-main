@@ -3,6 +3,8 @@ import { env } from './env'
 import { authStore } from '../../features/auth/store/authStore'
 import { getErrorMessage } from './errors'
 
+export { env }
+
 export const http = axios.create({
   baseURL: env.apiBaseUrl ?? '/api',
   timeout: 30_000,

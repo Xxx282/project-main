@@ -1,6 +1,7 @@
 com\rental\common\util\JwtUtil.class
 com\rental\modules\property\repository\PropertyRepository.class
 com\rental\modules\auth\dto\LoginResponse$LoginResponseBuilder.class
+com\rental\modules\contract\controller\ContractController.class
 com\rental\modules\ml\service\MlService.class
 com\rental\modules\user\repository\UserRepository.class
 com\rental\config\SwaggerConfig.class
@@ -19,6 +20,7 @@ com\rental\modules\favorite\entity\Favorite$FavoriteBuilder.class
 com\rental\modules\ml\dto\RecommendationRequest.class
 com\rental\modules\auth\controller\VerificationController$VerifyEmailRequest.class
 com\rental\modules\property\controller\PropertyController$ReorderImagesRequest.class
+com\rental\modules\contract\entity\RentalContract.class
 com\rental\modules\conversation\entity\Conversation$ConversationBuilder.class
 com\rental\modules\auth\service\AuthServiceImpl.class
 com\rental\modules\favorite\service\FavoriteService.class
@@ -26,6 +28,8 @@ com\rental\modules\property\repository\PropertyImageRepository.class
 com\rental\config\CorsConfig.class
 com\rental\modules\conversation\repository\MessageRepository.class
 com\rental\modules\favorite\entity\Favorite.class
+com\rental\modules\contract\dto\CreateContractRequest.class
+com\rental\modules\contract\repository\RentalContractRepository.class
 com\rental\common\ResultCode.class
 com\rental\modules\conversation\entity\Conversation$ConversationStatus.class
 com\rental\modules\favorite\service\FavoriteServiceImpl.class
@@ -48,6 +52,7 @@ com\rental\modules\payment\service\PaymentService.class
 com\rental\modules\tenant\entity\TenantPreference$TenantPreferenceBuilder.class
 com\rental\modules\property\service\PropertyImageService.class
 com\rental\modules\conversation\service\ConversationServiceImpl.class
+com\rental\modules\contract\service\ContractService.class
 com\rental\modules\property\entity\PropertyImage.class
 com\rental\modules\property\controller\PropertyController$CreatePropertyRequest.class
 com\rental\modules\admin\AdminController.class
@@ -56,6 +61,7 @@ com\rental\modules\conversation\entity\Conversation.class
 com\rental\modules\conversation\service\ConversationService.class
 com\rental\config\MlServiceConfig.class
 com\rental\config\WebConfig.class
+com\rental\modules\contract\entity\RentalContract$RentalContractBuilder.class
 com\rental\modules\ml\dto\PricePredictionResponse$FeatureImportance.class
 com\rental\modules\payment\dto\ReviewPaymentRequest.class
 com\rental\modules\property\entity\Property$Decoration.class
@@ -80,8 +86,8 @@ com\rental\modules\tenant\controller\TenantPreferenceController.class
 com\rental\modules\conversation\repository\ConversationRepository.class
 com\rental\modules\payment\entity\PaymentOrder.class
 com\rental\modules\auth\controller\VerificationController.class
+com\rental\modules\contract\dto\SignContractRequest.class
 com\rental\modules\property\controller\PropertyController.class
-com\rental\modules\conversation\controller\ConversationController$SendMessageRequest.class
 com\rental\modules\ml\client\MlServiceClient.class
 com\rental\modules\property\service\PropertyImageServiceImpl.class
 com\rental\modules\conversation\service\MessageService.class
@@ -96,4 +102,5 @@ com\rental\modules\auth\controller\AuthController.class
 com\rental\modules\ml\dto\RecommendationResponse.class
 com\rental\modules\admin\dto\Dashboard.class
 com\rental\modules\ml\client\MlServiceClientImpl.class
+com\rental\modules\contract\entity\RentalContract$ContractStatus.class
 com\rental\modules\tenant\repository\TenantPreferenceRepository.class

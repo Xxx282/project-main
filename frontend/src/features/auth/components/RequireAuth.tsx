@@ -15,6 +15,11 @@ export function RequireAuth(props: {
     return <Spin fullscreen />
   }
 
+  // 用户正在退出登录，不进行重定向，让用户正常导航到首页
+  if (auth.isLoggingOut) {
+    return props.children
+  }
+
   if (!auth.user) {
     return <Navigate to="/login" replace state={{ from: location.pathname }} />
   }

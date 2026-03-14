@@ -89,7 +89,7 @@ export function TenantListingDetailPage() {
                   icon={<DollarOutlined />}
                   onClick={() => {
                     if (!listingQ.data) return
-                    navigate(`/tenant/payments/create?propertyId=${propertyId}&payeeId=${listingQ.data.landlordId}`)
+                    navigate(`/tenant/contract?propertyId=${propertyId}&payeeId=${listingQ.data.landlordId}`)
                   }}
                 >
                   {t('pages.pay')}

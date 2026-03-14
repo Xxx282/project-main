@@ -32,4 +32,9 @@ public class Dashboard {
      * 待审核房源数
      */
     private long pendingListings;
+
+    /**
+     * 待审核订单数
+     */
+    private long pendingOrders;
 }
