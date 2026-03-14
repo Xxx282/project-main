@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { message, Spin, Card, Descriptions, Button, Space, Divider } from 'antd'
 import { getContractById, signContractAsLandlord, type RentalContract } from '../../contract/api/contractApi'
+import { useTranslation } from 'react-i18next'
 
 const C = {
   bg: '#f5f5f5',
@@ -33,6 +34,7 @@ const COLORS = {
 }
 
 export function LandlordContractSignPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const contractId = Number(searchParams.get('contractId'))
@@ -120,7 +122,7 @@ export function LandlordContractSignPage() {
   }
 
   const handleSign = () => {
-    if (!hasStroke) { message.warning('请先完成手写签名'); return }
+    if (!hasStroke) { message.warning(t('pages.pleaseSignFirst')); return }
     const sig = canvasRef.current!.toDataURL('image/png')
     signMutation.mutate({ signature: sig })
   }
@@ -176,7 +178,7 @@ export function LandlordContractSignPage() {
                 返回订单页面
               </Button>
               {fromPayment && (
-                <Button type="primary" size="large" onClick={() => message.info('请返回订单页面确认收款')}>
+                <Button type="primary" size="large" onClick={() => message.info(t('pages.pleaseConfirmReceipt'))}>
                   前往确认收款
                 </Button>
               )}
@@ -236,16 +238,16 @@ export function LandlordContractSignPage() {
               fontSize: 14, fontWeight: 700, color: COLORS.accent,
               letterSpacing: 1, borderLeft: `3px solid ${COLORS.accent}`,
               paddingLeft: 10, marginBottom: 16,
-            }}>合同信息</div>
+            }}>{t('pages.contractInfo')}</div>
             <div style={{ background: COLORS.card, borderRadius: 12, padding: 20 }}>
               <Descriptions column={2} size="small" colon>
-                <Descriptions.Item label="合同编号">{contract?.contractNo}</Descriptions.Item>
-                <Descriptions.Item label="房源">{contract?.propertyTitle}</Descriptions.Item>
-                <Descriptions.Item label="租客">{contract?.tenantRealName || contract?.tenantUsername}</Descriptions.Item>
-                <Descriptions.Item label="月租金">¥ {contract?.monthlyRent?.toLocaleString()}</Descriptions.Item>
-                <Descriptions.Item label="押金">¥ {contract?.deposit?.toLocaleString()}</Descriptions.Item>
-                <Descriptions.Item label="租期">
-                  {contract?.leaseStart} 至 {contract?.leaseEnd}
+                <Descriptions.Item label={t('pages.contractNo')}>{contract?.contractNo}</Descriptions.Item>
+                <Descriptions.Item label={t('pages.property')}>{contract?.propertyTitle}</Descriptions.Item>
+                <Descriptions.Item label={t('pages.tenant')}>{contract?.tenantRealName || contract?.tenantUsername}</Descriptions.Item>
+                <Descriptions.Item label={t('pages.monthlyRentLabel')}>¥ {contract?.monthlyRent?.toLocaleString()}</Descriptions.Item>
+                <Descriptions.Item label={t('pages.deposit')}>¥ {contract?.deposit?.toLocaleString()}</Descriptions.Item>
+                <Descriptions.Item label={t('pages.leaseTerm')}>
+                  {contract?.leaseStart} {t('pages.to')} {contract?.leaseEnd}
                 </Descriptions.Item>
               </Descriptions>
             </div>

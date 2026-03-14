@@ -263,16 +263,16 @@ export function TenantContractPage() {
           {/* ── 第一条 当事人 ── */}
           <Section title="第一条  当事人信息">
             <InfoRow label="甲方（出租方）" value={landlordName} />
-            <InfoRow label="联系电话" value={landlordPhone} />
+            <InfoRow label={t('pages.contactPhone')} value={landlordPhone} />
             <InfoRow label="乙方（承租方）" value="（签署人，详见平台账号）" />
           </Section>
 
           {/* ── 第二条 房屋 ── */}
           <Section title="第二条  租赁房屋">
-            <InfoRow label="房源名称" value={listing?.title || '-'} />
-            <InfoRow label="房屋面积" value={listing?.area ? `${listing.area} ㎡` : '-'} />
-            <InfoRow label="房间格局" value={listing?.bedrooms ? `${listing.bedrooms} 室` : '-'} />
-            <InfoRow label="装修情况" value={listing?.decoration || '-'} />
+            <InfoRow label={t('pages.propertyTitle')} value={listing?.title || '-'} />
+            <InfoRow label={t('pages.areaLabel')} value={listing?.area ? `${listing.area} ㎡` : '-'} />
+            <InfoRow label={t('pages.layout')} value={listing?.bedrooms ? `${listing.bedrooms} ${t('pages.bedrooms')}` : '-'} />
+            <InfoRow label={t('pages.decorationLabel')} value={listing?.decoration || '-'} />
           </Section>
 
           {/* ── 第三条 租期 ── */}
@@ -293,10 +293,10 @@ export function TenantContractPage() {
 
           {/* ── 第四条 租金 ── */}
           <Section title="第四条  租金与押金">
-            <InfoRow label="月租金" value={`¥ ${price.toLocaleString()} 元 / 月`} />
-            <InfoRow label="押金" value={`¥ ${deposit.toLocaleString()} 元（月租金 × 2）`} />
-            <InfoRow label="付款方式" value="按月支付，每月 1 日前缴纳当月租金" />
-            <InfoRow label="付款渠道" value="通过平台线上支付" />
+            <InfoRow label={t('pages.monthlyRentLabel')} value={`¥ ${price.toLocaleString()} ${t('pages.yuanPerMonth')}`} />
+            <InfoRow label={t('pages.deposit')} value={`¥ ${deposit.toLocaleString()} ${t('pages.depositMonthlyRentHint')}`} />
+            <InfoRow label={t('pages.paymentMethod')} value={t('pages.paymentMethodMonthly')} />
+            <InfoRow label={t('pages.paymentChannel')} value={t('pages.paymentChannelOnline')} />
           </Section>
 
           {/* ── 第五条 使用 ── */}

@@ -39,6 +39,8 @@ export type ListingsQuery = {
   maxPrice?: number
   bedrooms?: number
   status?: string
+  page?: number
+  size?: number
 }
 
 export async function listListings(query: ListingsQuery): Promise<Listing[]> {

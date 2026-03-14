@@ -1,4 +1,4 @@
-import { Button, Card, Form, InputNumber, Select, Space, Typography, Row, Col, Spin, Alert, Table, message, Divider } from 'antd'
+import { Button, Card, Form, InputNumber, Select, Space, Typography, Row, Col, Spin, Alert, Table, message, Divider, Tag } from 'antd'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
@@ -145,8 +145,8 @@ export function LandlordPricePredictPage() {
           </Card>
 
           <Row gutter={[24, 24]}>
-            {/* 左侧表单 */}
-            <Col xs={24} lg={14}>
+            {/* 左侧表单 - 更窄，留更多空间给右侧结果 */}
+            <Col xs={24} lg={9}>
               <Card 
                 style={{ 
                   background: 'rgba(255, 255, 255, 0.95)',
@@ -415,8 +415,8 @@ export function LandlordPricePredictPage() {
               </Card>
             </Col>
 
-            {/* 右侧结果展示 */}
-            <Col xs={24} lg={10}>
+            {/* 右侧结果展示 - 更宽，表格和房源详情有足够空间 */}
+            <Col xs={24} lg={15}>
               <Card 
                 style={{ 
                   background: 'rgba(255, 255, 255, 0.95)',
@@ -425,7 +425,9 @@ export function LandlordPricePredictPage() {
                   boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
                   height: '100%',
                   minHeight: 400,
+                  overflow: 'hidden',
                 }}
+                bodyStyle={{ overflow: 'hidden' }}
               >
                 {loading ? (
                   <div style={{ 
@@ -449,187 +451,296 @@ export function LandlordPricePredictPage() {
                   </div>
                 ) : result ? (
                   <div>
-                    <div style={{ textAlign: 'center', marginBottom: 24 }}>
+                    {/* 主预测结果 - 大字居中展示 */}
+                    <div style={{ 
+                      textAlign: 'center', 
+                      padding: '24px 16px',
+                      background: 'linear-gradient(135deg, #667eea 0%, #8b5cf6 100%)',
+                      borderRadius: 16,
+                      marginBottom: 20,
+                    }}>
                       <CheckCircleOutlined
                         style={{
-                          fontSize: 48,
-                          color: '#52c41a',
-                          marginBottom: 16,
+                          fontSize: 40,
+                          color: '#fff',
+                          marginBottom: 8,
                         }}
                       />
-                      <Typography.Title level={3} style={{ color: '#1a1a1a', margin: 0 }}>
+                      <Typography.Title level={4} style={{ color: '#fff', margin: '0 0 8px', opacity: 0.9 }}>
                         {t('pages.predictionResult')}
                       </Typography.Title>
+                      <div style={{ 
+                        fontSize: 42, 
+                        fontWeight: 700, 
+                        color: '#fff',
+                        lineHeight: 1.2,
+                      }}>
+                        {result.currency === 'CNY' ? '¥' : '₹'}{Math.round(result.predictedPrice).toLocaleString()}
+                        <span style={{ fontSize: 16, fontWeight: 400, opacity: 0.8 }}>/{t('common.yuanPerMonth') || '月'}</span>
+                      </div>
+                      <Typography.Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 14 }}>
+                        {t('pages.reasonablePrice') || '建议定价'}
+                      </Typography.Text>
                     </div>
 
-                    {/* 综合价格参考表格 */}
+                    {/* 价格区间可视化 */}
+                    {result.lowerBound && result.upperBound && (
+                      <Card
+                        style={{
+                          background: '#fff',
+                          borderRadius: 12,
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                          marginBottom: 16,
+                        }}
+                        bodyStyle={{ padding: 16 }}
+                      >
+                        <Typography.Text strong style={{ fontSize: 15, color: '#1a1a1a' }}>
+                          {t('pages.mlPrediction') || '价格区间'}
+                        </Typography.Text>
+                        <div style={{ marginTop: 12, position: 'relative', height: 48 }}>
+                          {/* 进度条背景 */}
+                          <div style={{
+                            position: 'absolute',
+                            top: 20,
+                            left: 0,
+                            right: 0,
+                            height: 8,
+                            background: 'linear-gradient(90deg, #52c41a 0%, #667eea 50%, #ff4d4f 100%)',
+                            borderRadius: 4,
+                          }} />
+                          {/* 最低价 */}
+                          <div style={{ position: 'absolute', left: '0%', top: 0, textAlign: 'center' }}>
+                            <div style={{ 
+                              width: 32, height: 32, 
+                              background: '#52c41a', borderRadius: '50%', 
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              color: '#fff', fontWeight: 600, fontSize: 12,
+                              margin: '0 auto 4px'
+                            }}>
+                              ↓
+                            </div>
+                            <Typography.Text style={{ fontSize: 13, color: '#52c41a', fontWeight: 600 }}>
+                              {result.currency === 'CNY' ? '¥' : '₹'}{Math.round(result.lowerBound).toLocaleString()}
+                            </Typography.Text>
+                            <div style={{ fontSize: 11, color: '#8c8c8c' }}>{t('pages.minPrice') || '最低'}</div>
+                          </div>
+                          {/* 合理价 */}
+                          <div style={{ position: 'absolute', left: '50%', top: 0, transform: 'translateX(-50%)', textAlign: 'center' }}>
+                            <div style={{ 
+                              width: 40, height: 40, 
+                              background: '#667eea', borderRadius: '50%', 
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              color: '#fff', fontWeight: 700, fontSize: 14,
+                              margin: '0 auto 4px', border: '3px solid #fff', boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
+                            }}>
+                              ✓
+                            </div>
+                            <Typography.Text style={{ fontSize: 14, color: '#667eea', fontWeight: 700 }}>
+                              {result.currency === 'CNY' ? '¥' : '₹'}{Math.round(result.predictedPrice).toLocaleString()}
+                            </Typography.Text>
+                            <div style={{ fontSize: 11, color: '#8c8c8c' }}>{t('pages.reasonablePrice') || '建议'}</div>
+                          </div>
+                          {/* 最高价 */}
+                          <div style={{ position: 'absolute', left: '100%', top: 0, transform: 'translateX(-50%)', textAlign: 'center' }}>
+                            <div style={{ 
+                              width: 32, height: 32, 
+                              background: '#ff4d4f', borderRadius: '50%', 
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              color: '#fff', fontWeight: 600, fontSize: 12,
+                              margin: '0 auto 4px'
+                            }}>
+                              ↑
+                            </div>
+                            <Typography.Text style={{ fontSize: 13, color: '#ff4d4f', fontWeight: 600 }}>
+                              {result.currency === 'CNY' ? '¥' : '₹'}{Math.round(result.upperBound).toLocaleString()}
+                            </Typography.Text>
+                            <div style={{ fontSize: 11, color: '#8c8c8c' }}>{t('pages.maxPrice') || '最高'}</div>
+                          </div>
+                        </div>
+                      </Card>
+                    )}
+
+                    {/* 综合价格参考（简化版） */}
                     <Card
                       style={{
                         background: '#fff',
                         borderRadius: '12px',
                         boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                        marginBottom: 16,
                       }}
+                      bodyStyle={{ padding: '20px 24px' }}
                     >
                       <div style={{ marginBottom: 16 }}>
                         <TableOutlined style={{ marginRight: 8, color: '#667eea' }} />
-                        <Typography.Title level={4} style={{ color: '#1a1a1a', margin: 0, display: 'inline' }}>
+                        <Typography.Text strong style={{ color: '#1a1a1a', fontSize: 15 }}>
                           {t('pages.priceReference') || '价格参考'}
-                        </Typography.Title>
+                        </Typography.Text>
                       </div>
 
-                      {/* ML预测价格区间 */}
+                      {/* ML预测价格简化展示 */}
                       {result.lowerBound && result.upperBound && (
-                        <>
-                          <Typography.Text strong style={{ color: '#1890ff', fontSize: 14 }}>
-                            {t('pages.mlPrediction') || 'ML智能预测'}
-                          </Typography.Text>
-                          <Table
-                            dataSource={[
-                              {
-                                key: '1',
-                                type: t('pages.minPrice') || '最低价',
-                                price: result.lowerBound,
-                                source: 'ML模型预测',
-                                note: t('pages.minPriceNote') || '保守定价，容易出租'
-                              },
-                              {
-                                key: '2',
-                                type: t('pages.reasonablePrice') || '合理价',
-                                price: result.predictedPrice,
-                                source: 'ML模型推荐',
-                                note: t('pages.reasonableNote') || '市场竞争力强，建议定价'
-                              },
-                              {
-                                key: '3',
-                                type: t('pages.maxPrice') || '最高价',
-                                price: result.upperBound,
-                                source: 'ML模型预测',
-                                note: t('pages.maxPriceNote') || '高价策略，可适当调整'
-                              },
-                            ]}
-                            size="small"
-                            pagination={false}
-                            rowKey="key"
-                            columns={[
-                              {
-                                title: t('pages.priceType') || '价格类型',
-                                dataIndex: 'type',
-                                key: 'type',
-                                width: '25%',
-                                render: (text, record) => (
-                                  <Space>
-                                    {record.key === '1' && <span style={{ color: '#52c41a', fontWeight: 'bold' }}>●</span>}
-                                    {record.key === '2' && <span style={{ color: '#667eea', fontWeight: 'bold' }}>●</span>}
-                                    {record.key === '3' && <span style={{ color: '#ff4d4f', fontWeight: 'bold' }}>●</span>}
-                                    <span style={{ fontWeight: 500 }}>{text}</span>
-                                  </Space>
-                                )
-                              },
-                              {
-                                title: t('pages.rentPrice') || '租金',
-                                dataIndex: 'price',
-                                key: 'price',
-                                width: '25%',
-                                render: (price: number) => (
-                                  <Typography.Text strong style={{ fontSize: 16 }}>
-                                    {result.currency === 'CNY' ? '¥' : '₹'}{Math.round(price).toLocaleString()}
-                                  </Typography.Text>
-                                )
-                              },
-                              {
-                                title: t('pages.source') || '来源',
-                                dataIndex: 'source',
-                                key: 'source',
-                                width: '25%',
-                              },
-                              {
-                                title: t('pages.suggestion') || '建议',
-                                dataIndex: 'note',
-                                key: 'note',
-                                width: '25%',
-                                render: (text: string) => (
-                                  <Typography.Text type="secondary">{text}</Typography.Text>
-                                )
-                              },
-                            ]}
-                          />
-                        </>
+                        <Table
+                          dataSource={[
+                            {
+                              key: '1',
+                              type: t('pages.minPrice') || '最低价',
+                              price: result.lowerBound,
+                              color: '#52c41a',
+                              note: t('pages.minPriceNote') || '保守定价'
+                            },
+                            {
+                              key: '2',
+                              type: t('pages.reasonablePrice') || '合理价',
+                              price: result.predictedPrice,
+                              color: '#667eea',
+                              note: t('pages.reasonableNote') || '建议定价'
+                            },
+                            {
+                              key: '3',
+                              type: t('pages.maxPrice') || '最高价',
+                              price: result.upperBound,
+                              color: '#ff4d4f',
+                              note: t('pages.maxPriceNote') || '高价策略'
+                            },
+                          ]}
+                          size="middle"
+                          pagination={false}
+                          rowKey="key"
+                          style={{ marginBottom: 0 }}
+                          columns={[
+                            {
+                              title: '',
+                              dataIndex: 'type',
+                              key: 'type',
+                              width: 100,
+                              render: (text, record) => (
+                                <Space size="small">
+                                  <span style={{ color: record.color, fontWeight: 'bold' }}>●</span>
+                                  <span style={{ fontWeight: 500, fontSize: 14 }}>{text}</span>
+                                </Space>
+                              )
+                            },
+                            {
+                              title: t('pages.rentPrice') || '租金',
+                              dataIndex: 'price',
+                              key: 'price',
+                              width: 120,
+                              render: (price: number, record) => (
+                                <Typography.Text strong style={{ fontSize: 16, color: record.color }}>
+                                  {result.currency === 'CNY' ? '¥' : '₹'}{Math.round(price).toLocaleString()}
+                                </Typography.Text>
+                              )
+                            },
+                            {
+                              title: t('pages.suggestion') || '建议',
+                              dataIndex: 'note',
+                              key: 'note',
+                              render: (text: string) => (
+                                <Typography.Text type="secondary" style={{ fontSize: 13 }}>{text}</Typography.Text>
+                              )
+                            },
+                          ]}
+                        />
                       )}
 
-                      {/* 相似房源参考 */}
+                      {/* 相似房源参考 - 卡片式展示 */}
                       {similarProperties.length > 0 && (
-                        <>
-                          <div style={{ marginTop: 24, marginBottom: 16 }}>
-                            <Typography.Text strong style={{ color: '#1890ff', fontSize: 14 }}>
-                              {t('pages.similarReference') || '相似房源参考'} ({t('pages.fromDatabase') || '来自数据库真实房源'})
+                        <Card
+                          size="small"
+                          style={{
+                            background: '#fafafa',
+                            borderRadius: 12,
+                            marginBottom: 16,
+                          }}
+                          bodyStyle={{ padding: 12 }}
+                        >
+                          <div style={{ marginBottom: 12 }}>
+                            <Typography.Text strong style={{ color: '#667eea', fontSize: 14 }}>
+                              {t('pages.similarReference') || '相似房源参考'}
+                            </Typography.Text>
+                            <Typography.Text type="secondary" style={{ fontSize: 12, marginLeft: 8 }}>
+                              ({t('pages.fromDatabase') || '来自数据库'})
                             </Typography.Text>
                           </div>
+                          <div style={{ overflowX: 'auto', marginRight: -12 }}>
                           <Table
-                            dataSource={similarProperties.map((p, i) => ({ ...p, key: `similar-${i}` }))}
+                            dataSource={similarProperties.slice(0, 5).map((p, i) => ({ ...p, key: `similar-${i}` }))}
                             size="small"
                             pagination={false}
                             rowKey="key"
+                            scroll={{ x: 380 }}
                             columns={[
-                              {
-                                title: t('pages.title') || '房源标题',
-                                dataIndex: 'title',
-                                key: 'title',
-                                ellipsis: true,
-                              },
                               {
                                 title: t('pages.city') || '城市',
                                 dataIndex: 'city',
                                 key: 'city',
-                                width: 80,
+                                width: 72,
+                                ellipsis: true,
                               },
                               {
                                 title: t('pages.region') || '区域',
                                 dataIndex: 'region',
                                 key: 'region',
-                                width: 100,
+                                width: 72,
+                                ellipsis: true,
                               },
                               {
                                 title: t('pages.bedroomsBHK') || '户型',
                                 dataIndex: 'bedrooms',
                                 key: 'bedrooms',
-                                width: 60,
+                                width: 56,
                                 render: (val: number) => `${val}${t('pages.bhk') || '室'}`,
                               },
                               {
                                 title: t('pages.area') || '面积',
                                 dataIndex: 'area',
                                 key: 'area',
-                                width: 70,
+                                width: 56,
                                 render: (val: number) => `${val}m²`,
                               },
                               {
                                 title: t('pages.rentPrice') || '租金',
                                 dataIndex: 'price',
                                 key: 'price',
-                                width: 100,
+                                width: 88,
                                 render: (val: number) => (
-                                  <Typography.Text strong style={{ color: '#52c41a' }}>
+                                  <Typography.Text strong style={{ color: '#f97316', fontSize: 14 }}>
                                     {result.currency === 'CNY' ? '¥' : '₹'}{val?.toLocaleString()}
                                   </Typography.Text>
                                 ),
                               },
                               {
-                                title: t('pages.decoration') || '装修',
+                                title: t('pages.decorationLabel') || '装修',
                                 dataIndex: 'decoration',
                                 key: 'decoration',
-                                width: 90,
+                                width: 68,
+                                render: (val: string) => {
+                                  const colorMap: Record<string, string> = {
+                                    'fine': 'green', 'luxury': 'purple', 'simple': 'blue', 'rough': 'default'
+                                  }
+                                  const labelMap: Record<string, string> = {
+                                    rough: t('common.rough'),
+                                    simple: t('common.simple'),
+                                    fine: t('common.fine'),
+                                    luxury: t('common.luxury'),
+                                  }
+                                  return <Tag color={colorMap[val] || 'default'} style={{ fontSize: 11 }}>{labelMap[val] || val}</Tag>
+                                },
                               },
                             ]}
                           />
-                          <div style={{ marginTop: 12, textAlign: 'right' }}>
-                            <Typography.Text strong style={{ color: '#667eea', fontSize: 14 }}>
-                              {t('pages.avgPrice') || '平均租金'}：
+                          </div>
+                          <div style={{ marginTop: 10, textAlign: 'center', padding: '8px 12px', background: '#fff', borderRadius: 8 }}>
+                            <Typography.Text type="secondary" style={{ fontSize: 13 }}>
+                              {t('pages.avgRent') || '平均租金'}：
+                            </Typography.Text>
+                            <Typography.Text strong style={{ color: '#f97316', fontSize: 16 }}>
                               {result.currency === 'CNY' ? '¥' : '₹'}{
-                                Math.round(similarProperties.reduce((sum, p) => sum + (p.price || 0), 0) / similarProperties.length)
+                                Math.round(similarProperties.reduce((sum, p) => sum + (p.price || 0), 0) / similarProperties.length).toLocaleString()
                               }
                             </Typography.Text>
                           </div>
-                        </>
+                        </Card>
                       )}
 
                       {/* 如果没有相似房源，显示提示 */}
@@ -654,69 +765,134 @@ export function LandlordPricePredictPage() {
                             borderRadius: '12px',
                             border: '1px solid #b7eb8f',
                           }}
+                          bodyStyle={{ padding: '24px 28px' }}
                         >
-                          <div style={{ marginBottom: 16 }}>
+                          <div style={{ marginBottom: 20 }}>
                             <Typography.Title level={5} style={{ color: '#52c41a', margin: 0, display: 'inline' }}>
                               {t('pages.closestProperty') || '数据库中最接近的房源'}
                             </Typography.Title>
                           </div>
 
-                          <Row gutter={[16, 12]}>
+                          <Row gutter={[24, 18]} style={{ lineHeight: 1.6 }}>
+                            {/* 标题、地址、描述：label 上、value 下，避免文字挤 */}
                             <Col xs={24}>
-                              <Typography.Text type="secondary">{t('pages.title') || '标题'}：</Typography.Text>
-                              <Typography.Text strong style={{ marginLeft: 8 }}>{closestProperty.title}</Typography.Text>
+                              <div style={{ marginBottom: 4 }}>
+                                <Typography.Text type="secondary" style={{ fontSize: 13 }}>
+                                  {t('pages.title') || '标题'}
+                                </Typography.Text>
+                              </div>
+                              <Typography.Text strong style={{ display: 'block', fontSize: 15 }}>{closestProperty.title}</Typography.Text>
                             </Col>
                             <Col xs={24} sm={12}>
-                              <Typography.Text type="secondary">{t('pages.city') || '城市'}：</Typography.Text>
-                              <Typography.Text strong style={{ marginLeft: 8 }}>{closestProperty.city}</Typography.Text>
+                              <div style={{ marginBottom: 4 }}>
+                                <Typography.Text type="secondary" style={{ fontSize: 13 }}>
+                                  {t('pages.city') || '城市'}
+                                </Typography.Text>
+                              </div>
+                              <Typography.Text strong>{closestProperty.city}</Typography.Text>
                             </Col>
                             <Col xs={24} sm={12}>
-                              <Typography.Text type="secondary">{t('pages.region') || '区域'}：</Typography.Text>
-                              <Typography.Text strong style={{ marginLeft: 8 }}>{closestProperty.region}</Typography.Text>
+                              <div style={{ marginBottom: 4 }}>
+                                <Typography.Text type="secondary" style={{ fontSize: 13 }}>
+                                  {t('pages.region') || '区域'}
+                                </Typography.Text>
+                              </div>
+                              <Typography.Text strong>{closestProperty.region}</Typography.Text>
                             </Col>
                             <Col xs={24}>
-                              <Typography.Text type="secondary">{t('pages.address') || '地址'}：</Typography.Text>
-                              <Typography.Text strong style={{ marginLeft: 8 }}>{closestProperty.address}</Typography.Text>
+                              <div style={{ marginBottom: 4 }}>
+                                <Typography.Text type="secondary" style={{ fontSize: 13 }}>
+                                  {t('pages.address') || '地址'}
+                                </Typography.Text>
+                              </div>
+                              <Typography.Text strong style={{ display: 'block', wordBreak: 'break-word' }}>{closestProperty.address}</Typography.Text>
                             </Col>
-                            <Col xs={12} sm={6}>
-                              <Typography.Text type="secondary">{t('pages.bedroomsBHK') || '户型'}：</Typography.Text>
-                              <Typography.Text strong style={{ marginLeft: 8 }}>{closestProperty.bedrooms}{t('pages.bhk') || '室'}</Typography.Text>
+                            <Col xs={12} sm={8}>
+                              <div style={{ marginBottom: 4 }}>
+                                <Typography.Text type="secondary" style={{ fontSize: 13 }}>
+                                  {t('pages.bedroomsBHK') || '户型'}
+                                </Typography.Text>
+                              </div>
+                              <Typography.Text strong>{closestProperty.bedrooms}{t('pages.bhk') || '室'}</Typography.Text>
                             </Col>
-                            <Col xs={12} sm={6}>
-                              <Typography.Text type="secondary">{t('pages.bathrooms') || '卫生间'}：</Typography.Text>
-                              <Typography.Text strong style={{ marginLeft: 8 }}>{closestProperty.bathrooms}</Typography.Text>
+                            <Col xs={12} sm={8}>
+                              <div style={{ marginBottom: 4 }}>
+                                <Typography.Text type="secondary" style={{ fontSize: 13 }}>
+                                  {t('pages.bathrooms') || '卫生间'}
+                                </Typography.Text>
+                              </div>
+                              <Typography.Text strong>{closestProperty.bathrooms}</Typography.Text>
                             </Col>
-                            <Col xs={12} sm={6}>
-                              <Typography.Text type="secondary">{t('pages.area') || '面积'}：</Typography.Text>
-                              <Typography.Text strong style={{ marginLeft: 8 }}>{closestProperty.area} m²</Typography.Text>
+                            <Col xs={12} sm={8}>
+                              <div style={{ marginBottom: 4 }}>
+                                <Typography.Text type="secondary" style={{ fontSize: 13 }}>
+                                  {t('pages.area') || '面积'}
+                                </Typography.Text>
+                              </div>
+                              <Typography.Text strong>{closestProperty.area} m²</Typography.Text>
                             </Col>
-                            <Col xs={12} sm={6}>
-                              <Typography.Text type="secondary">{t('pages.totalFloors') || '总楼层'}：</Typography.Text>
-                              <Typography.Text strong style={{ marginLeft: 8 }}>{closestProperty.totalFloors}</Typography.Text>
+                            <Col xs={12} sm={8}>
+                              <div style={{ marginBottom: 4 }}>
+                                <Typography.Text type="secondary" style={{ fontSize: 13 }}>
+                                  {t('pages.totalFloors') || '总楼层'}
+                                </Typography.Text>
+                              </div>
+                              <Typography.Text strong>{closestProperty.totalFloors}</Typography.Text>
                             </Col>
-                            <Col xs={12} sm={6}>
-                              <Typography.Text type="secondary">{t('pages.decoration') || '装修'}：</Typography.Text>
-                              <Typography.Text strong style={{ marginLeft: 8 }}>{closestProperty.decoration}</Typography.Text>
+                            <Col xs={12} sm={8}>
+                              <div style={{ marginBottom: 4 }}>
+                                <Typography.Text type="secondary" style={{ fontSize: 13 }}>
+                                  {t('pages.decoration') || '装修'}
+                                </Typography.Text>
+                              </div>
+                              <Typography.Text strong>
+                                {closestProperty.decoration === 'rough' ? t('common.rough') :
+                                 closestProperty.decoration === 'simple' ? t('common.simple') :
+                                 closestProperty.decoration === 'fine' ? t('common.fine') :
+                                 closestProperty.decoration === 'luxury' ? t('common.luxury') : closestProperty.decoration}
+                              </Typography.Text>
                             </Col>
-                            <Col xs={12} sm={6}>
-                              <Typography.Text type="secondary">{t('pages.status') || '状态'}：</Typography.Text>
-                              <Typography.Text strong style={{ marginLeft: 8 }}>{closestProperty.status}</Typography.Text>
+                            <Col xs={12} sm={8}>
+                              <div style={{ marginBottom: 4 }}>
+                                <Typography.Text type="secondary" style={{ fontSize: 13 }}>
+                                  {t('pages.status') || '状态'}
+                                </Typography.Text>
+                              </div>
+                              <Typography.Text strong>
+                                {closestProperty.status === 'available' ? t('pages.available') :
+                                 closestProperty.status === 'rented' ? t('pages.rented') :
+                                 closestProperty.status === 'offline' ? t('pages.offline') : closestProperty.status}
+                              </Typography.Text>
                             </Col>
-                            <Col xs={12} sm={6}>
-                              <Typography.Text type="secondary">{t('pages.views') || '浏览量'}：</Typography.Text>
-                              <Typography.Text strong style={{ marginLeft: 8 }}>{closestProperty.viewCount}</Typography.Text>
+                            <Col xs={12} sm={8}>
+                              <div style={{ marginBottom: 4 }}>
+                                <Typography.Text type="secondary" style={{ fontSize: 13 }}>
+                                  {t('pages.views') || '浏览量'}
+                                </Typography.Text>
+                              </div>
+                              <Typography.Text strong>{closestProperty.viewCount}</Typography.Text>
                             </Col>
                             <Col xs={24}>
-                              <Divider style={{ margin: '12px 0' }} />
-                              <Typography.Text type="secondary">{t('pages.rentPrice') || '租金'}：</Typography.Text>
-                              <Typography.Text strong style={{ marginLeft: 8, fontSize: 20, color: '#52c41a' }}>
+                              <Divider style={{ margin: '16px 0' }} />
+                              <div style={{ marginBottom: 4 }}>
+                                <Typography.Text type="secondary" style={{ fontSize: 13 }}>
+                                  {t('pages.rentPrice') || '租金'}
+                                </Typography.Text>
+                              </div>
+                              <Typography.Text strong style={{ fontSize: 22, color: '#52c41a' }}>
                                 {result.currency === 'CNY' ? '¥' : '₹'}{closestProperty.price?.toLocaleString()}
                               </Typography.Text>
                             </Col>
                             {closestProperty.description && (
                               <Col xs={24}>
-                                <Typography.Text type="secondary">{t('pages.description') || '描述'}：</Typography.Text>
-                                <Typography.Text style={{ marginLeft: 8 }}>{closestProperty.description}</Typography.Text>
+                                <div style={{ marginBottom: 4 }}>
+                                  <Typography.Text type="secondary" style={{ fontSize: 13 }}>
+                                    {t('pages.description') || '描述'}
+                                  </Typography.Text>
+                                </div>
+                                <Typography.Text style={{ display: 'block', wordBreak: 'break-word', lineHeight: 1.65 }}>
+                                  {closestProperty.description}
+                                </Typography.Text>
                               </Col>
                             )}
                           </Row>
