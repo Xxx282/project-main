@@ -26,6 +26,20 @@ public class MlService {
         // 参数校验
         validatePredictionRequest(request);
 
+        // 设置默认值，避免 ML 服务报错
+        if (request.getOrientation() == null) {
+            request.setOrientation("南");
+        }
+        if (request.getHasParking() == null) {
+            request.setHasParking(false);
+        }
+        if (request.getHasElevator() == null) {
+            request.setHasElevator(false);
+        }
+        if (request.getHasBalcony() == null) {
+            request.setHasBalcony(false);
+        }
+
         // 调用 ML 服务
         PricePredictionResponse response = mlServiceClient.predictPrice(request);
 

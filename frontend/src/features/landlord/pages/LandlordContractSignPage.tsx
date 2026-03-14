@@ -177,11 +177,6 @@ export function LandlordContractSignPage() {
               <Button size="large" onClick={handleBack}>
                 返回订单页面
               </Button>
-              {fromPayment && (
-                <Button type="primary" size="large" onClick={() => message.info(t('pages.pleaseConfirmReceipt'))}>
-                  前往确认收款
-                </Button>
-              )}
             </Space>
           </div>
         </div>

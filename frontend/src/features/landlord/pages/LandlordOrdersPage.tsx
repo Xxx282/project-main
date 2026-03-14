@@ -218,6 +218,7 @@ export function LandlordOrdersPage() {
 
 // ===== 签名组件 =====
 function SignContractButton({ contract, onSign }: { contract: RentalContract; onSign: (sig: string) => void }) {
+  const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [hasStroke, setHasStroke] = useState(false)
@@ -289,7 +290,7 @@ function SignContractButton({ contract, onSign }: { contract: RentalContract; on
       <Drawer
         title={t('pages.landlordSignsContract')}
         placement="bottom"
-        height={350}
+        styles={{ wrapper: { height: 350 } }}
         open={open}
         onClose={() => setOpen(false)}
         extra={
