@@ -111,15 +111,24 @@ export function TenantComparePage() {
       cols.push({
         title: t('pages.propertyTitle'),
         dataIndex: ['property', 'title'],
+        width: 160,
+        ellipsis: true,
         render: (title, record) =>
           record.property ? (
-            <Button 
-              type="link" 
+            <Button
+              type="link"
+              title={typeof title === 'string' ? title : ''}
               onClick={() => navigate(`/tenant/listings/${record.property!.id}`)}
               style={{
                 color: '#667eea',
                 fontWeight: 600,
                 padding: 0,
+                maxWidth: '100%',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                display: 'block',
+                textAlign: 'left',
               }}
             >
               {title}
@@ -134,6 +143,8 @@ export function TenantComparePage() {
       cols.push({
         title: t('pages.city'),
         dataIndex: ['property', 'city'],
+        width: 100,
+        ellipsis: true,
         render: (v) => v ?? '-',
       })
     }
@@ -142,6 +153,8 @@ export function TenantComparePage() {
       cols.push({
         title: t('pages.region'),
         dataIndex: ['property', 'region'],
+        width: 100,
+        ellipsis: true,
         render: (v) => v ?? '-',
       })
     }
@@ -192,9 +205,12 @@ export function TenantComparePage() {
       })
     }
 
-    // 操作列始终显示
+    // 操作列始终显示（固定宽度避免英文时被挤出）
     cols.push({
       title: t('common.operation'),
+      key: 'operation',
+      width: 140,
+      fixed: 'right',
       render: (_, record) => (
         <Button
           type="text"
@@ -327,6 +343,7 @@ export function TenantComparePage() {
                 columns={columns}
                 dataSource={favoritesQ.data ?? []}
                 loading={favoritesQ.isLoading}
+                scroll={{ x: 1000 }}
                 pagination={{ 
                   pageSize: 10,
                   showSizeChanger: false,

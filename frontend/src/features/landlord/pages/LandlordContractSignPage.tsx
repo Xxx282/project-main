@@ -144,41 +144,70 @@ export function LandlordContractSignPage() {
     )
   }
 
-  // 签署成功
+  // 签署成功 - 全屏居中大字展示
   if (signed) {
     return (
       <div style={{
-        minHeight: '100vh',
-        background: COLORS.bg,
-        color: COLORS.text,
-        padding: '40px 16px 80px',
-        fontFamily: '"Noto Serif SC", "Source Han Serif SC", Georgia, serif',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: 'rgba(13, 15, 26, 0.95)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 1000,
+        animation: 'fadeIn 0.5s ease',
       }}>
         <style>{`
-          @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+          @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+          @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
         `}</style>
-
-        <div style={{ maxWidth: 600, margin: '0 auto', textAlign: 'center' }}>
+        <div style={{
+          background: 'linear-gradient(135deg, #1a1e2e 0%, #141720 100%)',
+          border: '2px solid #34d399',
+          borderRadius: 24,
+          padding: '60px 80px',
+          textAlign: 'center',
+          boxShadow: '0 20px 60px rgba(52, 211, 153, 0.3), 0 0 80px rgba(52, 211, 153, 0.1)',
+          animation: 'fadeIn 0.6s ease both',
+        }}>
           <div style={{
-            background: 'rgba(52,211,153,0.08)',
-            border: `1px solid ${COLORS.success}`,
-            borderRadius: 16,
-            padding: '48px 32px',
-            animation: 'fadeIn .45s ease both',
+            fontSize: 80,
+            marginBottom: 24,
+            animation: 'bounce 1.5s ease infinite',
+          }}>🎉</div>
+          <div style={{
+            fontSize: 36,
+            fontWeight: 800,
+            color: '#34d399',
+            marginBottom: 16,
+            letterSpacing: 2,
+            textShadow: '0 0 20px rgba(52, 211, 153, 0.5)',
           }}>
-            <div style={{ fontSize: 56, marginBottom: 16 }}>✅</div>
-            <div style={{ fontSize: 22, fontWeight: 700, color: COLORS.success, marginBottom: 12 }}>
-              合同签署成功
-            </div>
-            <div style={{ fontSize: 14, color: COLORS.muted, marginBottom: 32 }}>
-              您的电子签名已记录，合同已生效
-            </div>
-            <Space size={16}>
-              <Button size="large" onClick={handleBack}>
-                返回订单页面
-              </Button>
-            </Space>
+            {t('pages.contractSignedComplete')}
           </div>
+          <div style={{
+            fontSize: 16,
+            color: '#7a7f9a',
+            marginBottom: 40,
+            maxWidth: 400,
+            lineHeight: 1.8,
+          }}>
+            {t('pages.signSuccessMessage')}
+          </div>
+          <Space size={16}>
+            <Button size="large" onClick={handleBack}>
+              {t('pages.backToOrders')}
+            </Button>
+            {fromPayment && (
+              <Button type="primary" size="large" onClick={() => message.info(t('pages.pleaseConfirmReceipt'))}>
+                {t('pages.confirmReceipt')}
+              </Button>
+            )}
+          </Space>
         </div>
       </div>
     )
@@ -275,7 +304,7 @@ export function LandlordContractSignPage() {
               padding: '24px',
             }}>
               <div style={{ color: COLORS.muted, fontSize: 13, marginBottom: 14 }}>
-                请在下方白色区域内手写签名（鼠标拖拽或触屏书写）
+                {t('pages.signAreaHint')}
               </div>
 
               {/* 画布 */}

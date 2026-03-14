@@ -1,4 +1,5 @@
-import { Button, Card, Form, InputNumber, Select, Space, Typography, Row, Col, Spin, Alert, Table, message, Divider, Tag } from 'antd'
+import { Button, Card, Form, Input, InputNumber, Select, Space, Typography, Row, Col, Spin, Alert, Table, message, Divider, Tag } from 'antd'
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Cell, Tooltip } from 'recharts'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
@@ -11,25 +12,11 @@ import {
 } from '@ant-design/icons'
 import { pricePredict, getSimilarProperties, getClosestProperty, type SimilarProperty, type ClosestProperty } from '../api/landlordApi'
 
-const CITY_OPTIONS = [
-  { label: 'Kolkata', value: 'Kolkata' },
-  { label: 'Mumbai', value: 'Mumbai' },
-  { label: 'Delhi', value: 'Delhi' },
-  { label: 'Chennai', value: 'Chennai' },
-  { label: 'Hyderabad', value: 'Hyderabad' },
-  { label: 'Bangalore', value: 'Bangalore' },
-]
-
-const FURNISHING_OPTIONS = [
-  { label: 'Furnished', value: 'Furnished' },
-  { label: 'Semi-Furnished', value: 'Semi-Furnished' },
-  { label: 'Unfurnished', value: 'Unfurnished' },
-]
-
-const AREA_TYPE_OPTIONS = [
-  { label: 'Super Area', value: 'Super Area' },
-  { label: 'Carpet Area', value: 'Carpet Area' },
-  { label: 'Built Area', value: 'Built Area' },
+// 装修选项：value 传 API，label 用 i18n
+const FURNISHING_OPTIONS_I18N: { value: string; i18nKey: string }[] = [
+  { value: 'Furnished', i18nKey: 'pages.furnished' },
+  { value: 'Semi-Furnished', i18nKey: 'pages.semiFurnished' },
+  { value: 'Unfurnished', i18nKey: 'pages.unfurnished' },
 ]
 
 export function LandlordPricePredictPage() {
@@ -163,9 +150,8 @@ export function LandlordPricePredictPage() {
                     bedrooms: 2,
                     bathrooms: 1,
                     area: 60,
-                    city: 'Kolkata',
-                    region: 'Bandel',
-                    propertyType: 'Super Area',
+                    city: '',
+                    region: '',
                     decoration: 'Unfurnished',
                     floor: 1,
                     totalFloors: 5
@@ -238,11 +224,12 @@ export function LandlordPricePredictPage() {
                             {t('pages.city')}
                           </span>
                         }
+                        rules={[{ required: true, message: t('pages.enterCity') || '请输入城市' }]}
                       >
-                        <Select 
-                          options={CITY_OPTIONS} 
-                          placeholder={t('pages.selectCity')}
+                        <Input 
+                          placeholder={t('pages.enterCity')}
                           size="large"
+                          allowClear
                         />
                       </Form.Item>
                     </Col>
@@ -256,58 +243,33 @@ export function LandlordPricePredictPage() {
                           </span>
                         }
                       >
-                        <Select
-                          showSearch
-                          allowClear
+                        <Input 
                           placeholder={t('pages.enterRegionName')}
                           size="large"
-                          options={[
-                            { label: 'Bandel', value: 'Bandel' },
-                            { label: 'Phool Bagan', value: 'Phool Bagan' },
-                            { label: 'Salt Lake City', value: 'Salt Lake City' },
-                            { label: 'Dumdum Park', value: 'Dumdum Park' },
-                          ]}
+                          allowClear
                         />
                       </Form.Item>
                     </Col>
                   </Row>
 
-                  <Row gutter={16}>
-                    <Col xs={24} sm={12}>
-                      <Form.Item 
-                        name="propertyType" 
-                        label={
-                          <span>
-                            <HomeOutlined style={{ marginRight: 8, color: '#667eea' }} />
-                            {t('pages.areaType')}
-                          </span>
-                        }
-                      >
-                        <Select 
-                          options={AREA_TYPE_OPTIONS} 
-                          placeholder={t('pages.select')}
-                          size="large"
-                        />
-                      </Form.Item>
-                    </Col>
-                    <Col xs={24} sm={12}>
-                      <Form.Item 
-                        name="decoration" 
-                        label={
-                          <span>
-                            <HomeOutlined style={{ marginRight: 8, color: '#667eea' }} />
-                            {t('pages.decoration')}
-                          </span>
-                        }
-                      >
-                        <Select 
-                          options={FURNISHING_OPTIONS} 
-                          placeholder={t('pages.select')}
-                          size="large"
-                        />
-                      </Form.Item>
-                    </Col>
-                  </Row>
+                  <Form.Item 
+                    name="decoration" 
+                    label={
+                      <span>
+                        <HomeOutlined style={{ marginRight: 8, color: '#667eea' }} />
+                        {t('pages.decoration')}
+                      </span>
+                    }
+                  >
+                    <Select 
+                      options={FURNISHING_OPTIONS_I18N.map(({ value, i18nKey }) => ({
+                        label: t(i18nKey),
+                        value,
+                      }))}
+                      placeholder={t('pages.select')}
+                      size="large"
+                    />
+                  </Form.Item>
 
                   <Row gutter={16}>
                     <Col xs={24} sm={12}>
@@ -476,7 +438,7 @@ export function LandlordPricePredictPage() {
                         color: '#fff',
                         lineHeight: 1.2,
                       }}>
-                        {result.currency === 'CNY' ? '¥' : '₹'}{Math.round(result.predictedPrice).toLocaleString()}
+                        {'￥'}{Math.round(result.predictedPrice).toLocaleString()}
                         <span style={{ fontSize: 16, fontWeight: 400, opacity: 0.8 }}>/{t('common.yuanPerMonth') || '月'}</span>
                       </div>
                       <Typography.Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 14 }}>
@@ -484,167 +446,53 @@ export function LandlordPricePredictPage() {
                       </Typography.Text>
                     </div>
 
-                    {/* 价格区间可视化 */}
-                    {result.lowerBound && result.upperBound && (
-                      <Card
-                        style={{
-                          background: '#fff',
-                          borderRadius: 12,
-                          boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                          marginBottom: 16,
-                        }}
-                        styles={{ body: { padding: 16 } }}
-                      >
-                        <Typography.Text strong style={{ fontSize: 15, color: '#1a1a1a' }}>
-                          {t('pages.mlPrediction') || '价格区间'}
-                        </Typography.Text>
-                        <div style={{ marginTop: 12, position: 'relative', height: 48 }}>
-                          {/* 进度条背景 */}
-                          <div style={{
-                            position: 'absolute',
-                            top: 20,
-                            left: 0,
-                            right: 0,
-                            height: 8,
-                            background: 'linear-gradient(90deg, #52c41a 0%, #667eea 50%, #ff4d4f 100%)',
-                            borderRadius: 4,
-                          }} />
-                          {/* 最低价 */}
-                          <div style={{ position: 'absolute', left: '0%', top: 0, textAlign: 'center' }}>
-                            <div style={{ 
-                              width: 32, height: 32, 
-                              background: '#52c41a', borderRadius: '50%', 
-                              display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              color: '#fff', fontWeight: 600, fontSize: 12,
-                              margin: '0 auto 4px'
-                            }}>
-                              ↓
-                            </div>
-                            <Typography.Text style={{ fontSize: 13, color: '#52c41a', fontWeight: 600 }}>
-                              {result.currency === 'CNY' ? '¥' : '₹'}{Math.round(result.lowerBound).toLocaleString()}
-                            </Typography.Text>
-                            <div style={{ fontSize: 11, color: '#8c8c8c' }}>{t('pages.minPrice') || '最低'}</div>
+                    {/* ML 智能预测 - 柱状图 */}
+                    {result.lowerBound && result.upperBound && (() => {
+                      const currencySym = '￥'
+                      const chartData = [
+                        { name: t('pages.minPrice') || '最低', value: Math.round(result.lowerBound!), color: '#52c41a' },
+                        { name: t('pages.reasonablePrice') || '建议', value: Math.round(result.predictedPrice), color: '#667eea' },
+                        { name: t('pages.maxPrice') || '最高', value: Math.round(result.upperBound!), color: '#ff4d4f' },
+                      ]
+                      return (
+                        <Card
+                          style={{
+                            background: '#fff',
+                            borderRadius: 12,
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                            marginBottom: 16,
+                          }}
+                          styles={{ body: { padding: 16 } }}
+                        >
+                          <Typography.Text strong style={{ fontSize: 15, color: '#1a1a1a' }}>
+                            {t('pages.mlPrediction') || 'ML智能预测'}
+                          </Typography.Text>
+                          <div style={{ marginTop: 12, width: '100%', height: 240 }}>
+                            <ResponsiveContainer width="100%" height="100%">
+                              <BarChart
+                                data={chartData}
+                                margin={{ top: 16, right: 24, left: 8, bottom: 24 }}
+                              >
+                                <XAxis dataKey="name" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
+                                <YAxis tickFormatter={(v) => `${currencySym}${v.toLocaleString()}`} fontSize={12} width={52} />
+                                <Tooltip
+                                  formatter={(value: number) => [`${currencySym}${value.toLocaleString()}`, t('common.yuanPerMonth') || '元/月']}
+                                  contentStyle={{ borderRadius: 8 }}
+                                  labelStyle={{ fontWeight: 600 }}
+                                />
+                                <Bar dataKey="value" radius={[6, 6, 0, 0]} barSize={48} maxBarSize={64}>
+                                  {chartData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={entry.color} />
+                                  ))}
+                                </Bar>
+                              </BarChart>
+                            </ResponsiveContainer>
                           </div>
-                          {/* 合理价 */}
-                          <div style={{ position: 'absolute', left: '50%', top: 0, transform: 'translateX(-50%)', textAlign: 'center' }}>
-                            <div style={{ 
-                              width: 40, height: 40, 
-                              background: '#667eea', borderRadius: '50%', 
-                              display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              color: '#fff', fontWeight: 700, fontSize: 14,
-                              margin: '0 auto 4px', border: '3px solid #fff', boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
-                            }}>
-                              ✓
-                            </div>
-                            <Typography.Text style={{ fontSize: 14, color: '#667eea', fontWeight: 700 }}>
-                              {result.currency === 'CNY' ? '¥' : '₹'}{Math.round(result.predictedPrice).toLocaleString()}
-                            </Typography.Text>
-                            <div style={{ fontSize: 11, color: '#8c8c8c' }}>{t('pages.reasonablePrice') || '建议'}</div>
-                          </div>
-                          {/* 最高价 */}
-                          <div style={{ position: 'absolute', left: '100%', top: 0, transform: 'translateX(-50%)', textAlign: 'center' }}>
-                            <div style={{ 
-                              width: 32, height: 32, 
-                              background: '#ff4d4f', borderRadius: '50%', 
-                              display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              color: '#fff', fontWeight: 600, fontSize: 12,
-                              margin: '0 auto 4px'
-                            }}>
-                              ↑
-                            </div>
-                            <Typography.Text style={{ fontSize: 13, color: '#ff4d4f', fontWeight: 600 }}>
-                              {result.currency === 'CNY' ? '¥' : '₹'}{Math.round(result.upperBound).toLocaleString()}
-                            </Typography.Text>
-                            <div style={{ fontSize: 11, color: '#8c8c8c' }}>{t('pages.maxPrice') || '最高'}</div>
-                          </div>
-                        </div>
-                      </Card>
-                    )}
+                        </Card>
+                      )
+                    })()}
 
-                    {/* 综合价格参考（简化版） */}
-                    <Card
-                      style={{
-                        background: '#fff',
-                        borderRadius: '12px',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                        marginBottom: 16,
-                      }}
-                      styles={{ body: { padding: '20px 24px' } }}
-                    >
-                      <div style={{ marginBottom: 16 }}>
-                        <TableOutlined style={{ marginRight: 8, color: '#667eea' }} />
-                        <Typography.Text strong style={{ color: '#1a1a1a', fontSize: 15 }}>
-                          {t('pages.priceReference') || '价格参考'}
-                        </Typography.Text>
-                      </div>
-
-                      {/* ML预测价格简化展示 */}
-                      {result.lowerBound && result.upperBound && (
-                        <Table
-                          dataSource={[
-                            {
-                              key: '1',
-                              type: t('pages.minPrice') || '最低价',
-                              price: result.lowerBound,
-                              color: '#52c41a',
-                              note: t('pages.minPriceNote') || '保守定价'
-                            },
-                            {
-                              key: '2',
-                              type: t('pages.reasonablePrice') || '合理价',
-                              price: result.predictedPrice,
-                              color: '#667eea',
-                              note: t('pages.reasonableNote') || '建议定价'
-                            },
-                            {
-                              key: '3',
-                              type: t('pages.maxPrice') || '最高价',
-                              price: result.upperBound,
-                              color: '#ff4d4f',
-                              note: t('pages.maxPriceNote') || '高价策略'
-                            },
-                          ]}
-                          size="middle"
-                          pagination={false}
-                          rowKey="key"
-                          style={{ marginBottom: 0 }}
-                          columns={[
-                            {
-                              title: '',
-                              dataIndex: 'type',
-                              key: 'type',
-                              width: 100,
-                              render: (text, record) => (
-                                <Space size="small">
-                                  <span style={{ color: record.color, fontWeight: 'bold' }}>●</span>
-                                  <span style={{ fontWeight: 500, fontSize: 14 }}>{text}</span>
-                                </Space>
-                              )
-                            },
-                            {
-                              title: t('pages.rentPrice') || '租金',
-                              dataIndex: 'price',
-                              key: 'price',
-                              width: 120,
-                              render: (price: number, record) => (
-                                <Typography.Text strong style={{ fontSize: 16, color: record.color }}>
-                                  {result.currency === 'CNY' ? '¥' : '₹'}{Math.round(price).toLocaleString()}
-                                </Typography.Text>
-                              )
-                            },
-                            {
-                              title: t('pages.suggestion') || '建议',
-                              dataIndex: 'note',
-                              key: 'note',
-                              render: (text: string) => (
-                                <Typography.Text type="secondary" style={{ fontSize: 13 }}>{text}</Typography.Text>
-                              )
-                            },
-                          ]}
-                        />
-                      )}
-
-                      {/* 相似房源参考 - 卡片式展示 */}
+                    {/* 相似房源参考 - 卡片式展示 */}
                       {similarProperties.length > 0 && (
                         <Card
                           size="small"
@@ -706,7 +554,7 @@ export function LandlordPricePredictPage() {
                                 width: 88,
                                 render: (val: number) => (
                                   <Typography.Text strong style={{ color: '#f97316', fontSize: 14 }}>
-                                    {result.currency === 'CNY' ? '¥' : '₹'}{val?.toLocaleString()}
+                                    {'￥'}{val?.toLocaleString()}
                                   </Typography.Text>
                                 ),
                               },
@@ -736,7 +584,7 @@ export function LandlordPricePredictPage() {
                               {t('pages.avgRent') || '平均租金'}：
                             </Typography.Text>
                             <Typography.Text strong style={{ color: '#f97316', fontSize: 16 }}>
-                              {result.currency === 'CNY' ? '¥' : '₹'}{
+                              {'￥'}{
                                 Math.round(similarProperties.reduce((sum, p) => sum + (p.price || 0), 0) / similarProperties.length).toLocaleString()
                               }
                             </Typography.Text>
@@ -881,7 +729,7 @@ export function LandlordPricePredictPage() {
                                 </Typography.Text>
                               </div>
                               <Typography.Text strong style={{ fontSize: 22, color: '#52c41a' }}>
-                                {result.currency === 'CNY' ? '¥' : '₹'}{closestProperty.price?.toLocaleString()}
+                                {'￥'}{closestProperty.price?.toLocaleString()}
                               </Typography.Text>
                             </Col>
                             {closestProperty.description && (
@@ -899,7 +747,6 @@ export function LandlordPricePredictPage() {
                           </Row>
                         </Card>
                       )}
-                    </Card>
 
                     {/* 置信度提示 */}
                     {result.confidence && (

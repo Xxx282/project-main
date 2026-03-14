@@ -295,14 +295,14 @@ function SignContractButton({ contract, onSign }: { contract: RentalContract; on
         onClose={() => setOpen(false)}
         extra={
           <Space>
-            <Button onClick={clearCanvas}>清除</Button>
-            <Button type="primary" onClick={handleSign} disabled={!hasStroke}>确认签署</Button>
+            <Button onClick={clearCanvas}>{t('pages.clearCanvas')}</Button>
+            <Button type="primary" onClick={handleSign} disabled={!hasStroke}>{t('pages.confirmSign')}</Button>
           </Space>
         }
       >
         <div style={{ background: '#f5f5f5', borderRadius: 8, padding: 16 }}>
           <div style={{ color: '#666', fontSize: 13, marginBottom: 12 }}>
-            请在下方签名：合同编号 {contract.contractNo}，房源 {contract.propertyTitle}
+            {t('pages.signHerePrompt', { contractNo: contract.contractNo, title: contract.propertyTitle })}
           </div>
           <canvas
             ref={canvasRef}

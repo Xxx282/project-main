@@ -16,7 +16,7 @@ body {
 
 html {
   /* 全局基础字号，已放大以提升可读性 */
-  font-size: 18px;
+  font-size: 36px;
 }
 
 body {
@@ -99,4 +99,23 @@ a:hover {
 .language-selector.ant-select-focused .ant-select-selector {
   border-color: rgba(255, 255, 255, 0.6) !important;
   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1) !important;
+}
+
+/* 登录页「自动登录」勾选样式 */
+.login-remember-checkbox.ant-checkbox-wrapper {
+  display: inline-flex;
+  align-items: center;
+  user-select: none;
+}
+.login-remember-checkbox .ant-checkbox-inner {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+}
+.login-remember-checkbox .ant-checkbox-checked .ant-checkbox-inner {
+  background: linear-gradient(135deg, #1677ff 0%, #4096ff 100%);
+  border-color: #1677ff;
+}
+.login-remember-checkbox > span:last-child {
+  padding-left: 10px;
 }

@@ -433,20 +433,6 @@ function ListingRow({ listing, settings }: { listing: Listing; settings: FieldOp
   const navigate = useNavigate()
   const show = (key: string) => settings.find((s) => s.key === key && s.visible)
 
-  const orientationLabel =
-    (listing.orientation === 'east' && t('common.east')) ||
-    (listing.orientation === 'south' && t('common.south')) ||
-    (listing.orientation === 'west' && t('common.west')) ||
-    (listing.orientation === 'north' && t('common.north')) ||
-    undefined
-
-  const decorationLabel =
-    (listing.decoration === 'rough' && t('common.rough')) ||
-    (listing.decoration === 'simple' && t('common.simple')) ||
-    (listing.decoration === 'fine' && t('common.fine')) ||
-    (listing.decoration === 'luxury' && t('common.luxury')) ||
-    undefined
-
   // 卡片标签：装修、朝向（与筛选维度对应）
   const tagLabels: string[] = []
   if (listing.decoration === 'fine') tagLabels.push(t('pages.tagFine'))
@@ -530,13 +516,6 @@ function ListingRow({ listing, settings }: { listing: Listing; settings: FieldOp
             )}
           </div>
 
-          {show('decorationOrientation') && (decorationLabel || orientationLabel) && (
-            <div style={{ fontSize: 14, color: '#9ca3af' }}>
-              {decorationLabel}
-              {decorationLabel && orientationLabel && ' / '}
-              {orientationLabel}
-            </div>
-          )}
           {tagLabels.length > 0 && (
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
               {tagLabels.map((label) => (

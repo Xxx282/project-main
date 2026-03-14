@@ -1,4 +1,4 @@
-import { Button, Card, Form, Input, Radio, Space, message } from 'antd'
+import { Button, Card, Checkbox, Form, Input, Space, message } from 'antd'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { PageHeader } from '../../../shared/ui/PageHeader'
@@ -71,17 +71,19 @@ export function LoginPage() {
           <Form.Item name="password" label={t('common.password')} rules={[{ required: true }]}>
             <Input.Password placeholder={t('common.enterPassword')} autoComplete="current-password" />
           </Form.Item>
-          <Form.Item name="remember" rules={[{ required: true }]}>
-            <Radio.Group
-              optionType="button"
-              buttonStyle="solid"
-              options={[
-                { label: t('common.rememberLogin'), value: true },
-                { label: t('common.onlyThisTime'), value: false },
-              ]}
-            />
+          <Form.Item name="remember" valuePropName="checked" style={{ marginBottom: 24 }}>
+            <Checkbox
+              style={{
+                fontSize: 15,
+                color: 'rgba(0,0,0,0.75)',
+                alignItems: 'center',
+              }}
+              className="login-remember-checkbox"
+            >
+              {t('common.autoLogin')}
+            </Checkbox>
           </Form.Item>
-          <Button type="primary" htmlType="submit" block>
+          <Button type="primary" htmlType="submit" block size="large" style={{ height: 48, fontSize: 16, fontWeight: 600, borderRadius: 10 }}>
             {t('common.login')}
           </Button>
         </Form>

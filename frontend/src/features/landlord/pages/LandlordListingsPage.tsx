@@ -41,7 +41,7 @@ export function LandlordListingsPage() {
       dataIndex: 'price', 
       render: (v) => (
         <span style={{ color: '#667eea', fontWeight: 600 }}>
-          ₹ {v?.toLocaleString()}
+          ￥ {v?.toLocaleString()}
         </span>
       ),
       width: 120,

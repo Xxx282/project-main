@@ -317,7 +317,7 @@ export function TenantContractPage() {
                 onChange={e => setLeaseEnd(e.target.value)} style={dateInputStyle} />
             </div>
             <p style={{ color: C.muted, fontSize: 13, margin: '8px 0 0' }}>
-              租赁期满如需续租，乙方须提前 30 日书面通知甲方。
+              {t('pages.renewalNotice')}
             </p>
           </Section>
 
@@ -332,46 +332,44 @@ export function TenantContractPage() {
           {/* ── 第五条 使用 ── */}
           <Section title={t('pages.section5Title')}>
             <ol style={{ paddingLeft: 20, color: C.muted, fontSize: 14, lineHeight: 2.2, margin: 0 }}>
-              <li>乙方应按约定用途合理使用房屋，不得擅自改变房屋结构或用途。</li>
-              <li>乙方须遵守所在楼宇及小区管理规定，不得扰民或从事违法活动。</li>
-              <li>未经甲方书面同意，乙方不得将房屋转租或转借他人。</li>
-              <li>乙方应爱护房内设施，人为损坏须照价赔偿。</li>
-              <li>水、电、燃气、宽带等日常费用由乙方自行承担。</li>
+              <li>{t('pages.section5Item1')}</li>
+              <li>{t('pages.section5Item2')}</li>
+              <li>{t('pages.section5Item3')}</li>
+              <li>{t('pages.section5Item4')}</li>
+              <li>{t('pages.section5Item5')}</li>
             </ol>
           </Section>
 
           {/* ── 第六条 维修 ── */}
           <Section title={t('pages.section6Title')}>
             <ol style={{ paddingLeft: 20, color: C.muted, fontSize: 14, lineHeight: 2.2, margin: 0 }}>
-              <li>房屋主体结构及固定附属设施的正常维修由甲方负责。</li>
-              <li>因乙方使用不当造成的损坏，维修费用由乙方承担。</li>
-              <li>乙方发现设施损坏，应及时通知甲方；紧急情况可先行处理并凭票据报销。</li>
+              <li>{t('pages.section6Item1')}</li>
+              <li>{t('pages.section6Item2')}</li>
+              <li>{t('pages.section6Item3')}</li>
             </ol>
           </Section>
 
           {/* ── 第七条 解除 ── */}
           <Section title={t('pages.section7Title')}>
             <ol style={{ paddingLeft: 20, color: C.muted, fontSize: 14, lineHeight: 2.2, margin: 0 }}>
-              <li>甲乙双方协商一致可提前解除本合同。</li>
-              <li>乙方提前解约须提前 30 日书面通知甲方，押金按实际情况处理。</li>
-              <li>甲方提前收回房屋须提前 30 日通知乙方，并退还剩余租金及全额押金。</li>
-              <li>任一方违约，违约方须向守约方支付一个月租金作为违约金。</li>
+              <li>{t('pages.section7Item1')}</li>
+              <li>{t('pages.section7Item2')}</li>
+              <li>{t('pages.section7Item3')}</li>
+              <li>{t('pages.section7Item4')}</li>
             </ol>
           </Section>
 
           {/* ── 第八条 争议 ── */}
           <Section title={t('pages.section8Title')}>
             <p style={{ color: C.muted, fontSize: 14, margin: 0 }}>
-              本合同发生争议，双方应先行友好协商；协商不成，可向房屋所在地人民法院提起诉讼，
-              以中华人民共和国现行法律法规作为裁决依据。
+              {t('pages.section8Content')}
             </p>
           </Section>
 
           {/* ── 第九条 其他 ── */}
           <Section title={t('pages.section9Title')}>
             <p style={{ color: C.muted, fontSize: 14, margin: 0 }}>
-              本合同经甲乙双方签署后正式生效，具有法律效力。合同通过平台电子方式存档，
-              甲乙双方均可在平台查阅。未尽事宜双方可签订书面补充协议，补充协议与本合同具有同等效力。
+              {t('pages.section9Content')}
             </p>
           </Section>
 
