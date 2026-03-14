@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Card, Input, Button, Space, Avatar, message, Spin, Typography, Dropdown } from 'antd'
-import { UserOutlined, ArrowLeftOutlined, SendOutlined, MessageOutlined, HomeOutlined, PictureOutlined, DeleteOutlined } from '@ant-design/icons'
+import { UserOutlined, ArrowLeftOutlined, SendOutlined, MessageOutlined, HomeOutlined, PictureOutlined, DeleteOutlined, RobotOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { getListing, getLandlordInfo, getTenantInfo } from '../../features/tenant/api/tenantApi'
@@ -77,6 +77,17 @@ async function sendMessageApi(conversationId: number, content: string, imageFile
 // 撤回消息
 async function recallMessageApi(messageId: number): Promise<Message> {
   const { data } = await http.post<{ code: number; data: Message }>(`/conversations/messages/${messageId}/recall`)
+  return data.data
+}
+
+// AI 智能回复建议（租客咨询房东场景）
+async function getAiReplySuggestion(params: {
+  listingTitle: string
+  listingPrice: string
+  listingDescription?: string
+  recentMessages: string
+}): Promise<string> {
+  const { data } = await http.post<{ code: number; data: string }>('/ai/chat/suggest', params)
   return data.data
 }
 
@@ -181,6 +192,7 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
   const [inputMessage, setInputMessage] = useState('')
   const [selectedImage, setSelectedImage] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [aiSuggestLoading, setAiSuggestLoading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // 标记已读
@@ -233,6 +245,30 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       handleSendMessage()
+    }
+  }
+
+  // 租客：获取 AI 智能回复建议
+  const handleAiSuggest = async () => {
+    if (!listingQ.data) return
+    setAiSuggestLoading(true)
+    try {
+      const recentMessages = (messagesQ.data ?? [])
+        .slice(-10)
+        .map((m) => `${m.senderRole === 'tenant' ? '租客' : '房东'}: ${m.content}`)
+        .join('\n')
+      const suggestion = await getAiReplySuggestion({
+        listingTitle: listingQ.data.title || '',
+        listingPrice: String(listingQ.data.price ?? ''),
+        listingDescription: listingQ.data.description || '',
+        recentMessages,
+      })
+      setInputMessage((prev) => (prev ? `${prev}\n${suggestion}` : suggestion))
+      message.success('已填入 AI 回复建议，可编辑后发送')
+    } catch {
+      message.error('AI 建议获取失败，请稍后重试')
+    } finally {
+      setAiSuggestLoading(false)
     }
   }
 
@@ -500,6 +536,22 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
                   >
                     ×
                   </Button>
+                </div>
+              )}
+              {isTenant && (
+                <div style={{ marginBottom: 8 }}>
+                  <Button
+                    type="link"
+                    icon={<RobotOutlined />}
+                    loading={aiSuggestLoading}
+                    onClick={handleAiSuggest}
+                    style={{ padding: 0, color: '#667eea', fontSize: 13 }}
+                  >
+                    AI 智能回复
+                  </Button>
+                  <Typography.Text type="secondary" style={{ fontSize: 12, marginLeft: 8 }}>
+                    根据当前对话生成回复建议，可编辑后发送
+                  </Typography.Text>
                 </div>
               )}
               <div style={{ display: 'flex', gap: 12, alignItems: 'flex-end' }}>
