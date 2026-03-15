@@ -17,7 +17,8 @@
 ### 启动命令
 
 ```bash
-# 前端
+# 前端...........................
+
 cd frontend
 npm install
 npm run dev
@@ -43,12 +44,70 @@ java -jar target\house-rental-backend-1.5.0.jar
 ## ML 模块
 
 ```bash
-cd rent-price-ml
 python -m venv venv
 venv\Scripts\activate
 pip install -r requirements.txt
+cd rent-price-ml
+python train.py
 python app/main.py
 ```
+
+> ML 模块为 FastAPI 服务，被动监听 http://localhost:5000，等待后端调用 `/predict`
+
+---
+
+## Payment 支付监控模块
+
+```bash
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+cd payment
+python app/main.py
+```
+
+> Payment 模块为 FastAPI 服务，被动监听 http://localhost:5001，等待后端调用 `/monitor/start`
+
+### 支付监控流程
+
+```
+前端发起支付请求
+       │
+       ▼
+后端 Spring Boot (主动触发)
+       │
+       ├── 1. 创建支付订单 (保存到数据库)
+       │
+       ├── 2. 启动支付监控 (后台线程)
+       │      │
+       │      └── ExecutorService.newCachedThreadPool()
+       │              │
+       │              └── 后台线程: runMonitorTask() 
+       │                      │
+       │                      └── 每 5 秒轮询 Payment FastAPI
+       │
+       └── 3. 返回 monitorId 给前端
+
+Payment FastAPI (被动监听)
+       │
+       └── 轮询支付宝接口查询交易状态
+              │
+              ├── SUCCESS: 支付成功
+              ├── PENDING: 等待中
+              └── TIMEOUT: 超时
+
+前端轮询监控状态
+       │
+       └── GET /api/payment-monitor/status/{monitorId}
+              │
+              └── 返回支付结果
+```
+
+| 组件 | 角色 | 说明 |
+|------|------|------|
+| 前端 | 发起方 | 用户点击支付，前端轮询状态 |
+| 后端 Java | 主动触发 | 收到请求后启动后台监控线程 |
+| Payment FastAPI | 被动监听 | 轮询支付宝查询支付状态 |
 
 ---
 
@@ -57,12 +116,16 @@ python app/main.py
 ### Ollama (本地免费)
 
 1. 下载安装: https://ollama.com
+
 2. 启动服务并下载模型:
+
    ```bash
    ollama serve 
    ollama pull qwen3:4b
    ```
+
 3. 配置 `backend/src/main/resources/application.yml`:
+
    ```yaml
    app:
      ai:
@@ -89,7 +152,7 @@ app:
 
 ## 项目结构
 
-```
+```bash
 project-main/
 ├── backend/                    # Spring Boot 后端
 │   ├── src/main/java/          # Java 源代码
@@ -99,11 +162,15 @@ project-main/
 ├── frontend/                   # React 前端
 │   ├── src/
 │   │   ├── features/           # 功能模块
-│   │   ├── shared/             # 共享组件
-│   │   └── i18n/               # 国际化
+│   │   ├── shared/            # 共享组件
+│   │   └── i18n/              # 国际化
 │   └── package.json
 │
-└── rent-price-ml/              # ML 价格预测模块
+├── rent-price-ml/              # ML 价格预测模块 (FastAPI)
+│   └── app/main.py             # 被动监听 localhost:5000
+│
+└── payment/                    # 支付监控模块 (FastAPI)
+    └── app/main.py             # 被动监听 localhost:5001
 ```
 
 ---
@@ -111,10 +178,11 @@ project-main/
 ## 技术栈
 
 | 类别 | 技术 |
-|------|------|
+| ------ | ------ |
 | 后端 | Spring Boot 3.2, Spring Security + JWT, Spring Data JPA, MySQL 8.0 |
 | 前端 | React 18, TypeScript, Vite, Ant Design, React Query, React Router |
-| ML | Python, 机器学习模型 |
+| ML | Python, 机器学习模型, FastAPI |
+| Payment | Python, FastAPI, 支付宝接口 |
 | AI | Ollama / DeepSeek API |
 
 ---
@@ -122,12 +190,14 @@ project-main/
 ## 常用命令
 
 ### Maven
+
 ```bash
 mvn clean package -DskipTests    # 打包
 mvn spring-boot:run -DskipTests # 启动
 ```
 
 ### NPM
+
 ```bash
 npm install   # 安装依赖
 npm run dev   # 开发模式
@@ -139,6 +209,7 @@ npm run build # 生产构建
 ## 常见问题
 
 **端口被占用**
+
 ```powershell
 netstat -ano | Select-String ":8080"
 Stop-Process -Id <PID> -Force

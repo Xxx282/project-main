@@ -6,8 +6,9 @@
  * @Description: 租客-我的收藏页面
  * @FilePath: \project-main\frontend\src\features\tenant\pages\TenantComparePage.tsx
  */
-import { Button, Card, Space, Table, Tag, message, Modal, Checkbox, Form } from 'antd'
+import { Button, Card, Space, Table, Tag, Modal, Checkbox, Form, App } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
+
 import { Link, useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
@@ -65,6 +66,7 @@ function saveColumnSettings(fields: FieldOption[]) {
 }
 
 export function TenantComparePage() {
+  const { message } = App.useApp()
   const { t } = useTranslation()
   const navigate = useNavigate()
   const queryClient = useQueryClient()

@@ -1,4 +1,5 @@
-import { Button, Card, Form, Input, Radio, Space, message } from 'antd'
+import { Button, Card, Form, Input, Radio, Space, App } from 'antd'
+
 import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { PageHeader } from '../../../shared/ui/PageHeader'
@@ -8,6 +9,7 @@ import { useAuth } from '../context/AuthContext'
 import { authStore } from '../store/authStore'
 
 export function RegisterPage() {
+  const { message } = App.useApp()
   const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()

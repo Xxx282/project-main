@@ -1,4 +1,5 @@
-import { Button, Card, Form, Input, InputNumber, Select, Space, Typography, Row, Col, Spin, Alert, Table, message, Divider, Tag } from 'antd'
+import { Button, Card, Form, Input, InputNumber, Select, Space, Typography, Row, Col, Spin, Alert, Table, Divider, Tag, App } from 'antd'
+
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Cell, Tooltip } from 'recharts'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -20,6 +21,7 @@ const FURNISHING_OPTIONS_I18N: { value: string; i18nKey: string }[] = [
 ]
 
 export function LandlordPricePredictPage() {
+  const { message } = App.useApp()
   const { t } = useTranslation()
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<{

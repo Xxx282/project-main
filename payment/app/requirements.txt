@@ -1,0 +1,6 @@
+# Payment Monitor FastAPI Dependencies
+fastapi>=0.100.0
+uvicorn>=0.23.0
+pydantic>=2.0.0
+selenium>=4.0.0
+webdriver-manager>=4.0.0

@@ -1,5 +1,6 @@
-import { Button, Card, Popconfirm, Space, Table, Tag, message, Typography, Empty } from 'antd'
+import { Button, Card, Popconfirm, Space, Table, Tag, Typography, Empty, App } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
+
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
@@ -14,6 +15,7 @@ import type { Listing } from '../../../shared/api/types'
 import { deleteListing, listMyListings } from '../api/landlordApi'
 
 export function LandlordListingsPage() {
+  const { message } = App.useApp()
   const { t } = useTranslation()
   const q = useQuery({
     queryKey: ['landlord', 'listings'],

@@ -77,6 +77,12 @@ app:
         max-attempts: 3
         delay: 1000
 
+  # 支付监控服务配置
+  payment:
+    monitor:
+      api-url: ${PAYMENT_MONITOR_API_URL:http://localhost:5001}
+      timeout: 60000
+
   # AI 服务配置
   # provider: ollama（本地免费）| openai（云 API 付费）
   ai:

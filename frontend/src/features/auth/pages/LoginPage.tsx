@@ -1,13 +1,15 @@
-import { Button, Card, Checkbox, Form, Input, Space, message } from 'antd'
+import { Button, Card, Checkbox, Form, Input, Space, App } from 'antd'
+
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { PageHeader } from '../../../shared/ui/PageHeader'
 import { login } from '../api/authApi'
-import { authStore, type UserRole } from '../store/authStore'
+import { authStore } from '../store/authStore'
 import { useAuth } from '../context/AuthContext'
 import { useAuthModal } from '../context/AuthModalContext'
 
 export function LoginPage() {
+  const { message } = App.useApp()
   const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()

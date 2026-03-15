@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useQuery, useMutation } from '@tanstack/react-query'
-import { message, Spin } from 'antd'
+import { Spin, App } from 'antd'
+
 import { useTranslation } from 'react-i18next'
 import { getListing, getLandlordInfo } from '../../tenant/api/tenantApi'
 import { createContract, signContract } from '../../contract/api/contractApi'
@@ -22,9 +23,9 @@ const C = {
 
 const today = new Date()
 const todayStr = today.toISOString().split('T')[0]
-const yearLater = new Date(today)
-yearLater.setFullYear(yearLater.getFullYear() + 1)
-const yearLaterStr = yearLater.toISOString().split('T')[0]
+const monthLater = new Date(today)
+monthLater.setMonth(monthLater.getMonth() + 1)
+const monthLaterStr = monthLater.toISOString().split('T')[0]
 
 // ────────────────────────────────────────────────────────────
 // Sub-components
@@ -91,6 +92,7 @@ function getDecorationLabel(decoration: string | undefined, t: (k: string) => st
 }
 
 export function TenantContractPage() {
+  const { message } = App.useApp()
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -98,7 +100,7 @@ export function TenantContractPage() {
   const payeeId = Number(searchParams.get('payeeId'))
 
   const [leaseStart, setLeaseStart] = useState(todayStr)
-  const [leaseEnd, setLeaseEnd] = useState(yearLaterStr)
+  const [leaseEnd, setLeaseEnd] = useState(monthLaterStr)
   const [agreed, setAgreed] = useState(false)
   const [signed, setSigned] = useState(false)
   const [contractId, setContractId] = useState<number | null>(null)
@@ -123,7 +125,7 @@ export function TenantContractPage() {
   const listing = listingQ.data
   const landlord = landlordQ.data
   const price = listing?.price ?? 0
-  const deposit = price * 2
+  const deposit = price * 1
   const landlordName = landlord?.realName || landlord?.username || '-'
   const landlordPhone = landlord?.phone || '-'
 
@@ -139,6 +141,14 @@ export function TenantContractPage() {
     onSuccess: () => {
       setSigned(true)
       message.success(t('pages.contractSignedSuccess'))
+      // 计算租期月数和定金
+      const startDate = new Date(leaseStart)
+      const endDate = new Date(leaseEnd)
+      const months = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24 * 30))
+      const isLongTerm = months >= 3 // 长租 >= 3个月，短租 < 3个月
+      const deposit = isLongTerm ? price * 2 : price * 1 // 长租2个月租金，短租1个月租金
+      // 跳转到支付页，传递参数
+      navigate(`/tenant/payments/create?propertyId=${propertyId}&payeeId=${payeeId}&deposit=${deposit}&leaseType=${isLongTerm ? 'long' : 'short'}&months=${months}&leaseStart=${leaseStart}&leaseEnd=${leaseEnd}`)
     },
     onError: (e: any) => message.error(e?.response?.data?.message || t('pages.signFailed')),
   })
@@ -310,14 +320,33 @@ export function TenantContractPage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap', padding: '10px 0' }}>
               <span style={{ color: C.muted, fontSize: 13 }}>{t('pages.leaseStartLabel')}</span>
               <input type="date" value={leaseStart} disabled={agreed}
-                onChange={e => setLeaseStart(e.target.value)} style={dateInputStyle} />
+                onChange={e => {
+                  const newStart = e.target.value
+                  setLeaseStart(newStart)
+                  // 如果新的开始日期导致结束日期不足一个月，自动调整
+                  const startDate = new Date(newStart)
+                  const endDate = new Date(leaseEnd)
+                  const minEndDate = new Date(startDate)
+                  minEndDate.setMonth(minEndDate.getMonth() + 1)
+                  if (endDate < minEndDate) {
+                    setLeaseEnd(minEndDate.toISOString().split('T')[0])
+                  }
+                }} style={dateInputStyle} />
               <span style={{ color: C.muted }}>—</span>
               <span style={{ color: C.muted, fontSize: 13 }}>{t('pages.leaseEndLabel')}</span>
               <input type="date" value={leaseEnd} disabled={agreed}
+                min={(() => {
+                  const minDate = new Date(leaseStart)
+                  minDate.setMonth(minDate.getMonth() + 1)
+                  return minDate.toISOString().split('T')[0]
+                })()}
                 onChange={e => setLeaseEnd(e.target.value)} style={dateInputStyle} />
             </div>
             <p style={{ color: C.muted, fontSize: 13, margin: '8px 0 0' }}>
               {t('pages.renewalNotice')}
+            </p>
+            <p style={{ color: C.muted, fontSize: 13, margin: '4px 0 0' }}>
+              {t('pages.lessThanOneMonthNotice')}
             </p>
           </Section>
 

@@ -47,7 +47,7 @@ export function ImageGallery({ images }: ImageGalleryProps) {
                 src={buildImageUrl(img.imageUrl)}
                 alt={`房源图片 ${img.sortOrder}`}
                 style={{ width: 100, height: 80, objectFit: 'cover', borderRadius: 4, cursor: 'pointer' }}
-                preview={{ mask: '预览', maskClassName: 'image-preview-mask' }}
+                preview={{ mask: '预览', classNames: { cover: 'image-preview-mask' } }}
               />
             </div>
           ))}

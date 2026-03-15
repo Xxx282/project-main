@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Table, Tag, Button, Modal, Input, message, Card, Space, Drawer } from 'antd'
+import { Table, Tag, Button, Modal, Input, Card, Space, Drawer, App } from 'antd'
+
 import { PageHeader } from '../../../shared/ui/PageHeader'
 import { getLandlordContracts, signContractAsLandlord, type RentalContract } from '../../contract/api/contractApi'
 import { getLandlordPayments, confirmPayment, type PaymentOrder } from '../../payment/api/paymentApi'
@@ -20,6 +21,7 @@ interface OrderItem {
 }
 
 export function LandlordOrdersPage() {
+  const { message } = App.useApp()
   const { t } = useTranslation()
   const queryClient = useQueryClient()
   const navigate = useNavigate()

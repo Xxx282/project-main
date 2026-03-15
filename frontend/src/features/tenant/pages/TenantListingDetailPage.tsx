@@ -1,24 +1,35 @@
-import { Card, Descriptions, Space, Button, message } from 'antd'
+import { Card, Descriptions, Space, Button, App } from 'antd'
+
 import { HeartOutlined, HeartFilled, ArrowLeftOutlined, MessageOutlined, DollarOutlined } from '@ant-design/icons'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { PageHeader } from '../../../shared/ui/PageHeader'
-import { getListing, checkFavorite, addFavorite, removeFavorite, getListingImages, getOrCreateConversation } from '../api/tenantApi'
+import { getListing, checkFavorite, addFavorite, removeFavorite, getListingImages, getOrCreateConversation, getLandlordInfo } from '../api/tenantApi'
 import { useAuth } from '../../auth/context/AuthContext'
+import { useAuthModal } from '../../auth/context/AuthModalContext'
 import { ImageGallery } from '../../../shared/components/ImageGallery'
 
 export function TenantListingDetailPage() {
+  const { message } = App.useApp()
   const { t } = useTranslation()
   const { id } = useParams()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const auth = useAuth()
+  const { openAuthModal } = useAuthModal()
   const propertyId = Number(id)
 
   const listingQ = useQuery({
     queryKey: ['tenant', 'listing', id],
     queryFn: () => getListing(propertyId),
+    enabled: Boolean(id),
+  })
+
+  // 查询房东信息
+  const landlordQ = useQuery({
+    queryKey: ['tenant', 'listing', id, 'landlord'],
+    queryFn: () => getLandlordInfo(propertyId),
     enabled: Boolean(id),
   })
 
@@ -60,12 +71,51 @@ export function TenantListingDetailPage() {
     },
   })
 
+  // 咨询房东 mutation
+  const contactLandlordMutation = useMutation({
+    mutationFn: () => getOrCreateConversation(propertyId, landlordQ.data?.id!),
+    onSuccess: (conversation) => {
+      navigate(`/tenant/chats/${conversation.id}`)
+    },
+    onError: () => {
+      message.error(t('pages.contactLandlordFailed') || '联系房东失败')
+    },
+  })
+
   const handleFavorite = () => {
+    if (!auth.user) {
+      openAuthModal('login')
+      return
+    }
     if (favoriteQ.data) {
       removeFavoriteMutation.mutate()
     } else {
       addFavoriteMutation.mutate()
     }
+  }
+
+  const handleContactLandlord = () => {
+    if (!auth.user) {
+      openAuthModal('login')
+      return
+    }
+    if (!landlordQ.data?.id) {
+      message.error(t('pages.landlordInfoNotReady'))
+      return
+    }
+    contactLandlordMutation.mutate()
+  }
+
+  const handlePayment = () => {
+    if (!auth.user) {
+      openAuthModal('login')
+      return
+    }
+    if (!landlordQ.data?.id) {
+      message.error(t('pages.landlordInfoNotReady'))
+      return
+    }
+    navigate(`/tenant/contract?propertyId=${propertyId}&payeeId=${landlordQ.data.id}`)
   }
 
   return (
@@ -99,6 +149,35 @@ export function TenantListingDetailPage() {
               >
                 {favoriteQ.data ? t('pages.favorited') : t('pages.favorite')}
               </Button>
+            )}
+            {!auth.user && (
+              <Button
+                type="default"
+                icon={<HeartOutlined />}
+                onClick={handleFavorite}
+              >
+                {t('pages.favorite')}
+              </Button>
+            )}
+            {auth.user && auth.user.role !== 'landlord' && (
+              <>
+                <Button
+                  type="primary"
+                  icon={<MessageOutlined />}
+                  onClick={handleContactLandlord}
+                  loading={contactLandlordMutation.isPending}
+                >
+                  {t('pages.contactLandlord') || '咨询房东'}
+                </Button>
+                <Button
+                  type="primary"
+                  icon={<DollarOutlined />}
+                  onClick={handlePayment}
+                  style={{ background: '#52c41a', borderColor: '#52c41a' }}
+                >
+                  {t('pages.payNow') || '立即支付'}
+                </Button>
+              </>
             )}
           </Space>
         }

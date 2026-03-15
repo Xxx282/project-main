@@ -28,6 +28,7 @@ import { TenantRecommendationsPage } from '../features/tenant/pages/TenantRecomm
 import { TenantContractPage } from '../features/tenant/pages/TenantContractPage'
 import { TenantPaymentPage } from '../features/tenant/pages/TenantPaymentPage'
 import { TenantPaymentsPage } from '../features/tenant/pages/TenantPaymentsPage'
+import { TenantPaymentSuccessPage } from '../features/tenant/pages/TenantPaymentSuccessPage'
 import { ProfilePage } from '../features/auth/pages/ProfilePage'
 
 export function AppRoutes() {
@@ -98,6 +99,14 @@ export function AppRoutes() {
             element={
               <RequireAuth roles={['tenant']}>
                 <TenantPaymentPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="payments/success"
+            element={
+              <RequireAuth roles={['tenant']}>
+                <TenantPaymentSuccessPage />
               </RequireAuth>
             }
           />

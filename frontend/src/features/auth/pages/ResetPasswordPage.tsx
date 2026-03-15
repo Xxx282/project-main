@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Button, Card, Form, Input, Space, message } from 'antd'
+import { Button, Card, Form, Input, Space, App } from 'antd'
+
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { PageHeader } from '../../../shared/ui/PageHeader'
@@ -7,6 +8,7 @@ import { resetPassword } from '../api/authApi'
 import { useAuthModal } from '../context/AuthModalContext'
 
 export function ResetPasswordPage() {
+  const { message } = App.useApp()
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { openAuthModal } = useAuthModal()

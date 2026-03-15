@@ -1,0 +1,13 @@
+# Payment Module Dependencies
+# Browser automation
+selenium>=4.0.0
+webdriver-manager>=4.0.0
+
+# For Windows GUI automation (pywinauto)
+pywinauto>=0.6.8
+
+# HTTP requests
+requests>=2.28.0
+
+# For scheduled tasks
+APScheduler>=3.10.0

@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { message, Spin, Card, Descriptions, Button, Space, Divider } from 'antd'
+import { Spin, Card, Descriptions, Button, Space, Divider, App } from 'antd'
+
 import { getContractById, signContractAsLandlord, type RentalContract } from '../../contract/api/contractApi'
 import { useTranslation } from 'react-i18next'
 
@@ -34,6 +35,7 @@ const COLORS = {
 }
 
 export function LandlordContractSignPage() {
+  const { message } = App.useApp()
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()

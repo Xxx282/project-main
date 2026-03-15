@@ -1,17 +1,17 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
-from model import predict_one
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field, field_validator
+from model import predict_one, get_feature_importance, predict_with_confidence
 import time
 import uvicorn
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Rent Price Prediction API", version="1.0")
 
 
 class RentFeatures(BaseModel):
-    # 这里的字段名必须和你的 CSV 特征列一致（除了 Rent）
-    # 你的列是：
-    # 'Posted On', 'BHK', 'Size', 'Floor', 'Area Type', 'Area Locality',
-    # 'City', 'Furnishing Status', 'Tenant Preferred', 'Bathroom', 'Point of Contact'
     Posted_On: str
     BHK: int
     Size: int
@@ -36,76 +36,195 @@ def api_v1_health():
 
 
 class NewPredictRequest(BaseModel):
-    bedrooms: int
-    area: float
-    city: str
-    region: str = None
-    bathrooms: float = 1
-    propertyType: str = "Apartment"
-    decoration: str = "Unfurnished"
-    floor: int = 1
-    totalFloors: int = 10
-    orientation: str = "North"
-    hasParking: bool = False
-    hasElevator: bool = False
-    hasBalcony: bool = False
+    bedrooms: int = Field(..., ge=0, le=20, description="Number of bedrooms")
+    area: float = Field(..., gt=0, description="Area in square meters")
+    city: str = Field(..., min_length=1, description="City name")
+    region: str = Field(default=None, description="Region or district")
+    bathrooms: float = Field(default=1, ge=0, le=20, description="Number of bathrooms")
+    propertyType: str = Field(default="Apartment", description="Property type: Apartment, House, Villa, etc.")
+    decoration: str = Field(default="Unfurnished", description="Decoration status: Unfurnished, Furnished, Semi-Furnished")
+    floor: int = Field(default=1, ge=0, description="Floor number")
+    totalFloors: int = Field(default=10, ge=1, description="Total floors in the building")
+    orientation: str = Field(default="North", description="Orientation: North, South, East, West")
+    hasParking: bool = Field(default=False, description="Has parking space")
+    hasElevator: bool = Field(default=False, description="Has elevator")
+    hasBalcony: bool = Field(default=False, description="Has balcony")
+
+    @field_validator('city', 'propertyType', 'decoration', 'orientation')
+    @classmethod
+    def validate_not_empty(cls, v):
+        if not v or not v.strip():
+            raise ValueError('Field cannot be empty')
+        return v.strip()
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "bedrooms": 2,
+                    "area": 80.0,
+                    "city": "Shanghai",
+                    "region": "Pudong",
+                    "bathrooms": 1,
+                    "propertyType": "Apartment",
+                    "decoration": "Furnished",
+                    "floor": 5,
+                    "totalFloors": 20,
+                    "orientation": "South",
+                    "hasParking": True,
+                    "hasElevator": True,
+                    "hasBalcony": True
+                }
+            ]
+        }
+    }
+
+
+def map_property_type_to_furnishing(prop_type: str, decoration: str) -> str:
+    """根据房产类型和装修状态映射到家具配置"""
+    prop_type_lower = prop_type.lower()
+    decoration_lower = decoration.lower()
+
+    if "furnished" in decoration_lower:
+        return "Furnished"
+    elif "semi" in decoration_lower:
+        return "Semi-Furnished"
+    else:
+        # 默认根据房产类型判断
+        if "villa" in prop_type_lower or "house" in prop_type_lower:
+            return "Semi-Furnished"
+        return "Unfurnished"
+
+
+def map_property_type_to_area_type(prop_type: str) -> str:
+    """根据房产类型映射到面积类型"""
+    prop_type_lower = prop_type.lower()
+
+    if "villa" in prop_type_lower:
+        return "Villa"
+    elif "house" in prop_type_lower:
+        return "House"
+    else:
+        return "Apartment"
 
 
 @app.post("/api/v1/predict")
 def api_v1_predict(payload: NewPredictRequest):
     start_time = int(time.time() * 1000)
-    
-    # Map new request fields to match training data columns (house_rent.csv)
-    record = {
-        "landlord_id": 1,  # default, not used in prediction
-        "title": f"{payload.propertyType} in {payload.city}",
-        "city": payload.city,
-        "region": payload.region or "Unknown",
-        "address": payload.region or "Unknown",
-        "bedrooms": payload.bedrooms,
-        "bathrooms": payload.bathrooms,
-        "area": payload.area,
-        "price": 0,  # placeholder, will be predicted
-        "total_floors": payload.totalFloors,
-        "orientation": payload.orientation,
-        "decoration": payload.decoration,
-        "description": "",
-        "status": "available",
-        "view_count": 0,
-        "created_at": time.strftime("%Y-%m-%d"),
-    }
-    
-    pred = predict_one(record)
-    
-    # Calculate confidence and bounds (simplified)
-    confidence = 0.85
-    lower_bound = pred * 0.9
-    upper_bound = pred * 1.1
-    
-    response_time = int(time.time() * 1000) - start_time
-    
-    return {
-        "predictedPrice": pred,
-        "currency": "CNY",
-        "confidence": confidence,
-        "lowerBound": lower_bound,
-        "upperBound": upper_bound,
-        "modelVersion": "1.0",
-        "algorithmName": "RandomForest",
-        "featureImportance": [
-            {"feature": "Size", "importance": 0.35},
-            {"feature": "City", "importance": 0.25},
-            {"feature": "BHK", "importance": 0.20},
-            {"feature": "Bathroom", "importance": 0.10},
-            {"feature": "Floor", "importance": 0.10}
-        ],
-        "responseTimeMs": response_time
-    }
+
+    try:
+        # Map request fields to match training data columns
+        furnishing_status = map_property_type_to_furnishing(
+            payload.propertyType,
+            payload.decoration
+        )
+        area_type = map_property_type_to_area_type(payload.propertyType)
+
+        # 构建预测记录
+        record = {
+            "landlord_id": 1,
+            "title": f"{payload.propertyType} in {payload.city}",
+            "city": payload.city,
+            "region": payload.region or payload.city,
+            "address": payload.region or payload.city,
+            "bedrooms": payload.bedrooms,
+            "bathrooms": int(payload.bathrooms),
+            "area": payload.area,
+            "price": 0,
+            "total_floors": payload.totalFloors,
+            "orientation": payload.orientation,
+            "decoration": furnishing_status,
+            "description": f"Floor {payload.floor}/{payload.totalFloors}, "
+                          f"Parking: {payload.hasParking}, "
+                          f"Elevator: {payload.hasElevator}, "
+                          f"Balcony: {payload.hasBalcony}",
+            "status": "available",
+            "view_count": 0,
+            "created_at": time.strftime("%Y-%m-%d"),
+        }
+
+        # 执行预测
+        pred = predict_one(record)
+
+        # 获取带置信区间的预测结果
+        confidence_result = predict_with_confidence(record)
+
+        # 获取特征重要性
+        raw_importance = get_feature_importance()
+
+        # 将展开的特征名聚合回原始特征
+        aggregated_importance = aggregate_feature_importance(raw_importance)
+
+        # 排序并取Top 5
+        sorted_importance = sorted(
+            aggregated_importance.items(),
+            key=lambda x: x[1],
+            reverse=True
+        )[:5]
+
+        feature_importance_list = [
+            {"feature": name, "importance": round(importance, 4)}
+            for name, importance in sorted_importance
+        ]
+
+        response_time = int(time.time() * 1000) - start_time
+
+        return {
+            "predictedPrice": round(pred, 2),
+            "currency": "CNY",
+            "confidence": 0.85,
+            "lowerBound": round(confidence_result["lower_bound"], 2),
+            "upperBound": round(confidence_result["upper_bound"], 2),
+            "modelVersion": "1.0",
+            "algorithmName": "XGBoost",
+            "featureImportance": feature_importance_list,
+            "responseTimeMs": response_time
+        }
+
+    except FileNotFoundError as e:
+        logger.error(f"Model file not found: {e}")
+        raise HTTPException(status_code=503, detail="Model not available. Please train the model first.")
+    except Exception as e:
+        logger.error(f"Prediction error: {e}")
+        raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")
+
+
+def aggregate_feature_importance(raw_importance: dict) -> dict:
+    """
+    将OneHotEncoder展开后的特征重要性聚合回原始特征。
+    例如：city_Shanghai, city_Beijing -> city
+    """
+    aggregated = {}
+
+    for feature_name, importance in raw_importance.items():
+        # 查找下划线分隔的类别特征前缀
+        if '_' in feature_name:
+            # 尝试找到原始特征名
+            parts = feature_name.rsplit('_', 1)
+            if len(parts) == 2:
+                prefix, suffix = parts
+                # 检查是否是已知的类别特征
+                if prefix in ["city", "region", "decoration", "orientation", "area_type"]:
+                    if prefix not in aggregated:
+                        aggregated[prefix] = 0
+                    aggregated[prefix] += importance
+                    continue
+                elif suffix.isdigit():
+                    # 可能是数字特征（如 bedrooms_0 等）
+                    if prefix not in aggregated:
+                        aggregated[prefix] = 0
+                    aggregated[prefix] += importance
+                    continue
+
+        # 非展开特征直接保留
+        if feature_name not in aggregated:
+            aggregated[feature_name] = importance
+
+    return aggregated
 
 
 @app.post("/predict")
 def predict(payload: RentFeatures):
-    # 把字段名映射回原始列名
     record = {
         "Posted On": payload.Posted_On,
         "BHK": payload.BHK,
@@ -120,8 +239,13 @@ def predict(payload: RentFeatures):
         "Point of Contact": payload.Point_of_Contact,
     }
 
-    pred = predict_one(record)
-    return {"ok": True, "predicted_rent": pred}
+    try:
+        pred = predict_one(record)
+        return {"ok": True, "predicted_rent": float(pred)}
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=503, detail="Model not available")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 if __name__ == "__main__":

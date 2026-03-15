@@ -1,6 +1,7 @@
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { Button, Card, Input, Space, message, Typography } from 'antd'
+import { Button, Card, Input, Space, Typography, App } from 'antd'
+
 import { MailOutlined, LockOutlined, SendOutlined } from '@ant-design/icons'
 import { http } from '../../../shared/api/http'
 import { PageHeader } from '../../../shared/ui/PageHeader'
@@ -19,6 +20,7 @@ interface VerifyResponse {
 }
 
 export function EmailVerifyPage() {
+  const { message } = App.useApp()
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const { openAuthModal } = useAuthModal()
