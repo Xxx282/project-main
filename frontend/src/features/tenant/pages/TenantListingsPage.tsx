@@ -29,15 +29,6 @@ const DEFAULT_FIELDS: FieldOption[] = [
   { key: 'decorationOrientation', title: 'decorationOrientation', visible: true },
 ]
 
-// 预设城市选项（可勾选）
-const CITY_OPTIONS = [
-  { value: '杭州', labelKey: 'pages.cityHangzhou' },
-  { value: '上海', labelKey: 'pages.cityShanghai' },
-  { value: '北京', labelKey: 'pages.cityBeijing' },
-  { value: '深圳', labelKey: 'pages.cityShenzhen' },
-  { value: '广州', labelKey: 'pages.cityGuangzhou' },
-]
-
 // 构建缩略图 URL - 与图片画廊保持一致逻辑
 const buildImageUrl = (imageUrl: string) => {
   if (!imageUrl) return ''
@@ -61,10 +52,8 @@ export function TenantListingsPage() {
   const listingsQ = useQuery({
     queryKey: ['tenant', 'listings', Object.fromEntries(params)],
     queryFn: () => {
-      const cities = params.get('city')?.split(',').filter(Boolean) ?? []
       return listListings({
         q: params.get('q') || undefined,
-        city: cities.length === 1 ? cities[0] : undefined,
         region: params.get('region') || undefined,
         bedrooms: params.get('bedrooms') ? Number(params.get('bedrooms')) : undefined,
         minPrice: params.get('minPrice') ? Number(params.get('minPrice')) : undefined,
@@ -75,11 +64,7 @@ export function TenantListingsPage() {
     },
   })
 
-  // 解析城市、房型、朝向、装修多选（用于筛选，勾选即生效）
-  const cityFilter = useMemo(
-    () => params.get('city')?.split(',').filter(Boolean) ?? [],
-    [params]
-  )
+  // 解析房型、朝向、装修多选（用于筛选，勾选即生效）
   const bedroomFilter = useMemo(
     () => params.get('bedrooms')?.split(',').filter(Boolean).map(Number).filter(Boolean) ?? [],
     [params]
@@ -96,13 +81,12 @@ export function TenantListingsPage() {
   const filteredListings = useMemo(() => {
     const list = listingsQ.data ?? []
     return list.filter((item) => {
-      if (cityFilter.length && item.city && !cityFilter.includes(item.city)) return false
       if (bedroomFilter.length && item.bedrooms && !bedroomFilter.includes(item.bedrooms)) return false
       if (orientationFilter.length && item.orientation && !orientationFilter.includes(item.orientation)) return false
       if (decorationFilter.length && item.decoration && !decorationFilter.includes(item.decoration)) return false
       return true
     })
-  }, [listingsQ.data, cityFilter, bedroomFilter, orientationFilter, decorationFilter])
+  }, [listingsQ.data, bedroomFilter, orientationFilter, decorationFilter])
 
   const updateFilterParam = (key: string, values: string[]) => {
     const next = new URLSearchParams(params)
@@ -200,7 +184,6 @@ export function TenantListingsPage() {
               layout="vertical"
               initialValues={{
                 ...Object.fromEntries(params),
-                city: cityFilter as string[],
                 bedrooms: bedroomFilter as string[],
                 orientation: orientationFilter as string[],
                 decoration: decorationFilter as string[],
@@ -211,7 +194,6 @@ export function TenantListingsPage() {
                 if (v.region) next.set('region', v.region)
                 if (v.minPrice != null) next.set('minPrice', String(v.minPrice))
                 if (v.maxPrice != null) next.set('maxPrice', String(v.maxPrice))
-                if (Array.isArray(v.city) && v.city.length) next.set('city', v.city.join(','))
                 if (Array.isArray(v.bedrooms) && v.bedrooms.length) next.set('bedrooms', v.bedrooms.join(','))
                 if (Array.isArray(v.orientation) && v.orientation.length) next.set('orientation', v.orientation.join(','))
                 if (Array.isArray(v.decoration) && v.decoration.length) next.set('decoration', v.decoration.join(','))
@@ -281,18 +263,6 @@ export function TenantListingsPage() {
                   style: { padding: 0 },
                   children: (
                     <div style={{ padding: '16px 0 8px', color: '#fff' }}>
-                      {/* 第一行：位置（城市勾选，同朝向样式） */}
-                      <div style={{ marginBottom: 16 }}>
-                        <div style={{ color: 'rgba(255,255,255,0.9)', fontSize: 15, fontWeight: 600, marginBottom: 8 }}>{t('pages.filterLocation')}</div>
-                        <Form.Item name="city" style={{ marginBottom: 0 }}>
-                          <Checkbox.Group
-                            options={CITY_OPTIONS.map((c) => ({ value: c.value, label: t(c.labelKey) }))}
-                            style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}
-                            onChange={(vals) => updateFilterParam('city', (vals as string[]) || [])}
-                          />
-                        </Form.Item>
-                      </div>
-
                       {/* 第二行：房型 */}
                       <div style={{ marginBottom: 16 }}>
                         <div style={{ color: 'rgba(255,255,255,0.9)', fontSize: 15, fontWeight: 600, marginBottom: 8 }}>{t('pages.filterRoomType')}</div>

@@ -27,7 +27,7 @@ const getRandomColor = () => {
 }
 
 // 扩展城市列表：如果数据不够，重复填充以达到目标数量
-const expandCityList = (cityStats: CityStats, minCount: number = 30): CityStats => {
+const expandCityList = (cityStats: CityStats, minCount: number = 50): CityStats => {
   if (cityStats.length === 0) return []
   const result: CityStats = []
   let index = 0
@@ -37,9 +37,6 @@ const expandCityList = (cityStats: CityStats, minCount: number = 30): CityStats 
   }
   return result
 }
-
-// 判断是否应该竖排（随机约30%概率）
-const shouldBeVertical = () => Math.random() < 0.3
 
 // 生成随机位置（围绕中心分布）
 interface WordPosition {
@@ -67,7 +64,6 @@ export function HomePage() {
   const [scrollY, setScrollY] = useState(0)
   const [cityStats, setCityStats] = useState<CityStats>([])
   const [expandedCityStats, setExpandedCityStats] = useState<CityStats>([])
-  const [verticalFlags, setVerticalFlags] = useState<boolean[]>([])
   const [wordPositions, setWordPositions] = useState<WordPosition[]>([])
   const [visibleTags, setVisibleTags] = useState(0) // 可见的标签数量
 
@@ -84,10 +80,9 @@ export function HomePage() {
     getCityStatistics()
       .then((data) => {
         setCityStats(data)
-        // 扩展城市列表并生成竖排标记
-        const expanded = expandCityList(data, 30)
+        // 扩展城市列表
+        const expanded = expandCityList(data, 50)
         setExpandedCityStats(expanded)
-        setVerticalFlags(expanded.map(() => shouldBeVertical()))
         // 生成每个词的位置
         setWordPositions(expanded.map((_, i) => generateRandomPosition(i, expanded.length)))
       })
@@ -179,8 +174,7 @@ export function HomePage() {
                 ? 18
                 : 18 + (count - minCount) / (maxCount - minCount) * 24
 
-            // 获取该位置的竖排标记和位置
-            const isVertical = verticalFlags[index] || false
+            // 获取该位置的位置信息
             const pos = wordPositions[index] || { x: 0, y: 0, rotation: 0 }
 
             return (
@@ -191,8 +185,6 @@ export function HomePage() {
                   fontSize: `${fontSize}px`,
                   color: getRandomColor(),
                   animationDelay: `${index * 0.05}s`,
-                  writingMode: isVertical ? 'vertical-rl' : 'horizontal-tb',
-                  textOrientation: isVertical ? 'upright' : 'mixed',
                   // 使用绝对定位围绕中心分布
                   position: 'absolute',
                   left: `calc(50% + ${pos.x * 35}vw)`,

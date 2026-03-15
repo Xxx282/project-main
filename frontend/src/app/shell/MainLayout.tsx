@@ -243,10 +243,14 @@ export function MainLayout() {
   const effectiveRole: UserRole = auth.user?.role ?? 'tenant'
 
   // 处理语言切换
-  const handleLanguageChange = (value: string) => {
-    i18n.changeLanguage(value)
-    setCurrentLanguage(value)
-    localStorage.setItem('language', value)
+  const handleLanguageChange = async (value: string) => {
+    try {
+      await i18n.changeLanguage(value)
+      setCurrentLanguage(value)
+      localStorage.setItem('language', value)
+    } catch (error) {
+      console.error('Language change failed:', error)
+    }
   }
 
   const menuItems: MenuProps['items'] = useMemo(() => {
@@ -285,8 +289,8 @@ export function MainLayout() {
   return (
     <Layout style={{ minHeight: '100vh', background: 'transparent' }}>
       <Header style={headerStyle}>
-        <Typography.Text style={{ color: navTextColor, fontWeight: 600, marginRight: 32 }}>
-          {t('common.appName')}
+        <Typography.Text style={{ color: navTextColor, fontWeight: 600, marginRight: 32, fontSize: 18 }}>
+          Smart Rental
         </Typography.Text>
         {/* 中间区域：让顶栏菜单居中显示 */}
         <div style={{ flex: 1, display: 'flex', justifyContent: 'center', minWidth: 0 }}>
@@ -311,8 +315,12 @@ export function MainLayout() {
         <Space size="middle">
           {/* 语言切换下拉菜单 */}
           <Select
-            value={currentLanguage}
-            onChange={handleLanguageChange}
+            defaultValue={i18n.language}
+            onChange={(value: string) => {
+              i18n.changeLanguage(value)
+              localStorage.setItem('language', value)
+              setCurrentLanguage(value)
+            }}
             style={{
               width: 100,
             }}

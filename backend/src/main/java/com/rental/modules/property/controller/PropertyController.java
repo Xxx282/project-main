@@ -52,8 +52,8 @@ public class PropertyController {
             @RequestParam(required = false) String q,
             @RequestParam(required = false) String city,
             @RequestParam(required = false) String region,
-            @RequestParam(required = false) BigDecimal minRent,
-            @RequestParam(required = false) BigDecimal maxRent,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice,
             @RequestParam(required = false) Integer bedrooms,
             @RequestParam(required = false) String status,
             @RequestParam(defaultValue = "0") int page,
@@ -73,7 +73,7 @@ public class PropertyController {
 
         // 否则使用原有筛选功能
         Page<Property> listings = propertyService.findByFilters(
-                city, region, minRent, maxRent, bedrooms, propertyStatus, pageable);
+                city, region, minPrice, maxPrice, bedrooms, propertyStatus, pageable);
 
         return ResponseEntity.ok(Result.success(listings.getContent()));
     }

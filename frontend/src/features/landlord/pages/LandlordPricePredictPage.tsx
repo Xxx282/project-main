@@ -15,9 +15,10 @@ import { pricePredict, getSimilarProperties, getClosestProperty, type SimilarPro
 
 // 装修选项：value 传 API，label 用 i18n
 const FURNISHING_OPTIONS_I18N: { value: string; i18nKey: string }[] = [
-  { value: 'Furnished', i18nKey: 'pages.furnished' },
-  { value: 'Semi-Furnished', i18nKey: 'pages.semiFurnished' },
-  { value: 'Unfurnished', i18nKey: 'pages.unfurnished' },
+  { value: 'rough', i18nKey: 'common.rough' },
+  { value: 'simple', i18nKey: 'common.simple' },
+  { value: 'fine', i18nKey: 'common.fine' },
+  { value: 'luxury', i18nKey: 'common.luxury' },
 ]
 
 export function LandlordPricePredictPage() {
@@ -48,8 +49,7 @@ export function LandlordPricePredictPage() {
         region: v.region || '',
         bathrooms: v.bathrooms,
         propertyType: v.propertyType || 'Super Area',
-        decoration: v.decoration || 'Unfurnished',
-        floor: v.floor || 1,
+        decoration: v.decoration || 'rough',
         totalFloors: v.totalFloors || 5,
       }
 
@@ -152,8 +152,7 @@ export function LandlordPricePredictPage() {
                     area: 60,
                     city: '',
                     region: '',
-                    decoration: 'Unfurnished',
-                    floor: 1,
+                    decoration: 'rough',
                     totalFloors: 5
                   }}
                   onFinish={handlePredict}
@@ -271,87 +270,21 @@ export function LandlordPricePredictPage() {
                     />
                   </Form.Item>
 
-                  <Row gutter={16}>
-                    <Col xs={24} sm={12}>
-                      <Form.Item 
-                        name="floor" 
-                        label={
-                          <span>
-                            <HomeOutlined style={{ marginRight: 8, color: '#b4a5e8' }} />
-                            {t('pages.currentFloor')}
-                          </span>
-                        }
-                        dependencies={['totalFloors']}
-                        rules={[
-                          {
-                            type: 'number',
-                            min: 0,
-                            message: t('pages.floorNonNegative') || '当前楼层不能为负数',
-                          },
-                          ({ getFieldValue }) => ({
-                            validator(_, value) {
-                              const total = getFieldValue('totalFloors')
-                              // 只在两个值都填了时进行比较
-                              if (value == null || total == null) {
-                                return Promise.resolve()
-                              }
-                              if (value <= total) {
-                                return Promise.resolve()
-                              }
-                              return Promise.reject(
-                                new Error(t('pages.floorExceedsTotal') || '当前楼层不能大于总楼层数')
-                              )
-                            },
-                          }),
-                        ]}
-                      >
-                        <InputNumber 
-                          style={{ width: '100%' }} 
-                          placeholder={t('pages.example')}
-                          size="large"
-                        />
-                      </Form.Item>
-                    </Col>
-                    <Col xs={24} sm={12}>
-                      <Form.Item 
-                        name="totalFloors" 
-                        label={
-                          <span>
-                            <HomeOutlined style={{ marginRight: 8, color: '#b4a5e8' }} />
-                            {t('pages.totalFloors')}
-                          </span>
-                        }
-                        dependencies={['floor']}
-                        rules={[
-                          {
-                            type: 'number',
-                            min: 1,
-                            message: t('pages.totalFloorsMin') || '总楼层数至少为 1 层',
-                          },
-                          ({ getFieldValue }) => ({
-                            validator(_, value) {
-                              const floor = getFieldValue('floor')
-                              if (value == null || floor == null) {
-                                return Promise.resolve()
-                              }
-                              if (value >= floor) {
-                                return Promise.resolve()
-                              }
-                              return Promise.reject(
-                                new Error(t('pages.totalLessThanFloor') || '总楼层数不能小于当前楼层')
-                              )
-                            },
-                          }),
-                        ]}
-                      >
-                        <InputNumber 
-                          style={{ width: '100%' }} 
-                          placeholder={t('pages.example2')}
-                          size="large"
-                        />
-                      </Form.Item>
-                    </Col>
-                  </Row>
+                  <Form.Item 
+                    name="totalFloors" 
+                    label={
+                      <span>
+                        <HomeOutlined style={{ marginRight: 8, color: '#b4a5e8' }} />
+                        {t('pages.totalFloors')}
+                      </span>
+                    }
+                  >
+                    <InputNumber 
+                      style={{ width: '100%' }} 
+                      placeholder={t('pages.example2')}
+                      size="large"
+                    />
+                  </Form.Item>
 
                   <Form.Item style={{ marginTop: 24, marginBottom: 0 }}>
                     <Button 

@@ -47,16 +47,16 @@ BEDROOMS_TO_BATHROOMS = {
     6: 2,
 }
 
-# 标题模板
+# 标题模板（英文）
 TITLE_TEMPLATES = [
-    '精致 {region} 公寓',
-    '{city}{region} 温馨好房',
-    '{region} 舒适两居室',
-    '出租 {region} 精装房',
-    '{city} {region} 地铁房',
-    '{region} 南北通透户型',
-    '{region} 拎包入住公寓',
-    '{region} 学区房出租',
+    'Exquisite {region} Apartment',
+    '{city}{region} Cozy Home',
+    '{region} Comfortable 2BR',
+    'For Rent: {region} Fine Decorated',
+    '{city} {region} Metro Station Nearby',
+    '{region} South-North Facing',
+    '{region} Move-in Ready Apartment',
+    'For Rent: {region} School District',
 ]
 
 ORIENTATIONS = ['north', 'south', 'east', 'west']
@@ -109,7 +109,7 @@ def generate_realistic_data(row):
     row['bathrooms'] = bathrooms
     row['total_floors'] = total_floors
     row['orientation'] = orientation
-    row['description'] = f'{bedrooms}室{bathrooms}卫，面积 {area} 平米，{decoration}装修，{orientation}朝向，拎包入住。'
+    row['description'] = f'{bedrooms} bedroom(s), {bathrooms} bathroom(s), {area} sqm, {decoration} decoration, {orientation} facing, move-in ready.'
     
     return row
 

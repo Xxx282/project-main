@@ -202,7 +202,6 @@ export function TenantListingDetailPage() {
           contentStyle={{ padding: '14px 16px' }}
           style={{ marginTop: 24 }}
         >
-          <Descriptions.Item label={t('common.id')}>{listingQ.data?.id ?? '-'}</Descriptions.Item>
           <Descriptions.Item label={t('common.title')}>{listingQ.data?.title ?? '-'}</Descriptions.Item>
           <Descriptions.Item label={t('pages.city')}>{listingQ.data?.city ?? '-'}</Descriptions.Item>
           <Descriptions.Item label={t('pages.region')}>{listingQ.data?.region ?? '-'}</Descriptions.Item>
