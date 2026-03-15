@@ -22,7 +22,7 @@ interface FieldOption {
 const DEFAULT_FIELDS: FieldOption[] = [
   { key: 'cover', title: 'cover', visible: true },
   { key: 'id', title: 'id', visible: true },
-  { key: 'title', title: 'title', visible: false },
+  { key: 'title', title: 'title', visible: true },
   { key: 'cityRegion', title: 'cityRegion', visible: true },
   { key: 'price', title: 'price', visible: true },
   { key: 'layout', title: 'layout', visible: true },
@@ -175,15 +175,15 @@ export function TenantListingsPage() {
   }
 
   return (
-    <div style={{ 
-      width: '100%', 
+    <div style={{
+      width: '100%',
       minHeight: '100vh',
       background: 'linear-gradient(135deg, #a5d8ff 0%, #b4a5e8 50%, #c4b5fd 100%)',
       padding: '16px',
+      fontSize: 20,
     }}>
       <div style={{ maxWidth: cardMaxWidth, margin: '0 auto' }}>
         <Space orientation="vertical" size={16} style={{ width: '100%' }}>
-          <PageHeader title={t('pages.listings')} align="center" />
 
           {/* 搜索 + 高级筛选面板 */}
           <Card
@@ -494,7 +494,7 @@ function ListingRow({ listing, settings }: { listing: Listing; settings: FieldOp
             {show('title') && (
               <span
                 style={{
-                  fontSize: 18,
+                  fontSize: 30,
                   fontWeight: 600,
                   color: '#111827',
                 }}

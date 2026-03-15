@@ -299,7 +299,7 @@ export function MainLayout() {
             style={{
               background: 'transparent',
               borderBottom: 'none',
-              fontSize: 16,
+              fontSize: 25,
               fontWeight: 500,
               color: navTextColor,
               width: '100%',
