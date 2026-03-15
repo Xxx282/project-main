@@ -1,4 +1,4 @@
-import { Button, Layout, Menu, Space, Typography, Modal, Select } from 'antd'
+import { Button, Dropdown, Layout, Menu, Space, Typography, Modal, Select } from 'antd'
 import type { MenuProps } from 'antd'
 import { useEffect, useMemo, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
@@ -9,6 +9,7 @@ import type { UserRole } from '../../features/auth/store/authStore'
 import { LoginPage } from '../../features/auth/pages/LoginPage'
 import { RegisterPage } from '../../features/auth/pages/RegisterPage'
 import { EmailVerifyModal } from '../../features/auth/components/EmailVerifyModal'
+import { TenantPreferencesPage } from '../../features/tenant/pages/TenantPreferencesPage'
 
 const { Header, Content } = Layout
 
@@ -30,6 +31,7 @@ type TopNavKey =
   | 'admin_users'
   | 'admin_listings'
   | 'admin_payments'
+  | 'profile'
   | 'auth_login'
   | 'auth_register'
   | 'rent_house'
@@ -44,7 +46,8 @@ function keyToPath(key: TopNavKey): string {
     case 'tenant_reco':
       return '/tenant/recommendations'
     case 'tenant_prefs':
-      return '/tenant/preferences'
+      // 偏好设置通过弹窗显示，不需要路由跳转
+      return ''
     case 'tenant_compare':
       return '/tenant/compare'
     case 'tenant_inquiries':
@@ -71,6 +74,8 @@ function keyToPath(key: TopNavKey): string {
       return '/admin/listings'
     case 'admin_payments':
       return '/admin/payments'
+    case 'profile':
+      return '/profile'
     case 'auth_login':
       return '/login'
     case 'auth_register':
@@ -104,6 +109,8 @@ function pathToKey(pathname: string): TopNavKey {
   if (pathname.startsWith('/admin/listings')) return 'admin_listings'
   if (pathname.startsWith('/admin/payments')) return 'admin_payments'
   if (pathname.startsWith('/admin')) return 'admin_dashboard'
+
+  if (pathname.startsWith('/profile')) return 'profile'
 
   if (pathname.startsWith('/register')) return 'auth_register'
   if (pathname.startsWith('/login')) return 'auth_login'
@@ -171,6 +178,16 @@ export function MainLayout() {
     setCurrentLanguage(i18n.language)
   }, [i18n.language])
 
+  // 处理从 RequireAuth 重定向回来时自动打开登录弹窗
+  useEffect(() => {
+    const state = location.state as { showAuthModal?: string } | undefined
+    if (state?.showAuthModal && !auth.user) {
+      openAuthModal(state.showAuthModal as 'login' | 'register')
+      // 清除 state
+      navigate(location.pathname, { replace: true, state: {} })
+    }
+  }, [location.state, auth.user, navigate, openAuthModal])
+
   // 判断是否是首页
   const isHomePage = location.pathname === '/'
 
@@ -234,7 +251,9 @@ export function MainLayout() {
     const base = getRoleMenu(t)[effectiveRole].map(({ key, label }) => ({
       key,
       label,
-      onClick: () => navigate(keyToPath(key)),
+      onClick: key === 'tenant_prefs'
+        ? () => openAuthModal('preferences')
+        : () => navigate(keyToPath(key)),
     }))
     return base
   }, [effectiveRole, auth.user, navigate, t, openAuthModal])
@@ -281,21 +300,40 @@ export function MainLayout() {
           />
           {auth.user ? (
             <>
-              <Typography.Text style={{ color: navTextColor }}>
-                {auth.user.username}
-              </Typography.Text>
-              <Button
-                onClick={() => {
-                  auth.logout()
+              <Dropdown
+                menu={{
+                  items: [
+                    {
+                      key: 'profile',
+                      label: t('nav.profile'),
+                      onClick: () => navigate('/profile'),
+                    },
+                    {
+                      type: 'divider',
+                    },
+                    {
+                      key: 'logout',
+                      label: t('common.logout'),
+                      onClick: () => auth.logout(),
+                    },
+                  ],
                 }}
-                style={{
-                  background: 'rgba(255,255,255,0.15)',
-                  border: '1px solid rgba(255,255,255,0.3)',
-                  color: navTextColor,
-                }}
+                placement="bottomRight"
               >
-                {t('common.logout')}
-              </Button>
+                <Typography.Text
+                  style={{
+                    color: navTextColor,
+                    cursor: 'pointer',
+                    padding: '4px 8px',
+                    borderRadius: 4,
+                    transition: 'background 0.3s',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.1)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                >
+                  {auth.user.username}
+                </Typography.Text>
+              </Dropdown>
             </>
           ) : (
             <>
@@ -435,7 +473,7 @@ export function MainLayout() {
         {/* 首页上的登录/注册弹窗：只在未登录时可见 */}
         {!auth.user && (
           <Modal
-            open={authModal.visible}
+            open={authModal.visible && authModal.mode !== 'preferences'}
             footer={null}
             onCancel={closeAuthModal}
             centered
@@ -474,6 +512,30 @@ export function MainLayout() {
             </div>
           </Modal>
         )}
+
+        {/* 偏好设置弹窗：对所有用户可见 */}
+        <Modal
+          open={authModal.visible && authModal.mode === 'preferences'}
+          footer={null}
+          onCancel={closeAuthModal}
+          centered
+          width={600}
+          destroyOnHidden
+          title={null}
+          styles={{
+            mask: {
+              backgroundColor: 'rgba(0,0,0,0.1)',
+              backdropFilter: 'blur(2px)',
+            },
+            body: {
+              padding: 0,
+              borderRadius: 16,
+              overflow: 'hidden',
+            },
+          }}
+        >
+          <TenantPreferencesPage />
+        </Modal>
       </Content>
     </Layout>
   )

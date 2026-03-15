@@ -68,11 +68,7 @@ export function RegisterPage() {
                 openAuthModal('verify-email', values.email)
               } else {
                 void message.success(t('common.registerSuccessLogin'))
-                if (isInModal) {
-                  openAuthModal('login')
-                } else {
-                  navigate('/login', { replace: true })
-                }
+                openAuthModal('login')
               }
             } catch {
               void message.error(t('common.registerFailed'))
@@ -126,7 +122,10 @@ export function RegisterPage() {
           </Button>
         </Form>
         <div style={{ textAlign: 'center', marginTop: 16 }}>
-          {t('common.alreadyHaveAccount')}<Link to="/login">{t('common.loginNow')}</Link>
+          {t('common.alreadyHaveAccount')}
+          <Link to="#" onClick={(e) => { e.preventDefault(); openAuthModal('login') }}>
+            {t('common.loginNow')}
+          </Link>
         </div>
       </Card>
     </Space>

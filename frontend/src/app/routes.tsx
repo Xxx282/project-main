@@ -28,6 +28,7 @@ import { TenantRecommendationsPage } from '../features/tenant/pages/TenantRecomm
 import { TenantContractPage } from '../features/tenant/pages/TenantContractPage'
 import { TenantPaymentPage } from '../features/tenant/pages/TenantPaymentPage'
 import { TenantPaymentsPage } from '../features/tenant/pages/TenantPaymentsPage'
+import { ProfilePage } from '../features/auth/pages/ProfilePage'
 
 export function AppRoutes() {
   return (
@@ -35,8 +36,6 @@ export function AppRoutes() {
       <Route path="/" element={<MainLayout />}>
         <Route index element={<HomePage />} />
 
-        <Route path="login" element={<LoginPage />} />
-        <Route path="register" element={<RegisterPage />} />
         <Route path="forgot-password" element={<ForgotPasswordPage />} />
         <Route path="reset-password" element={<ResetPasswordPage />} />
         <Route path="verify-email" element={<EmailVerifyPage />} />
@@ -75,14 +74,6 @@ export function AppRoutes() {
             element={
               <RequireAuth roles={['tenant']}>
                 <TenantComparePage />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="preferences"
-            element={
-              <RequireAuth roles={['tenant']}>
-                <TenantPreferencesPage />
               </RequireAuth>
             }
           />
@@ -239,6 +230,15 @@ export function AppRoutes() {
             }
           />
         </Route>
+
+        <Route
+          path="profile"
+          element={
+            <RequireAuth>
+              <ProfilePage />
+            </RequireAuth>
+          }
+        />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>

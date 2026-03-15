@@ -4,10 +4,12 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { PageHeader } from '../../../shared/ui/PageHeader'
 import { forgotPassword } from '../api/authApi'
+import { useAuthModal } from '../context/AuthModalContext'
 
 export function ForgotPasswordPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const { openAuthModal } = useAuthModal()
   const [form] = Form.useForm<{ email: string }>()
   const [loading, setLoading] = useState(false)
 
@@ -37,7 +39,7 @@ export function ForgotPasswordPage() {
               await forgotPassword(values.email.trim())
               message.success(t('auth.forgotPasswordSuccess'))
               form.resetFields()
-              navigate('/login', { replace: true })
+              openAuthModal('login')
             } catch (e) {
               message.error(e instanceof Error ? e.message : t('auth.forgotPasswordFailed'))
             } finally {
@@ -59,7 +61,9 @@ export function ForgotPasswordPage() {
             {t('auth.sendResetLink')}
           </Button>
           <div style={{ marginTop: 16, textAlign: 'center' }}>
-            <Link to="/login">{t('auth.backToLogin')}</Link>
+            <Link to="#" onClick={(e) => { e.preventDefault(); openAuthModal('login') }}>
+              {t('auth.backToLogin')}
+            </Link>
           </div>
         </Form>
       </Card>

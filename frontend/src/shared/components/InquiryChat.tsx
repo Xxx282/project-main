@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Card, Input, Button, Space, Avatar, message, Spin, Typography, Dropdown } from 'antd'
+import { Card, Input, Button, Space, Avatar, Spin, Typography, Dropdown, App } from 'antd'
 import { UserOutlined, ArrowLeftOutlined, SendOutlined, MessageOutlined, HomeOutlined, PictureOutlined, DeleteOutlined, RobotOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -121,6 +121,7 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const auth = useAuth()
+  const { message } = App.useApp()
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   // 获取对话详情
@@ -181,11 +182,10 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
     mutationFn: (messageId: number) => recallMessageApi(messageId),
     onSuccess: () => {
       message.success(t('pages.messageRecalled') || '消息已撤回')
-      queryClient.invalidateQueries({ queryKey: ['conversation', conversationId, 'messages'] })
-      queryClient.invalidateQueries({ queryKey: ['conversation', conversationId] })
+      messagesQ.refetch()
     },
-    onError: (err: any) => {
-      message.error(err?.response?.data?.message || t('pages.recallFailed'))
+    onError: (err: Error) => {
+      message.error(err.message || t('pages.recallFailed'))
     },
   })
 

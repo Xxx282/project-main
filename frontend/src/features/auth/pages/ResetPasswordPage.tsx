@@ -4,10 +4,12 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { PageHeader } from '../../../shared/ui/PageHeader'
 import { resetPassword } from '../api/authApi'
+import { useAuthModal } from '../context/AuthModalContext'
 
 export function ResetPasswordPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const { openAuthModal } = useAuthModal()
   const [searchParams] = useSearchParams()
   const token = searchParams.get('token') ?? ''
   const email = searchParams.get('email') ?? ''
@@ -63,7 +65,7 @@ export function ResetPasswordPage() {
                 newPassword: values.newPassword,
               })
               message.success(t('auth.resetPasswordSuccess'))
-              navigate('/login', { replace: true })
+              openAuthModal('login')
             } catch (e) {
               message.error(e instanceof Error ? e.message : t('auth.resetPasswordFailed'))
             } finally {
@@ -101,7 +103,9 @@ export function ResetPasswordPage() {
             {t('auth.resetPasswordSubmit')}
           </Button>
           <div style={{ marginTop: 16, textAlign: 'center' }}>
-            <Link to="/login">{t('auth.backToLogin')}</Link>
+            <Link to="#" onClick={(e) => { e.preventDefault(); openAuthModal('login') }}>
+              {t('auth.backToLogin')}
+            </Link>
           </div>
         </Form>
       </Card>

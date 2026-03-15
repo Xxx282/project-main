@@ -7,14 +7,14 @@
  * @FilePath: \project-main\frontend\src\features\tenant\pages\TenantPreferencesPage.tsx
  */
 import { useQueryClient } from '@tanstack/react-query'
-import { Button, Card, Col, Form, Input, InputNumber, Row, Select, Space, message } from 'antd'
+import { Button, Card, Col, Form, Input, InputNumber, Row, Select, Space, App } from 'antd'
 import { useQuery } from '@tanstack/react-query'
 import { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { PageHeader } from '../../../shared/ui/PageHeader'
 import { getPreferences, savePreferences } from '../api/tenantApi'
 import type { TenantPreferences } from '../../../shared/api/types'
+import { useAuthModal } from '../../auth/context/AuthModalContext'
 
 // 城市选项 - 已废弃，改用输入框
 // const CITY_OPTIONS = [
@@ -52,8 +52,9 @@ const getBedroomOptions = (t: any) => [
 
 export function TenantPreferencesPage() {
   const { t } = useTranslation()
-  const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const { closeAuthModal } = useAuthModal()
+  const { message } = App.useApp()
 
   const prefsQ = useQuery({
     queryKey: ['tenant', 'preferences'],
@@ -91,7 +92,7 @@ export function TenantPreferencesPage() {
       queryClient.removeQueries({ queryKey: ['tenant', 'recommendations'] })
       // 等待一小段时间确保缓存被清除
       await new Promise(resolve => setTimeout(resolve, 100))
-      navigate('/tenant/recommendations')
+      closeAuthModal()
     } catch {
       void message.error(t('pages.saveFailed'))
     }
@@ -132,7 +133,10 @@ export function TenantPreferencesPage() {
 
   return (
     <Space orientation="vertical" size={16} style={{ width: '100%' }}>
-      <PageHeader title={t('pages.tenantPreferences')} />
+      <PageHeader
+        title={t('pages.tenantPreferences')}
+        align="center"
+      />
       <Card style={{ maxWidth: 900, margin: '0 auto' }}>
         <Form
           form={form}
@@ -191,25 +195,24 @@ export function TenantPreferencesPage() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item label={t('pages.areaRange')} >
-                <Input.Group compact>
+                <Space.Compact>
                   <Form.Item name="minArea" noStyle>
                     <InputNumber
-                      style={{ width: '45%' }}
+                      style={{ width: '100%' }}
                       min={0}
                       placeholder={t('pages.min')}
-                      addonAfter="m²"
                     />
                   </Form.Item>
-                  <span style={{ display: 'inline-block', width: '10%', textAlign: 'center' }}>~</span>
+                  <span style={{ display: 'inline-block', width: 30, textAlign: 'center' }}>~</span>
                   <Form.Item name="maxArea" noStyle>
                     <InputNumber
-                      style={{ width: '45%' }}
+                      style={{ width: '100%' }}
                       min={0}
                       placeholder={t('pages.max')}
-                      addonAfter="m²"
                     />
                   </Form.Item>
-                </Input.Group>
+                  <Input addonAfter="m²" disabled style={{ width: 60 }} />
+                </Space.Compact>
               </Form.Item>
             </Col>
           </Row>
@@ -217,25 +220,24 @@ export function TenantPreferencesPage() {
           <Row gutter={24}>
             <Col xs={24} sm={12}>
               <Form.Item label={t('pages.floorRange')} >
-                <Input.Group compact>
+                <Space.Compact>
                   <Form.Item name="minFloors" noStyle>
                     <InputNumber
-                      style={{ width: '45%' }}
+                      style={{ width: '100%' }}
                       min={1}
                       placeholder={t('pages.lowest')}
-                      addonAfter={t('pages.floor')}
                     />
                   </Form.Item>
-                  <span style={{ display: 'inline-block', width: '10%', textAlign: 'center' }}>~</span>
+                  <span style={{ display: 'inline-block', width: 30, textAlign: 'center' }}>~</span>
                   <Form.Item name="maxFloors" noStyle>
                     <InputNumber
-                      style={{ width: '45%' }}
+                      style={{ width: '100%' }}
                       min={1}
                       placeholder={t('pages.highest')}
-                      addonAfter={t('pages.floor')}
                     />
                   </Form.Item>
-                </Input.Group>
+                  <Input addonAfter={t('pages.floor')} disabled style={{ width: 60 }} />
+                </Space.Compact>
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
@@ -268,9 +270,6 @@ export function TenantPreferencesPage() {
               </Button>
               <Button onClick={handleReset} loading={prefsQ.isLoading}>
                 {t('pages.resetAllPreferences')}
-              </Button>
-              <Button onClick={() => navigate('/tenant/recommendations')}>
-                {t('pages.backToRecommendations')}
               </Button>
             </Space>
           </Form.Item>

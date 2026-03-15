@@ -56,6 +56,9 @@ public class UserEntity {
 
     @Column(name = "verification_code_expired_at")
     private LocalDateTime verificationCodeExpiredAt;
+
+    @Column(name = "pending_email", length = 100)
+    private String pendingEmail;
     // ========== 邮箱验证字段 ==========
 
     // ========== 密码重置字段 ==========

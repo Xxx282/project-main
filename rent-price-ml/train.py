@@ -14,7 +14,7 @@ from xgboost import XGBRegressor
 
 
 DATA_PATH = "data/house_rent.csv"
-TARGET_COL = "Rent"
+TARGET_COL = "price"
 MODEL_PATH = "models/model.joblib"
 
 
@@ -101,7 +101,7 @@ def main():
     # 保存强模型（用来部署）
     os.makedirs("models", exist_ok=True)
     joblib.dump(xgb, MODEL_PATH)
-    print(f"\n✅ Saved model to: {MODEL_PATH}")
+    print(f"\n[OK] Saved model to: {MODEL_PATH}")
 
 
 if __name__ == "__main__":

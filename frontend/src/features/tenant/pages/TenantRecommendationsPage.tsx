@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
 import type { MouseEvent } from 'react'
-import { Button, Card, Space, Typography, Empty, Image, Slider } from 'antd'
+import { Button, Card, Space, Typography, Empty, Image, Slider, Spin } from 'antd'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -9,6 +9,7 @@ import { PageHeader } from '../../../shared/ui/PageHeader'
 import type { Listing } from '../../../shared/api/types'
 import { getRecommendations, getListingImages } from '../api/tenantApi'
 import { useAuth } from '../../auth/context/AuthContext'
+import { useAuthModal } from '../../auth/context/AuthModalContext'
 
 const { Text } = Typography
 
@@ -16,6 +17,7 @@ export function TenantRecommendationsPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const auth = useAuth()
+  const { openAuthModal } = useAuthModal()
   const isGuest = !auth.user
 
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -98,7 +100,7 @@ export function TenantRecommendationsPage() {
   }
 
   const handlePreferences = () => {
-    navigate('/tenant/preferences')
+    openAuthModal('preferences')
   }
 
   const handleSliderChange = (value: number | [number, number]) => {
@@ -200,7 +202,16 @@ export function TenantRecommendationsPage() {
         }
       />
 
-      {listings.length === 0 ? (
+      {recoQ.isLoading ? (
+        <Card style={{ maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
+          <div style={{ padding: 48 }}>
+            <Spin size="large" />
+            <div style={{ marginTop: 16 }}>
+              <Typography.Text type="secondary">{t('common.loading')}</Typography.Text>
+            </div>
+          </div>
+        </Card>
+      ) : listings.length === 0 ? (
         <Card style={{ maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
           <Empty
             description={t('pages.noRecommendations')}

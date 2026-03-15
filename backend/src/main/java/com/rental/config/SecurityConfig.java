@@ -19,6 +19,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
  * Spring Security 配置
@@ -45,17 +46,18 @@ public class SecurityConfig {
                 // 配置请求授权
                 .authorizeHttpRequests(auth -> auth
                         // 公开端点
-                        .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/ml/status").permitAll()
-                        .requestMatchers("/ml/closest").permitAll()
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/auth/**")).permitAll()
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/swagger-ui/**")).permitAll()
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/v3/api-docs/**")).permitAll()
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/ml/status")).permitAll()
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/ml/closest")).permitAll()
                         // AI 服务公开访问
-                        .requestMatchers("/ai/**").permitAll()
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/ai/**")).permitAll()
                         // 健康检查
-                        .requestMatchers("/actuator/health").permitAll()
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/actuator/health")).permitAll()
                         // 静态资源（图片等）公开访问
-                        .requestMatchers("/uploads/**").permitAll()
-                        .requestMatchers("/api/uploads/**").permitAll()
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/uploads/**")).permitAll()
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/api/uploads/**")).permitAll()
                         // 房源列表和详情公开访问（未登录用户可查看）
                         .requestMatchers(HttpMethod.GET, "/listings/**").permitAll()
                         // 用户信息公开访问（用于聊天等场景）

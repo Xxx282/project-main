@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback } from 'react'
 
-type AuthModalMode = 'login' | 'register' | 'verify-email'
+type AuthModalMode = 'login' | 'register' | 'verify-email' | 'preferences'
 
 type AuthModalState = {
   visible: boolean

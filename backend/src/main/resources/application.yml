@@ -36,6 +36,7 @@ spring:
 
   # JPA 配置
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: update
       naming:
@@ -43,7 +44,6 @@ spring:
     show-sql: false
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
 
   # Jackson 配置
@@ -94,6 +94,10 @@ app:
     allowed-extensions: jpg,jpeg,png,webp
     max-size: 5242880
 
+  # 高德地图API配置
+  amap:
+    key: 5ea5ff6504753ba6e4cce1132a876451
+
 # Swagger 配置
 springdoc:
   api-docs:
@@ -108,3 +112,9 @@ logging:
     root: INFO
     com.rental: INFO
     org.hibernate.SQL: INFO
+  charset:
+    console: UTF-8
+    file: UTF-8
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) %magenta(%thread) %cyan(%logger{36}) - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %thread %logger{36} - %msg%n"

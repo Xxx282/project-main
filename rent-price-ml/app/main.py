@@ -55,19 +55,24 @@ class NewPredictRequest(BaseModel):
 def api_v1_predict(payload: NewPredictRequest):
     start_time = int(time.time() * 1000)
     
-    # Map new request fields to existing record dict
+    # Map new request fields to match training data columns (house_rent.csv)
     record = {
-        "Posted On": time.strftime("%Y-%m-%d"),
-        "BHK": payload.bedrooms,
-        "Size": int(payload.area),
-        "Floor": f"{payload.floor} out of {payload.totalFloors}",
-        "Area Type": payload.propertyType,
-        "Area Locality": payload.region or "Unknown",
-        "City": payload.city,
-        "Furnishing Status": payload.decoration,
-        "Tenant Preferred": "Family",
-        "Bathroom": int(payload.bathrooms),
-        "Point of Contact": "Contact Owner",
+        "landlord_id": 1,  # default, not used in prediction
+        "title": f"{payload.propertyType} in {payload.city}",
+        "city": payload.city,
+        "region": payload.region or "Unknown",
+        "address": payload.region or "Unknown",
+        "bedrooms": payload.bedrooms,
+        "bathrooms": payload.bathrooms,
+        "area": payload.area,
+        "price": 0,  # placeholder, will be predicted
+        "total_floors": payload.totalFloors,
+        "orientation": payload.orientation,
+        "decoration": payload.decoration,
+        "description": "",
+        "status": "available",
+        "view_count": 0,
+        "created_at": time.strftime("%Y-%m-%d"),
     }
     
     pred = predict_one(record)

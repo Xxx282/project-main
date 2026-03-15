@@ -21,7 +21,7 @@ export function RequireAuth(props: {
   }
 
   if (!auth.user) {
-    return <Navigate to="/login" replace state={{ from: location.pathname }} />
+    return <Navigate to="/" replace state={{ from: location.pathname, showAuthModal: 'login' } as any} />
   }
 
   if (props.roles?.length && !props.roles.includes(auth.user.role)) {

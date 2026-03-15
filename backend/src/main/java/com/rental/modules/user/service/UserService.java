@@ -15,6 +15,9 @@ public interface UserService {
     List<UserEntity> findAll();
     List<UserEntity> findByIsActive(Boolean isActive);
     UserEntity updateUser(Long id, UserEntity userEntity);
+    UserEntity updateProfile(Long id, String username, String phone, String realName);
+    UserEntity requestEmailChange(Long id, String newEmail);
+    UserEntity confirmEmailChange(Long id, String verificationCode);
     UserEntity disableUser(Long id);
     UserEntity enableUser(Long id);
     boolean existsByEmail(String email);

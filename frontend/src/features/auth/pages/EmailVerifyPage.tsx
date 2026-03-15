@@ -4,6 +4,7 @@ import { Button, Card, Input, Space, message, Typography } from 'antd'
 import { MailOutlined, LockOutlined, SendOutlined } from '@ant-design/icons'
 import { http } from '../../../shared/api/http'
 import { PageHeader } from '../../../shared/ui/PageHeader'
+import { useAuthModal } from '../context/AuthModalContext'
 
 const { Text } = Typography
 
@@ -20,6 +21,7 @@ interface VerifyResponse {
 export function EmailVerifyPage() {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
+  const { openAuthModal } = useAuthModal()
   const email = searchParams.get('email') || ''
   const [code, setCode] = useState('')
   const [loading, setLoading] = useState(false)
@@ -28,9 +30,9 @@ export function EmailVerifyPage() {
   useEffect(() => {
     if (!email) {
       message.error('缺少邮箱参数')
-      navigate('/register')
+      openAuthModal('register')
     }
-  }, [email, navigate])
+  }, [email])
 
   const handleVerify = async () => {
     if (!code) {
@@ -44,8 +46,8 @@ export function EmailVerifyPage() {
     setLoading(true)
     try {
       await http.post<VerifyResponse>('/auth/verify-email', { email, code })
-      message.success('验证成功！即将跳转到登录页...')
-      setTimeout(() => navigate('/login'), 2000)
+      message.success('验证成功！即将打开登录页...')
+      setTimeout(() => openAuthModal('login'), 1500)
     } catch (err: any) {
       const errMsg = err.response?.data?.message || '验证失败，请重试'
       message.error(errMsg)
@@ -128,7 +130,7 @@ export function EmailVerifyPage() {
         </Space>
 
         <div style={{ textAlign: 'center', marginTop: 24 }}>
-          <Button type="link" onClick={() => navigate('/register')}>
+          <Button type="link" onClick={() => openAuthModal('register')}>
             返回注册
           </Button>
         </div>

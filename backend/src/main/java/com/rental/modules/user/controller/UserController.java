@@ -2,6 +2,9 @@ package com.rental.modules.user.controller;
 
 import com.rental.common.Result;
 import com.rental.common.ResultCode;
+import com.rental.modules.user.dto.EmailChangeConfirmRequest;
+import com.rental.modules.user.dto.EmailChangeRequest;
+import com.rental.modules.user.dto.UpdateProfileRequest;
 import com.rental.modules.user.entity.UserEntity;
 import com.rental.modules.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -85,5 +88,40 @@ public class UserController {
         return userService.findById(userId)
                 .map(user -> ResponseEntity.ok(Result.success(user)))
                 .orElseGet(() -> ResponseEntity.ok(Result.error(ResultCode.USER_NOT_FOUND)));
+    }
+
+    @PutMapping("/profile")
+    @Operation(summary = "更新当前用户资料")
+    public ResponseEntity<Result<UserEntity>> updateCurrentUserProfile(
+            HttpServletRequest request,
+            @RequestBody UpdateProfileRequest updateRequest) {
+        Long userId = (Long) request.getAttribute("userId");
+        UserEntity updatedUser = userService.updateProfile(
+                userId,
+                updateRequest.getUsername(),
+                updateRequest.getPhone(),
+                updateRequest.getRealName()
+        );
+        return ResponseEntity.ok(Result.success(updatedUser));
+    }
+
+    @PostMapping("/profile/email-change")
+    @Operation(summary = "请求更改邮箱")
+    public ResponseEntity<Result<String>> requestEmailChange(
+            HttpServletRequest request,
+            @RequestBody EmailChangeRequest emailChangeRequest) {
+        Long userId = (Long) request.getAttribute("userId");
+        userService.requestEmailChange(userId, emailChangeRequest.getNewEmail());
+        return ResponseEntity.ok(Result.success("验证码已发送到新邮箱，请查收"));
+    }
+
+    @PostMapping("/profile/email-change/confirm")
+    @Operation(summary = "确认邮箱更改")
+    public ResponseEntity<Result<UserEntity>> confirmEmailChange(
+            HttpServletRequest request,
+            @RequestBody EmailChangeConfirmRequest confirmRequest) {
+        Long userId = (Long) request.getAttribute("userId");
+        UserEntity updatedUser = userService.confirmEmailChange(userId, confirmRequest.getVerificationCode());
+        return ResponseEntity.ok(Result.success(updatedUser));
     }
 }
