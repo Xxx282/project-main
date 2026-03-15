@@ -175,13 +175,24 @@ export function LandlordOrdersPage() {
   const isLoading = contractsQ.isLoading || paymentsQ.isLoading
 
   return (
+    <div style={{
+      width: '100%',
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #a5d8ff 0%, #b4a5e8 50%, #c4b5fd 100%)',
+      padding: '24px',
+    }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto' }}>
     <Space orientation="vertical" size={16} style={{ width: '100%' }}>
       <PageHeader
         title={t('pages.ordersManagement')}
         subtitle={t('pages.orderDetails')}
       />
 
-      <Card title={t('pages.pendingOrders')} extra={<Tag color="orange">{pendingItems.length} {t('pages.item')}</Tag>}>
+      <Card
+        style={{ borderRadius: 12, boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)', border: 'none' }}
+        title={t('pages.pendingOrders')}
+        extra={<Tag color="orange">{pendingItems.length} {t('pages.item')}</Tag>}
+      >
         <Table
           columns={columns}
           dataSource={pendingItems}
@@ -192,7 +203,11 @@ export function LandlordOrdersPage() {
       </Card>
 
       {awaitingAdminItems.length > 0 && (
-        <Card title={t('pages.awaitingAdminOrders')} extra={<Tag color="blue">{awaitingAdminItems.length} {t('pages.item')}</Tag>}>
+        <Card
+          style={{ borderRadius: 12, boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)', border: 'none' }}
+          title={t('pages.awaitingAdminOrders')}
+          extra={<Tag color="blue">{awaitingAdminItems.length} {t('pages.item')}</Tag>}
+        >
           <Table
             columns={columns.slice(0, -1)}
             dataSource={awaitingAdminItems}
@@ -203,7 +218,11 @@ export function LandlordOrdersPage() {
         </Card>
       )}
 
-      <Card title={t('pages.completedOrders')} extra={<Tag color="green">{completedItems.length} {t('pages.item')}</Tag>}>
+      <Card
+        style={{ borderRadius: 12, boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)', border: 'none' }}
+        title={t('pages.completedOrders')}
+        extra={<Tag color="green">{completedItems.length} {t('pages.item')}</Tag>}
+      >
         <Table
           columns={columns.slice(0, -1)}
           dataSource={completedItems}
@@ -213,6 +232,8 @@ export function LandlordOrdersPage() {
         />
       </Card>
     </Space>
+      </div>
+    </div>
   )
 }
 

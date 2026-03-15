@@ -69,7 +69,14 @@ export function TenantListingDetailPage() {
   }
 
   return (
-    <Space orientation="vertical" size={16} style={{ width: '100%' }}>
+    <div style={{
+      width: '100%',
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #a5d8ff 0%, #b4a5e8 50%, #c4b5fd 100%)',
+      padding: '24px',
+    }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+    <Space orientation="vertical" size={20} style={{ width: '100%' }}>
       {/* 返回按钮 */}
       <Button
         icon={<ArrowLeftOutlined />}
@@ -96,11 +103,26 @@ export function TenantListingDetailPage() {
           </Space>
         }
       />
-      <Card>
+      <Card
+        style={{
+          borderRadius: 12,
+          boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)',
+          border: 'none',
+          overflow: 'hidden',
+        }}
+        styles={{ body: { padding: '28px 32px' } }}
+      >
         {/* 图片画廊 */}
         <ImageGallery images={imagesQ.data ?? []} />
 
-        <Descriptions bordered size="small" column={2}>
+        <Descriptions
+          bordered
+          column={2}
+          size="middle"
+          labelStyle={{ padding: '14px 16px', fontWeight: 500, background: '#fafafa' }}
+          contentStyle={{ padding: '14px 16px' }}
+          style={{ marginTop: 24 }}
+        >
           <Descriptions.Item label={t('common.id')}>{listingQ.data?.id ?? '-'}</Descriptions.Item>
           <Descriptions.Item label={t('common.title')}>{listingQ.data?.title ?? '-'}</Descriptions.Item>
           <Descriptions.Item label={t('pages.city')}>{listingQ.data?.city ?? '-'}</Descriptions.Item>
@@ -136,5 +158,7 @@ export function TenantListingDetailPage() {
         </Descriptions>
       </Card>
     </Space>
+      </div>
+    </div>
   )
 }

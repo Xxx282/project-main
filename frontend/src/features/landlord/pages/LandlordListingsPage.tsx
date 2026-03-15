@@ -40,7 +40,7 @@ export function LandlordListingsPage() {
       title: t('common.price'), 
       dataIndex: 'price', 
       render: (v) => (
-        <span style={{ color: '#667eea', fontWeight: 600 }}>
+        <span style={{ color: '#b4a5e8', fontWeight: 600 }}>
           ￥ {v?.toLocaleString()}
         </span>
       ),
@@ -76,7 +76,7 @@ export function LandlordListingsPage() {
             <Button 
               type="link" 
               icon={<EditOutlined />}
-              style={{ color: '#667eea' }}
+              style={{ color: '#b4a5e8' }}
             >
               {t('common.edit')}
             </Button>
@@ -111,7 +111,7 @@ export function LandlordListingsPage() {
     <div style={{ 
       width: '100%', 
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #4facfe 0%, #667eea 50%, #8b5cf6 100%)',
+      background: 'linear-gradient(135deg, #a5d8ff 0%, #b4a5e8 50%, #c4b5fd 100%)',
       padding: '24px',
     }}>
       <div style={{ maxWidth: 1400, margin: '0 auto' }}>
@@ -119,10 +119,9 @@ export function LandlordListingsPage() {
           {/* 页面标题 */}
           <Card 
             style={{ 
-              background: 'rgba(255, 255, 255, 0.95)',
-              backdropFilter: 'blur(10px)',
-              borderRadius: '16px',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+              borderRadius: 12,
+              boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)',
+              border: 'none',
             }}
           >
             <div style={{ 
@@ -133,7 +132,7 @@ export function LandlordListingsPage() {
               gap: 16,
             }}>
               <div>
-                <FileTextOutlined style={{ fontSize: 32, color: '#667eea', marginRight: 12 }} />
+                <FileTextOutlined style={{ fontSize: 32, color: '#b4a5e8', marginRight: 12 }} />
                 <Typography.Title level={2} style={{ margin: 0, display: 'inline-block', color: '#1a1a1a' }}>
                   {t('pages.landlordListingsManagement')}
                 </Typography.Title>
@@ -144,7 +143,7 @@ export function LandlordListingsPage() {
                   size="large"
                   icon={<PlusOutlined />}
                   style={{
-                    background: 'linear-gradient(135deg, #4facfe 0%, #667eea 50%, #8b5cf6 100%)',
+                    background: 'linear-gradient(135deg, #a5d8ff 0%, #b4a5e8 50%, #c4b5fd 100%)',
                     border: 'none',
                     borderRadius: '8px',
                     boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
@@ -161,10 +160,9 @@ export function LandlordListingsPage() {
           {/* 表格卡片 */}
           <Card 
             style={{ 
-              background: 'rgba(255, 255, 255, 0.95)',
-              backdropFilter: 'blur(10px)',
-              borderRadius: '16px',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+              borderRadius: 12,
+              boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)',
+              border: 'none',
             }}
           >
             {q.data && q.data.length === 0 ? (
@@ -181,7 +179,7 @@ export function LandlordListingsPage() {
                     type="primary"
                     icon={<PlusOutlined />}
                     style={{
-                      background: 'linear-gradient(135deg, #4facfe 0%, #667eea 50%, #8b5cf6 100%)',
+                      background: 'linear-gradient(135deg, #a5d8ff 0%, #b4a5e8 50%, #c4b5fd 100%)',
                       border: 'none',
                     }}
                   >

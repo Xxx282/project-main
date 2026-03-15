@@ -187,6 +187,13 @@ export function TenantRecommendationsPage() {
   )
 
   return (
+    <div style={{
+      width: '100%',
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #a5d8ff 0%, #b4a5e8 50%, #c4b5fd 100%)',
+      padding: '24px',
+    }}>
+      <div style={{ maxWidth: 1000, margin: '0 auto' }}>
     <Space orientation="vertical" size={24} style={{ width: '100%' }}>
       <PageHeader
         title={t('pages.tenantRecommendations')}
@@ -203,7 +210,14 @@ export function TenantRecommendationsPage() {
       />
 
       {recoQ.isLoading ? (
-        <Card style={{ maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
+        <Card style={{
+          maxWidth: 800,
+          margin: '0 auto',
+          textAlign: 'center',
+          borderRadius: 12,
+          boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)',
+          border: '1px solid #f3f4f6',
+        }}>
           <div style={{ padding: 48 }}>
             <Spin size="large" />
             <div style={{ marginTop: 16 }}>
@@ -212,7 +226,14 @@ export function TenantRecommendationsPage() {
           </div>
         </Card>
       ) : listings.length === 0 ? (
-        <Card style={{ maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
+        <Card style={{
+          maxWidth: 800,
+          margin: '0 auto',
+          textAlign: 'center',
+          borderRadius: 12,
+          boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)',
+          border: '1px solid #f3f4f6',
+        }}>
           <Empty
             description={t('pages.noRecommendations')}
             image={Empty.PRESENTED_IMAGE_SIMPLE}
@@ -228,9 +249,9 @@ export function TenantRecommendationsPage() {
             style={{
               maxWidth: 1040,
               margin: '0 auto',
-              borderRadius: 16,
-              boxShadow: '0 18px 45px rgba(15, 23, 42, 0.08)',
-              border: '1px solid #e5e7eb',
+              borderRadius: 12,
+              boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)',
+              border: '1px solid #f3f4f6',
             }}
             styles={{ body: { padding: 32 } }}
           >
@@ -298,7 +319,9 @@ export function TenantRecommendationsPage() {
             style={{
               maxWidth: 1040,
               margin: '0 auto',
-              borderRadius: 16,
+              borderRadius: 12,
+              boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)',
+              border: '1px solid #f3f4f6',
               padding: '24px 32px',
             }}
           >
@@ -316,6 +339,8 @@ export function TenantRecommendationsPage() {
         </>
       )}
     </Space>
+      </div>
+    </div>
   )
 }
 

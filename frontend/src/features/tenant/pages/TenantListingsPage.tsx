@@ -178,7 +178,7 @@ export function TenantListingsPage() {
     <div style={{ 
       width: '100%', 
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #4facfe 0%, #667eea 50%, #8b5cf6 100%)',
+      background: 'linear-gradient(135deg, #a5d8ff 0%, #b4a5e8 50%, #c4b5fd 100%)',
       padding: '16px',
     }}>
       <div style={{ maxWidth: cardMaxWidth, margin: '0 auto' }}>
@@ -191,8 +191,8 @@ export function TenantListingsPage() {
               width: '100%',
               borderRadius: 12,
               boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)',
-              border: '1px solid #f3f4f6',
-              background: 'linear-gradient(135deg, #4facfe 0%, #667eea 50%, #8b5cf6 100%)',
+              border: 'none',
+              background: 'linear-gradient(135deg, #a5d8ff 0%, #b4a5e8 50%, #c4b5fd 100%)',
             }}
           >
             <Form
@@ -236,7 +236,7 @@ export function TenantListingsPage() {
                     size="large"
                     style={{
                       height: 48, paddingInline: 32, borderRadius: 24, fontSize: 18,
-                      background: '#fff', color: '#667eea', fontWeight: 600, border: 'none',
+                      background: '#fff', color: '#b4a5e8', fontWeight: 600, border: 'none',
                     }}
                   >
                     {t('common.search')}
@@ -247,8 +247,7 @@ export function TenantListingsPage() {
                     size="large"
                     style={{
                       height: 48, paddingInline: 24, borderRadius: 24, fontSize: 18,
-                      background: filterOpen ? '#fff' : 'rgba(255,255,255,0.2)',
-                      border: '1px solid rgba(255,255,255,0.5)', color: filterOpen ? '#667eea' : '#fff',
+                      background: '#fff', color: '#b4a5e8', fontWeight: 600, border: 'none',
                     }}
                     onClick={() => setFilterOpen(!filterOpen)}
                   >
@@ -260,7 +259,7 @@ export function TenantListingsPage() {
                     size="large"
                     style={{
                       height: 48, paddingInline: 24, borderRadius: 24, fontSize: 18,
-                      background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.5)', color: '#fff',
+                      background: '#fff', color: '#b4a5e8', fontWeight: 600, border: 'none',
                     }}
                     onClick={() => { setParams(new URLSearchParams()); setFilterOpen(false); }}
                   >
@@ -374,7 +373,7 @@ export function TenantListingsPage() {
               width: '100%',
               borderRadius: 12,
               boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)',
-              border: '1px solid #f3f4f6',
+              border: 'none',
             }}
             styles={{ body: { padding: '16px', fontSize: 18 } }}
           >
@@ -433,8 +432,11 @@ function ListingRow({ listing, settings }: { listing: Listing; settings: FieldOp
   const navigate = useNavigate()
   const show = (key: string) => settings.find((s) => s.key === key && s.visible)
 
-  // 卡片标签：装修、朝向（与筛选维度对应）
+  // 卡片标签：几室、装修、朝向（与筛选维度对应）
   const tagLabels: string[] = []
+  if (listing.bedrooms != null) {
+    tagLabels.push(`${listing.bedrooms}${t('common.bedrooms')}`)
+  }
   if (listing.decoration === 'fine') tagLabels.push(t('pages.tagFine'))
   else if (listing.decoration === 'luxury') tagLabels.push(t('pages.tagLuxury'))
   else if (listing.decoration === 'simple') tagLabels.push(t('pages.tagSimple'))
@@ -502,20 +504,6 @@ function ListingRow({ listing, settings }: { listing: Listing; settings: FieldOp
             )}
           </div>
 
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, fontSize: 16, color: '#4b5563' }}>
-            {show('layout') && (
-              <span>
-                {(listing.bedrooms ?? '-')}{t('common.bedrooms')} {(listing.bathrooms ?? '-')}{t('common.bathrooms')}
-              </span>
-            )}
-            {typeof listing.area === 'number' && <span>{listing.area}㎡</span>}
-            {show('cityRegion') && (
-              <span>
-                {listing.city ?? '-'} {listing.region ? `/ ${listing.region}` : ''}
-              </span>
-            )}
-          </div>
-
           {tagLabels.length > 0 && (
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
               {tagLabels.map((label) => (
@@ -565,8 +553,8 @@ function ListingThumbnail({ propertyId }: { propertyId: number }) {
   return (
     <div
       style={{
-        width: 220,
-        height: 160,
+        width: 300,
+        height: 220,
         overflow: 'hidden',
         borderRadius: 10,
         boxShadow: '0 10px 25px rgba(15, 23, 42, 0.18)',
@@ -580,8 +568,8 @@ function ListingThumbnail({ propertyId }: { propertyId: number }) {
         <Image
           src={buildImageUrl(cover!.imageUrl)}
           alt={t('common.coverImage')}
-          width={220}
-          height={160}
+          width={300}
+          height={220}
           style={{ objectFit: 'cover' }}
           preview={false}
         />

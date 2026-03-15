@@ -77,25 +77,24 @@ export function LandlordListingEditPage(props: { mode: 'create' | 'edit' }) {
     <div style={{ 
       width: '100%', 
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #4facfe 0%, #667eea 50%, #8b5cf6 100%)',
+      background: 'linear-gradient(135deg, #a5d8ff 0%, #b4a5e8 50%, #c4b5fd 100%)',
       padding: '24px',
     }}>
-      <div style={{ maxWidth: 900, margin: '0 auto' }}>
-        <Space orientation="vertical" size={24} style={{ width: '100%' }}>
+      <div style={{ maxWidth: 1000, margin: '0 auto' }}>
+        <Space orientation="vertical" size={28} style={{ width: '100%' }}>
           {/* 页面标题 */}
-          <Card 
-            style={{ 
-              background: 'rgba(255, 255, 255, 0.95)',
-              backdropFilter: 'blur(10px)',
-              borderRadius: '16px',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+          <Card
+            style={{
+              borderRadius: 12,
+              boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)',
+              border: 'none',
             }}
           >
-            <div style={{ textAlign: 'center', padding: '8px 0' }}>
+            <div style={{ textAlign: 'center', padding: '12px 0' }}>
               {props.mode === 'create' ? (
-                <PlusOutlined style={{ fontSize: 32, color: '#667eea', marginBottom: 8 }} />
+                <PlusOutlined style={{ fontSize: 32, color: '#b4a5e8', marginBottom: 8 }} />
               ) : (
-                <EditOutlined style={{ fontSize: 32, color: '#667eea', marginBottom: 8 }} />
+                <EditOutlined style={{ fontSize: 32, color: '#b4a5e8', marginBottom: 8 }} />
               )}
               <Typography.Title level={2} style={{ margin: '8px 0', color: '#1a1a1a' }}>
                 {props.mode === 'create' ? t('pages.landlordCreateListing') : t('pages.landlordEditListing')}
@@ -104,13 +103,13 @@ export function LandlordListingEditPage(props: { mode: 'create' | 'edit' }) {
           </Card>
 
           {/* 表单卡片 */}
-          <Card 
-            style={{ 
-              background: 'rgba(255, 255, 255, 0.95)',
-              backdropFilter: 'blur(10px)',
-              borderRadius: '16px',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+          <Card
+            style={{
+              borderRadius: 12,
+              boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)',
+              border: 'none',
             }}
+            styles={{ body: { padding: '32px 40px' } }}
           >
             <Form
               form={form}
@@ -148,7 +147,7 @@ export function LandlordListingEditPage(props: { mode: 'create' | 'edit' }) {
                 name="title" 
                 label={
                   <span>
-                    <FileTextOutlined style={{ marginRight: 8, color: '#667eea' }} />
+                    <FileTextOutlined style={{ marginRight: 8, color: '#b4a5e8' }} />
                     {t('common.title')}
                   </span>
                 } 
@@ -163,7 +162,7 @@ export function LandlordListingEditPage(props: { mode: 'create' | 'edit' }) {
                     name="price" 
                     label={
                       <span>
-                        <DollarOutlined style={{ marginRight: 8, color: '#667eea' }} />
+                        <DollarOutlined style={{ marginRight: 8, color: '#b4a5e8' }} />
                         {t('pages.pricePerMonth')}
                       </span>
                     } 
@@ -182,7 +181,7 @@ export function LandlordListingEditPage(props: { mode: 'create' | 'edit' }) {
                     name="area" 
                     label={
                       <span>
-                        <HomeOutlined style={{ marginRight: 8, color: '#667eea' }} />
+                        <HomeOutlined style={{ marginRight: 8, color: '#b4a5e8' }} />
                         {t('pages.areaSquareMeters')}
                       </span>
                     } 
@@ -204,7 +203,7 @@ export function LandlordListingEditPage(props: { mode: 'create' | 'edit' }) {
                     name="city" 
                     label={
                       <span>
-                        <EnvironmentOutlined style={{ marginRight: 8, color: '#667eea' }} />
+                        <EnvironmentOutlined style={{ marginRight: 8, color: '#b4a5e8' }} />
                         {t('pages.city')}
                       </span>
                     } 
@@ -218,7 +217,7 @@ export function LandlordListingEditPage(props: { mode: 'create' | 'edit' }) {
                     name="region" 
                     label={
                       <span>
-                        <EnvironmentOutlined style={{ marginRight: 8, color: '#667eea' }} />
+                        <EnvironmentOutlined style={{ marginRight: 8, color: '#b4a5e8' }} />
                         {t('pages.region')}
                       </span>
                     } 
@@ -235,7 +234,7 @@ export function LandlordListingEditPage(props: { mode: 'create' | 'edit' }) {
                     name="bedrooms" 
                     label={
                       <span>
-                        <HomeOutlined style={{ marginRight: 8, color: '#667eea' }} />
+                        <HomeOutlined style={{ marginRight: 8, color: '#b4a5e8' }} />
                         {t('pages.bedroomCount')}
                       </span>
                     } 
@@ -254,7 +253,7 @@ export function LandlordListingEditPage(props: { mode: 'create' | 'edit' }) {
                     name="bathrooms" 
                     label={
                       <span>
-                        <HomeOutlined style={{ marginRight: 8, color: '#667eea' }} />
+                        <HomeOutlined style={{ marginRight: 8, color: '#b4a5e8' }} />
                         {t('pages.bathroomCount')}
                       </span>
                     } 
@@ -276,7 +275,7 @@ export function LandlordListingEditPage(props: { mode: 'create' | 'edit' }) {
                     name="totalFloors" 
                     label={
                       <span>
-                        <BuildOutlined style={{ marginRight: 8, color: '#667eea' }} />
+                        <BuildOutlined style={{ marginRight: 8, color: '#b4a5e8' }} />
                         {t('pages.totalFloorsCount')}
                       </span>
                     }
@@ -294,7 +293,7 @@ export function LandlordListingEditPage(props: { mode: 'create' | 'edit' }) {
                     name="orientation" 
                     label={
                       <span>
-                        <BuildOutlined style={{ marginRight: 8, color: '#667eea' }} />
+                        <BuildOutlined style={{ marginRight: 8, color: '#b4a5e8' }} />
                         {t('common.orientationLabel')}
                       </span>
                     }
@@ -313,7 +312,7 @@ export function LandlordListingEditPage(props: { mode: 'create' | 'edit' }) {
                 name="decoration" 
                 label={
                   <span>
-                    <BuildOutlined style={{ marginRight: 8, color: '#667eea' }} />
+                    <BuildOutlined style={{ marginRight: 8, color: '#b4a5e8' }} />
                     {t('pages.decorationStatus')}
                   </span>
                 }
@@ -330,7 +329,7 @@ export function LandlordListingEditPage(props: { mode: 'create' | 'edit' }) {
                 name="description" 
                 label={
                   <span>
-                    <FileTextOutlined style={{ marginRight: 8, color: '#667eea' }} />
+                    <FileTextOutlined style={{ marginRight: 8, color: '#b4a5e8' }} />
                     {t('pages.listingDescription')}
                   </span>
                 }
@@ -347,7 +346,7 @@ export function LandlordListingEditPage(props: { mode: 'create' | 'edit' }) {
                 <Form.Item 
                   label={
                     <span>
-                      <PictureOutlined style={{ marginRight: 8, color: '#667eea' }} />
+                      <PictureOutlined style={{ marginRight: 8, color: '#b4a5e8' }} />
                       {t('pages.listingImagesOptional')}
                     </span>
                   }
@@ -382,7 +381,7 @@ export function LandlordListingEditPage(props: { mode: 'create' | 'edit' }) {
                     height: 48,
                     fontSize: 16,
                     fontWeight: 600,
-                    background: 'linear-gradient(135deg, #4facfe 0%, #667eea 50%, #8b5cf6 100%)',
+                    background: 'linear-gradient(135deg, #a5d8ff 0%, #b4a5e8 50%, #c4b5fd 100%)',
                     border: 'none',
                     borderRadius: '8px',
                     boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
@@ -399,7 +398,7 @@ export function LandlordListingEditPage(props: { mode: 'create' | 'edit' }) {
                 <Divider style={{ margin: '24px 0' }} />
                 <div style={{ marginTop: 16 }}>
                   <Typography.Title level={4} style={{ marginBottom: 16 }}>
-                    <PictureOutlined style={{ marginRight: 8, color: '#667eea' }} />
+                    <PictureOutlined style={{ marginRight: 8, color: '#b4a5e8' }} />
                     {t('pages.listingImages')}
                   </Typography.Title>
                   <ImageUploader

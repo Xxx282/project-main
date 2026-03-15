@@ -107,7 +107,7 @@ export function LandlordPricePredictPage() {
     <div style={{ 
       width: '100%', 
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #4facfe 0%, #667eea 50%, #8b5cf6 100%)',
+      background: 'linear-gradient(135deg, #a5d8ff 0%, #b4a5e8 50%, #c4b5fd 100%)',
       padding: '24px',
     }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
@@ -115,14 +115,13 @@ export function LandlordPricePredictPage() {
           {/* 页面标题 */}
           <Card 
             style={{ 
-              background: 'rgba(255, 255, 255, 0.95)',
-              backdropFilter: 'blur(10px)',
-              borderRadius: '16px',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+              borderRadius: 12,
+              boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)',
+              border: 'none',
             }}
           >
             <div style={{ textAlign: 'center', padding: '8px 0' }}>
-              <CalculatorOutlined style={{ fontSize: 32, color: '#667eea', marginBottom: 8 }} />
+              <CalculatorOutlined style={{ fontSize: 32, color: '#b4a5e8', marginBottom: 8 }} />
               <Typography.Title level={2} style={{ margin: '8px 0', color: '#1a1a1a' }}>
                 {t('pages.landlordPricePredict')}
               </Typography.Title>
@@ -137,10 +136,9 @@ export function LandlordPricePredictPage() {
             <Col xs={24} lg={9}>
               <Card 
                 style={{ 
-                  background: 'rgba(255, 255, 255, 0.95)',
-                  backdropFilter: 'blur(10px)',
-                  borderRadius: '16px',
-                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                  borderRadius: 12,
+                  boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)',
+                  border: 'none',
                   height: '100%',
                 }}
               >
@@ -164,7 +162,7 @@ export function LandlordPricePredictPage() {
                         name="bedrooms" 
                         label={
                           <span>
-                            <HomeOutlined style={{ marginRight: 8, color: '#667eea' }} />
+                            <HomeOutlined style={{ marginRight: 8, color: '#b4a5e8' }} />
                             {t('pages.bedroomsBHK')}
                           </span>
                         }
@@ -182,7 +180,7 @@ export function LandlordPricePredictPage() {
                         name="bathrooms" 
                         label={
                           <span>
-                            <HomeOutlined style={{ marginRight: 8, color: '#667eea' }} />
+                            <HomeOutlined style={{ marginRight: 8, color: '#b4a5e8' }} />
                             {t('pages.bathrooms')}
                           </span>
                         }
@@ -201,7 +199,7 @@ export function LandlordPricePredictPage() {
                     name="area" 
                     label={
                       <span>
-                        <HomeOutlined style={{ marginRight: 8, color: '#667eea' }} />
+                        <HomeOutlined style={{ marginRight: 8, color: '#b4a5e8' }} />
                         {t('pages.area')}
                       </span>
                     }
@@ -220,7 +218,7 @@ export function LandlordPricePredictPage() {
                         name="city" 
                         label={
                           <span>
-                            <HomeOutlined style={{ marginRight: 8, color: '#667eea' }} />
+                            <HomeOutlined style={{ marginRight: 8, color: '#b4a5e8' }} />
                             {t('pages.city')}
                           </span>
                         }
@@ -238,7 +236,7 @@ export function LandlordPricePredictPage() {
                         name="region" 
                         label={
                           <span>
-                            <HomeOutlined style={{ marginRight: 8, color: '#667eea' }} />
+                            <HomeOutlined style={{ marginRight: 8, color: '#b4a5e8' }} />
                             {t('pages.region')}
                           </span>
                         }
@@ -256,7 +254,7 @@ export function LandlordPricePredictPage() {
                     name="decoration" 
                     label={
                       <span>
-                        <HomeOutlined style={{ marginRight: 8, color: '#667eea' }} />
+                        <HomeOutlined style={{ marginRight: 8, color: '#b4a5e8' }} />
                         {t('pages.decoration')}
                       </span>
                     }
@@ -277,7 +275,7 @@ export function LandlordPricePredictPage() {
                         name="floor" 
                         label={
                           <span>
-                            <HomeOutlined style={{ marginRight: 8, color: '#667eea' }} />
+                            <HomeOutlined style={{ marginRight: 8, color: '#b4a5e8' }} />
                             {t('pages.currentFloor')}
                           </span>
                         }
@@ -317,7 +315,7 @@ export function LandlordPricePredictPage() {
                         name="totalFloors" 
                         label={
                           <span>
-                            <HomeOutlined style={{ marginRight: 8, color: '#667eea' }} />
+                            <HomeOutlined style={{ marginRight: 8, color: '#b4a5e8' }} />
                             {t('pages.totalFloors')}
                           </span>
                         }
@@ -365,10 +363,10 @@ export function LandlordPricePredictPage() {
                         height: 48,
                         fontSize: 16,
                         fontWeight: 600,
-                        background: 'linear-gradient(135deg, #4facfe 0%, #667eea 50%, #8b5cf6 100%)',
+                        background: 'linear-gradient(135deg, #a5d8ff 0%, #b4a5e8 50%, #c4b5fd 100%)',
                         border: 'none',
                         borderRadius: '8px',
-                        boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
+                        boxShadow: '0 4px 15px rgba(180, 165, 232, 0.4)',
                       }}
                     >
                       {t('pages.predictRent')}
@@ -382,10 +380,9 @@ export function LandlordPricePredictPage() {
             <Col xs={24} lg={15}>
               <Card 
                 style={{ 
-                  background: 'rgba(255, 255, 255, 0.95)',
-                  backdropFilter: 'blur(10px)',
-                  borderRadius: '16px',
-                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                  borderRadius: 12,
+                  boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)',
+                  border: 'none',
                   height: '100%',
                   minHeight: 400,
                   overflow: 'hidden',
@@ -402,7 +399,7 @@ export function LandlordPricePredictPage() {
                     minHeight: 300,
                   }}>
                     <Spin 
-                      indicator={<LoadingOutlined style={{ fontSize: 48, color: '#667eea' }} spin />} 
+                      indicator={<LoadingOutlined style={{ fontSize: 48, color: '#b4a5e8' }} spin />} 
                       size="large"
                     />
                     <Typography.Text 
@@ -418,7 +415,7 @@ export function LandlordPricePredictPage() {
                     <div style={{ 
                       textAlign: 'center', 
                       padding: '24px 16px',
-                      background: 'linear-gradient(135deg, #667eea 0%, #8b5cf6 100%)',
+                      background: 'linear-gradient(135deg, #b4a5e8 0%, #c4b5fd 100%)',
                       borderRadius: 16,
                       marginBottom: 20,
                     }}>
@@ -451,7 +448,7 @@ export function LandlordPricePredictPage() {
                       const currencySym = '￥'
                       const chartData = [
                         { name: t('pages.minPrice') || '最低', value: Math.round(result.lowerBound!), color: '#52c41a' },
-                        { name: t('pages.reasonablePrice') || '建议', value: Math.round(result.predictedPrice), color: '#667eea' },
+                        { name: t('pages.reasonablePrice') || '建议', value: Math.round(result.predictedPrice), color: '#b4a5e8' },
                         { name: t('pages.maxPrice') || '最高', value: Math.round(result.upperBound!), color: '#ff4d4f' },
                       ]
                       return (
@@ -504,7 +501,7 @@ export function LandlordPricePredictPage() {
                           styles={{ body: { padding: 12 } }}
                         >
                           <div style={{ marginBottom: 12 }}>
-                            <Typography.Text strong style={{ color: '#667eea', fontSize: 14 }}>
+                            <Typography.Text strong style={{ color: '#b4a5e8', fontSize: 14 }}>
                               {t('pages.similarReference') || '相似房源参考'}
                             </Typography.Text>
                             <Typography.Text type="secondary" style={{ fontSize: 12, marginLeft: 8 }}>

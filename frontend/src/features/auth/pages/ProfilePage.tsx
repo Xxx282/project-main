@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { App, Button, Card, Col, Form, Input, Modal, Row, Space, Typography, message } from 'antd'
+import { App, Button, Card, Col, Form, Input, Modal, Row, Space, Typography } from 'antd'
+import { UserOutlined } from '@ant-design/icons'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { PageHeader } from '../../../shared/ui/PageHeader'
@@ -89,16 +90,52 @@ export function ProfilePage() {
 
   if (profileQuery.isLoading) {
     return (
-      <div style={{ textAlign: 'center', padding: 50 }}>
-        {t('common.loading')}
+      <div
+        style={{
+          minHeight: '100vh',
+          background: 'linear-gradient(135deg, #7ec8ff 0%, #a3a0e8 50%, #b4a5e8 100%)',
+          padding: 24,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Card
+          style={{
+            background: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(10px)',
+            borderRadius: 16,
+            padding: 48,
+          }}
+        >
+          <Typography.Text type="secondary">{t('common.loading')}</Typography.Text>
+        </Card>
       </div>
     )
   }
 
   if (profileQuery.isError) {
     return (
-      <div style={{ textAlign: 'center', padding: 50, color: '#ff4d4f' }}>
-        {t('pages.profile.loadFailed')}
+      <div
+        style={{
+          minHeight: '100vh',
+          background: 'linear-gradient(135deg, #7ec8ff 0%, #a3a0e8 50%, #b4a5e8 100%)',
+          padding: 24,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Card
+          style={{
+            background: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(10px)',
+            borderRadius: 16,
+            padding: 48,
+          }}
+        >
+          <Typography.Text type="danger">{t('pages.profile.loadFailed')}</Typography.Text>
+        </Card>
       </div>
     )
   }
@@ -106,36 +143,65 @@ export function ProfilePage() {
   const user = profileQuery.data
 
   return (
-    <Space direction="vertical" size={16} style={{ width: '100%' }}>
-      <PageHeader
-        title={t('pages.profile.title')}
-        subtitle={t('pages.profile.subtitle')}
+    <div style={{ position: 'relative', minHeight: '100vh', width: '100%' }}>
+      {/* 全屏渐变背景层，盖住所有白底 */}
+      <div
+        className="profile-page-bg"
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: -1,
+        }}
       />
+      <div style={{ maxWidth: 900, margin: '0 auto', padding: 24, position: 'relative', zIndex: 1 }}>
+        <Space direction="vertical" size={24} style={{ width: '100%' }}>
+          <PageHeader
+            title={t('pages.profile.title')}
+            subtitle={t('pages.profile.subtitle')}
+            align="center"
+          />
 
-      <Card style={{ maxWidth: 800, margin: '0 auto' }}>
-        <Row gutter={24}>
-          <Col xs={24} sm={8} style={{ textAlign: 'center', marginBottom: 24 }}>
-            <div
-              style={{
-                width: 120,
-                height: 120,
-                borderRadius: '50%',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                margin: '0 auto 16px',
-                fontSize: 48,
-                color: '#fff',
-              }}
-            >
-              {user?.username?.charAt(0).toUpperCase() || 'U'}
+          <Card
+            className="profile-center-card"
+            style={{
+              background: 'rgba(255, 255, 255, 0.92)',
+              backdropFilter: 'blur(16px)',
+              borderRadius: 24,
+              border: '1px solid rgba(255, 255, 255, 0.6)',
+              boxShadow: '0 24px 56px rgba(79, 172, 254, 0.12), 0 12px 28px rgba(102, 126, 234, 0.08), 0 0 0 1px rgba(255,255,255,0.5) inset',
+            }}
+            styles={{ body: { padding: '40px 48px' } }}
+          >
+            {/* 头像与用户名：居中置于卡片顶部 */}
+            <div style={{ textAlign: 'center', marginBottom: 36 }}>
+              <div
+                style={{
+                  width: 100,
+                  height: 100,
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #7ec8ff 0%, #a3a0e8 50%, #b4a5e8 100%)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: 16,
+                  color: '#fff',
+                  boxShadow: '0 8px 24px rgba(102, 126, 234, 0.35)',
+                }}
+              >
+                <UserOutlined style={{ fontSize: 48 }} />
+              </div>
+              <Title level={4} style={{ margin: 0, color: '#1a1a1a', fontWeight: 600 }}>
+                {user?.username}
+              </Title>
+              <Text type="secondary" style={{ fontSize: 14, display: 'block', marginTop: 4 }}>
+                {user?.role === 'tenant' ? t('common.tenant') : user?.role === 'landlord' ? t('common.landlord') : t('common.admin')}
+              </Text>
             </div>
-            <Title level={4} style={{ marginBottom: 4 }}>{user?.username}</Title>
-            <Text type="secondary">{user?.role === 'tenant' ? t('common.tenant') : user?.role === 'landlord' ? t('common.landlord') : t('common.admin')}</Text>
-          </Col>
 
-          <Col xs={24} sm={16}>
+            {/* 表单：输入栏统一宽度与样式 */}
             <Form
               form={form}
               layout="vertical"
@@ -145,6 +211,7 @@ export function ProfilePage() {
                 phone: user?.phone || '',
                 realName: user?.realName || '',
               }}
+              style={{ maxWidth: 520, margin: '0 auto' }}
             >
               <Form.Item
                 label={t('pages.profile.username')}
@@ -154,21 +221,27 @@ export function ProfilePage() {
                   { min: 3, message: t('pages.profile.usernameMinLength') },
                 ]}
               >
-                <Input placeholder={t('pages.profile.usernamePlaceholder')} />
+                <Input
+                  placeholder={t('pages.profile.usernamePlaceholder')}
+                  size="large"
+                  style={{ borderRadius: 10 }}
+                />
               </Form.Item>
 
-              <Form.Item
-                label={t('pages.profile.realName')}
-                name="realName"
-              >
-                <Input placeholder={t('pages.profile.realNamePlaceholder')} />
+              <Form.Item label={t('pages.profile.realName')} name="realName">
+                <Input
+                  placeholder={t('pages.profile.realNamePlaceholder')}
+                  size="large"
+                  style={{ borderRadius: 10 }}
+                />
               </Form.Item>
 
-              <Form.Item
-                label={t('pages.profile.phone')}
-                name="phone"
-              >
-                <Input placeholder={t('pages.profile.phonePlaceholder')} />
+              <Form.Item label={t('pages.profile.phone')} name="phone">
+                <Input
+                  placeholder={t('pages.profile.phonePlaceholder')}
+                  size="large"
+                  style={{ borderRadius: 10 }}
+                />
               </Form.Item>
 
               <Form.Item
@@ -176,55 +249,94 @@ export function ProfilePage() {
                   <Space>
                     {t('pages.profile.email')}
                     {user?.emailVerified && (
-                      <Text type="success" style={{ fontSize: 12 }}>
+                      <Text type="success" style={{ fontSize: 13 }}>
                         ({t('pages.profile.verified')})
                       </Text>
                     )}
                   </Space>
                 }
               >
-                <Space>
+                <Space.Compact style={{ width: '100%' }}>
                   <Input
                     value={user?.email}
                     disabled
-                    style={{ width: 250 }}
+                    size="large"
+                    style={{ flex: 1, borderRadius: '10px 0 0 10px' }}
                   />
-                  <Button onClick={() => setEmailModalOpen(true)}>
+                  <Button
+                    size="large"
+                    onClick={() => setEmailModalOpen(true)}
+                    style={{
+                      background: 'rgba(102, 126, 234, 0.12)',
+                      borderColor: '#a3a0e8',
+                      color: '#a3a0e8',
+                      fontWeight: 600,
+                      borderRadius: '0 10px 10px 0',
+                    }}
+                  >
                     {t('pages.profile.changeEmail')}
                   </Button>
-                </Space>
+                </Space.Compact>
               </Form.Item>
 
-              <Form.Item style={{ marginTop: 24 }}>
-                <Button type="primary" htmlType="submit" loading={profileQuery.isLoading}>
+              <Form.Item style={{ marginTop: 40, marginBottom: 0, textAlign: 'center' }}>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  size="large"
+                  loading={profileQuery.isLoading}
+                  style={{
+                    height: 48,
+                    minWidth: 160,
+                    fontSize: 16,
+                    fontWeight: 600,
+                    borderRadius: 12,
+                    background: 'linear-gradient(135deg, #7ec8ff 0%, #a3a0e8 50%, #b4a5e8 100%)',
+                    border: 'none',
+                    boxShadow: '0 4px 16px rgba(102, 126, 234, 0.4)',
+                  }}
+                >
                   {t('pages.profile.save')}
                 </Button>
               </Form.Item>
             </Form>
-          </Col>
-        </Row>
-      </Card>
+          </Card>
 
-      {/* 邮箱更改弹窗 */}
-      <Modal
-        title={t('pages.profile.changeEmail')}
-        open={emailModalOpen}
-        onCancel={() => {
-          setEmailModalOpen(false)
-          emailForm.resetFields()
-        }}
-        footer={[
-          <Button key="cancel" onClick={() => {
+        {/* 邮箱更改弹窗 */}
+        <Modal
+          title={t('pages.profile.changeEmail')}
+          open={emailModalOpen}
+          onCancel={() => {
             setEmailModalOpen(false)
             emailForm.resetFields()
-          }}>
-            {t('common.cancel')}
-          </Button>,
-          <Button key="confirm" type="primary" loading={emailChangeLoading} onClick={handleConfirmEmailChange}>
-            {t('pages.profile.confirm')}
-          </Button>,
-        ]}
-      >
+          }}
+          footer={[
+            <Button
+              key="cancel"
+              onClick={() => {
+                setEmailModalOpen(false)
+                emailForm.resetFields()
+              }}
+            >
+              {t('common.cancel')}
+            </Button>,
+            <Button
+              key="confirm"
+              type="primary"
+              loading={emailChangeLoading}
+              onClick={handleConfirmEmailChange}
+              style={{
+                background: 'linear-gradient(135deg, #7ec8ff 0%, #a3a0e8 50%, #b4a5e8 100%)',
+                border: 'none',
+                borderRadius: 8,
+                fontWeight: 600,
+              }}
+            >
+              {t('pages.profile.confirm')}
+            </Button>,
+          ]}
+          styles={{ content: { borderRadius: 16 } }}
+        >
         <Form form={emailForm} layout="vertical">
           <Form.Item
             label={t('pages.profile.newEmail')}
@@ -255,7 +367,9 @@ export function ProfilePage() {
             </Space>
           </Form.Item>
         </Form>
-      </Modal>
-    </Space>
+        </Modal>
+      </Space>
+      </div>
+    </div>
   )
 }

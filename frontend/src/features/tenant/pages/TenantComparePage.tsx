@@ -120,7 +120,7 @@ export function TenantComparePage() {
               title={typeof title === 'string' ? title : ''}
               onClick={() => navigate(`/tenant/listings/${record.property!.id}`)}
               style={{
-                color: '#667eea',
+                color: '#b4a5e8',
                 fontWeight: 600,
                 padding: 0,
                 maxWidth: '100%',
@@ -258,7 +258,7 @@ export function TenantComparePage() {
     <div style={{ 
       width: '100%', 
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #4facfe 0%, #667eea 50%, #8b5cf6 100%)',
+      background: 'linear-gradient(135deg, #a5d8ff 0%, #b4a5e8 50%, #c4b5fd 100%)',
       padding: '24px',
     }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
@@ -276,7 +276,7 @@ export function TenantComparePage() {
                     background: 'rgba(255, 255, 255, 0.95)',
                     backdropFilter: 'blur(10px)',
                     border: 'none',
-                    color: '#667eea',
+                    color: '#b4a5e8',
                     fontWeight: 600,
                     borderRadius: '24px',
                     height: '48px',
@@ -291,7 +291,7 @@ export function TenantComparePage() {
                     icon={<HomeOutlined />}
                     size="large"
                     style={{
-                      background: 'linear-gradient(135deg, #4facfe 0%, #667eea 50%, #8b5cf6 100%)',
+                      background: 'linear-gradient(135deg, #a5d8ff 0%, #b4a5e8 50%, #c4b5fd 100%)',
                       border: 'none',
                       borderRadius: '24px',
                       height: '48px',
@@ -317,14 +317,14 @@ export function TenantComparePage() {
           >
             {favoritesQ.data?.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '60px 0' }}>
-                <HeartFilled style={{ fontSize: 64, color: '#667eea', marginBottom: 24, opacity: 0.6 }} />
+                <HeartFilled style={{ fontSize: 64, color: '#b4a5e8', marginBottom: 24, opacity: 0.6 }} />
                 <p style={{ color: '#666', fontSize: 16, marginBottom: 24 }}>{t('pages.noFavorites')}</p>
                 <Link to="/tenant/listings">
                   <Button 
                     type="primary"
                     size="large"
                     style={{
-                      background: 'linear-gradient(135deg, #4facfe 0%, #667eea 50%, #8b5cf6 100%)',
+                      background: 'linear-gradient(135deg, #a5d8ff 0%, #b4a5e8 50%, #c4b5fd 100%)',
                       border: 'none',
                       borderRadius: '24px',
                       height: '48px',
@@ -391,7 +391,7 @@ export function TenantComparePage() {
             }}
             okButtonProps={{
               style: {
-                background: 'linear-gradient(135deg, #4facfe 0%, #667eea 50%, #8b5cf6 100%)',
+                background: 'linear-gradient(135deg, #a5d8ff 0%, #b4a5e8 50%, #c4b5fd 100%)',
                 border: 'none',
                 borderRadius: '8px',
                 fontWeight: 600,

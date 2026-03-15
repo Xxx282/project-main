@@ -190,6 +190,30 @@ export function MainLayout() {
 
   // 判断是否是首页
   const isHomePage = location.pathname === '/'
+  const isProfilePage = location.pathname.startsWith('/profile')
+  // 与个人中心一致：渐变铺满、无白边。包含：个人中心、房源列表、推荐、收藏、我的订单、咨询、房东订单/房源/预测等
+  const isGradientFullBleed =
+    isProfilePage ||
+    location.pathname.startsWith('/tenant/listings') ||
+    location.pathname.startsWith('/tenant/recommendations') ||
+    location.pathname.startsWith('/tenant/compare') ||
+    location.pathname.startsWith('/tenant/payments') ||
+    location.pathname.startsWith('/landlord/favorites') ||
+    location.pathname.startsWith('/landlord/all-listings') ||
+    location.pathname.startsWith('/tenant/inquiries') ||
+    location.pathname.startsWith('/landlord/inquiries') ||
+    location.pathname.startsWith('/tenant/chats/') ||
+    location.pathname.startsWith('/landlord/listings') ||
+    location.pathname.startsWith('/landlord/orders') ||
+    location.pathname.startsWith('/landlord/predict')
+  const isFullBleedPage = isHomePage || isProfilePage || isGradientFullBleed
+
+  // 个人中心页：给 body 加渐变背景类（在 Layout 里做，确保路由一切换就生效）
+  // 应用到所有页面
+  useEffect(() => {
+    document.body.classList.add('profile-page-body')
+    return () => document.body.classList.remove('profile-page-body')
+  }, [])
 
   // 首页导航栏透明，其他页面使用深色背景
   const headerStyle: React.CSSProperties = isHomePage
@@ -259,7 +283,7 @@ export function MainLayout() {
   }, [effectiveRole, auth.user, navigate, t, openAuthModal])
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout style={{ minHeight: '100vh', background: 'transparent' }}>
       <Header style={headerStyle}>
         <Typography.Text style={{ color: navTextColor, fontWeight: 600, marginRight: 32 }}>
           {t('common.appName')}
@@ -358,7 +382,7 @@ export function MainLayout() {
         </Space>
       </Header>
 
-      <Content style={{ padding: isHomePage ? 0 : 24 }}>
+      <Content style={{ padding: isFullBleedPage ? 0 : 24, background: 'transparent' }}>
         {/* 首页视差背景 */}
         {isHomePage && (
           <div
@@ -413,58 +437,15 @@ export function MainLayout() {
         <div
           style={{
             position: 'relative',
-            borderRadius: isHomePage ? 0 : 24,
-            padding: isHomePage ? 0 : 32,
-            minHeight: isHomePage ? '100vh' : '70vh',
-            background: isHomePage ? 'transparent' :
-              'radial-gradient(circle at top left, #e0e7ff 0, #f1f5f9 35%, #ffffff 100%)',
+            borderRadius: isFullBleedPage ? 0 : 24,
+            padding: isFullBleedPage ? 0 : 32,
+            minHeight: isFullBleedPage ? '100vh' : '70vh',
+            background: isFullBleedPage ? 'transparent' : 'rgba(255, 255, 255, 0.75)',
+            backdropFilter: isFullBleedPage ? 'none' : 'blur(12px)',
             overflow: 'hidden',
-            boxShadow: isHomePage ? 'none' : '0 22px 45px rgba(15, 23, 42, 0.15)',
+            boxShadow: isFullBleedPage ? 'none' : '0 22px 45px rgba(15, 23, 42, 0.15)',
           }}
         >
-          {!isHomePage && (
-            <>
-              <div
-                style={{
-                  position: 'absolute',
-                  inset: -40,
-                  backgroundImage: 'url(/pattern-grid.svg)',
-                  backgroundSize: '140px 140px',
-                  opacity: 0.55,
-                  pointerEvents: 'none',
-                }}
-              />
-              {/* 彩色渐变光斑 */}
-              <div
-                style={{
-                  position: 'absolute',
-                  top: -80,
-                  right: -60,
-                  width: 260,
-                  height: 260,
-                  borderRadius: '999px',
-                  background:
-                    'radial-gradient(circle at 30% 20%, rgba(59,130,246,0.9), transparent 60%)',
-                  filter: 'blur(6px)',
-                  opacity: 0.85,
-                }}
-              />
-              <div
-                style={{
-                  position: 'absolute',
-                  bottom: -90,
-                  left: -70,
-                  width: 220,
-                  height: 220,
-                  borderRadius: '999px',
-                  background:
-                    'radial-gradient(circle at 70% 80%, rgba(236,72,153,0.9), transparent 60%)',
-                  filter: 'blur(8px)',
-                  opacity: 0.9,
-                }}
-              />
-            </>
-          )}
           <div style={{ position: 'relative' }}>
             <Outlet />
           </div>

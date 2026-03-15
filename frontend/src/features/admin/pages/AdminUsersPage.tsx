@@ -69,9 +69,16 @@ export function AdminUsersPage() {
   ]
 
   return (
+    <div style={{
+      width: '100%',
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #4facfe 0%, #667eea 50%, #8b5cf6 100%)',
+      padding: '24px',
+    }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto' }}>
     <Space orientation="vertical" size={16} style={{ width: '100%' }}>
       <PageHeader title={t('nav.userManagement')} />
-      <Card>
+      <Card style={{ background: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(10px)', borderRadius: 16, boxShadow: '0 18px 45px rgba(15, 23, 42, 0.1)' }}>
         <Table<AdminUser>
           rowKey="id"
           loading={q.isLoading}
@@ -81,6 +88,8 @@ export function AdminUsersPage() {
         />
       </Card>
     </Space>
+      </div>
+    </div>
   )
 }
 

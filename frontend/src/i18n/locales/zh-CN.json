@@ -80,7 +80,8 @@
     "luxury": "豪华",
     "operation": "操作",
     "action": "操作",
-    "detail": "详情"
+    "detail": "详情",
+    "orientationLabel": "朝向"
   },
   "nav": {
     "home": "首页",

@@ -119,3 +119,17 @@ a:hover {
 .login-remember-checkbox > span:last-child {
   padding-left: 10px;
 }
+
+/* 个人中心：柔和蓝紫渐变背景（固定层 + body 双保险） */
+.profile-page-bg {
+  background: linear-gradient(135deg, #a5d8ff 0%, #b4a5e8 50%, #c4b5fd 100%);
+}
+body.profile-page-body {
+  background: linear-gradient(135deg, #a5d8ff 0%, #b4a5e8 50%, #c4b5fd 100%) !important;
+  background-attachment: fixed;
+}
+/* 个人中心页：强制 Layout/Content 透明，否则会盖住 body 渐变 */
+body.profile-page-body .ant-layout,
+body.profile-page-body .ant-layout-content {
+  background: transparent !important;
+}

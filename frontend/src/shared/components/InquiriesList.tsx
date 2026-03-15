@@ -88,7 +88,7 @@ export function InquiriesList({ role, title, subtitle, chatPath, queryKey }: Inq
     <div style={{ 
       width: '100%', 
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #4facfe 0%, #667eea 50%, #8b5cf6 100%)',
+      background: 'linear-gradient(135deg, #a5d8ff 0%, #b4a5e8 50%, #c4b5fd 100%)',
       padding: '24px',
     }}>
       <div style={{ maxWidth: 1000, margin: '0 auto' }}>
@@ -103,7 +103,7 @@ export function InquiriesList({ role, title, subtitle, chatPath, queryKey }: Inq
             }}
           >
             <div style={{ textAlign: 'center', padding: '8px 0' }}>
-              <MessageOutlined style={{ fontSize: 32, color: '#667eea', marginBottom: 8 }} />
+              <MessageOutlined style={{ fontSize: 32, color: '#b4a5e8', marginBottom: 8 }} />
               <Typography.Title level={2} style={{ margin: '8px 0', color: '#1a1a1a' }}>
                 {title}
               </Typography.Title>
@@ -156,13 +156,13 @@ export function InquiriesList({ role, title, subtitle, chatPath, queryKey }: Inq
                       size={56}
                       icon={<UserOutlined />}
                       style={{ 
-                        backgroundColor: role === 'tenant' ? '#667eea' : '#52c41a',
+                        backgroundColor: role === 'tenant' ? '#b4a5e8' : '#52c41a',
                         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
                       }}
                     />
                     <div style={{ flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
-                        <HomeOutlined style={{ color: '#667eea' }} />
+                        <HomeOutlined style={{ color: '#b4a5e8' }} />
                         <span style={{ fontWeight: 600, fontSize: 16 }}>{item.propertyTitle}</span>
                         <Tag color="blue">{getOtherPartyLabel()}</Tag>
                         <span style={{ color: '#999', fontSize: 14 }}>

@@ -279,7 +279,7 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
       <div style={{ 
         width: '100%', 
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #4facfe 0%, #667eea 50%, #8b5cf6 100%)',
+        background: 'linear-gradient(135deg, #a5d8ff 0%, #b4a5e8 50%, #c4b5fd 100%)',
         display: 'flex', 
         justifyContent: 'center', 
         alignItems: 'center', 
@@ -294,7 +294,7 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
       <div style={{ 
         width: '100%', 
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #4facfe 0%, #667eea 50%, #8b5cf6 100%)',
+        background: 'linear-gradient(135deg, #a5d8ff 0%, #b4a5e8 50%, #c4b5fd 100%)',
         padding: '24px',
       }}>
         <div style={{ maxWidth: 1000, margin: '0 auto' }}>
@@ -335,7 +335,7 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
     <div style={{ 
       width: '100%', 
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #4facfe 0%, #667eea 50%, #8b5cf6 100%)',
+      background: 'linear-gradient(135deg, #a5d8ff 0%, #b4a5e8 50%, #c4b5fd 100%)',
       padding: '24px',
     }}>
       <div style={{ maxWidth: 1000, margin: '0 auto' }}>
@@ -350,7 +350,7 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
               background: 'rgba(255, 255, 255, 0.95)',
               backdropFilter: 'blur(10px)',
               border: 'none',
-              color: '#667eea',
+              color: '#b4a5e8',
               fontWeight: 600,
             }}
           >
@@ -374,7 +374,7 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
                   size="default" 
                   icon={<UserOutlined />} 
                   style={{ 
-                    backgroundColor: isTenant ? '#667eea' : '#52c41a',
+                    backgroundColor: isTenant ? '#b4a5e8' : '#52c41a',
                     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
                   }} 
                 />
@@ -386,7 +386,7 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
                   <div style={{ fontSize: 12, color: '#999', display: 'flex', alignItems: 'center', gap: 4 }}>
                     <HomeOutlined />
                     <span>{listingQ.data?.title}</span>
-                    <span style={{ marginLeft: 8, color: '#667eea', fontWeight: 600 }}>
+                    <span style={{ marginLeft: 8, color: '#b4a5e8', fontWeight: 600 }}>
                       {t('common.yuanPerMonth').replace('/月', '')}{listingQ.data?.price}
                     </span>
                   </div>
@@ -436,7 +436,7 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
                           padding: '12px 16px',
                           borderRadius: isMe ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
                           background: isMe 
-                            ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' 
+                            ? 'linear-gradient(135deg, #b4a5e8 0%, #c4b5fd 100%)' 
                             : isRecalled ? '#f5f5f5' : '#fff',
                           color: isMe ? '#fff' : '#000',
                           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
@@ -545,7 +545,7 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
                     icon={<RobotOutlined />}
                     loading={aiSuggestLoading}
                     onClick={handleAiSuggest}
-                    style={{ padding: 0, color: '#667eea', fontSize: 13 }}
+                    style={{ padding: 0, color: '#b4a5e8', fontSize: 13 }}
                   >
                     {t('pages.aiReplySuggestion')}
                   </Button>
@@ -568,7 +568,7 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
                     type="text"
                     icon={<PictureOutlined />}
                     size="large"
-                    style={{ color: '#667eea' }}
+                    style={{ color: '#b4a5e8' }}
                     onClick={(e) => {
                       e.preventDefault()
                       fileInputRef.current?.click()
@@ -593,10 +593,10 @@ export function InquiryChat({ conversationId, userRole, listPath }: InquiryChatP
                   loading={sendMessageMutation.isPending}
                   size="large"
                   style={{
-                    background: 'linear-gradient(135deg, #4facfe 0%, #667eea 50%, #8b5cf6 100%)',
+                    background: 'linear-gradient(135deg, #a5d8ff 0%, #b4a5e8 50%, #c4b5fd 100%)',
                     border: 'none',
                     borderRadius: '8px',
-                    boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
+                    boxShadow: '0 4px 15px rgba(180, 165, 232, 0.4)',
                     height: 'auto',
                     padding: '0 24px',
                   }}

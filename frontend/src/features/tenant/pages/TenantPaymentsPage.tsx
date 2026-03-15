@@ -82,12 +82,23 @@ export function TenantPaymentsPage() {
   ]
 
   return (
+    <div style={{
+      width: '100%',
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #a5d8ff 0%, #b4a5e8 50%, #c4b5fd 100%)',
+      padding: '24px',
+    }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto' }}>
     <Space orientation="vertical" size={16} style={{ width: '100%' }}>
       <PageHeader
         title={t('payment.myPayments')}
         subtitle={t('payment.myPaymentsSubtitle')}
       />
-      <Card>
+      <Card style={{
+        borderRadius: 12,
+        boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)',
+        border: 'none',
+      }}>
         <Table
           columns={columns}
           dataSource={data?.content || []}
@@ -102,5 +113,7 @@ export function TenantPaymentsPage() {
         />
       </Card>
     </Space>
+      </div>
+    </div>
   )
 }

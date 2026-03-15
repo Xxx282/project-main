@@ -79,7 +79,8 @@
     "luxury": "Luxury",
     "operation": "Operation",
     "action": "Action",
-    "detail": "Detail"
+    "detail": "Detail",
+    "orientationLabel": "Orientation"
   },
   "auth": {
     "forgotPassword": "Forgot password",
