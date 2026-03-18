@@ -2,8 +2,8 @@ import csv
 import random
 
 # 读取原始数据
-input_file = 'rent-price-ml/data/house_rent.csv'
-output_file = 'rent-price-ml/data/house_rent_cleaned.csv'
+input_file = 'data/house_rent.csv'
+output_file = 'data/house_rent_cleaned.csv'
 
 # 各城市区域价格基准（每月租金 元/月）
 CITY_BASE_PRICE = {
@@ -62,6 +62,20 @@ TITLE_TEMPLATES = [
 ORIENTATIONS = ['north', 'south', 'east', 'west']
 DECORATIONS = ['rough', 'simple', 'fine', 'luxury']
 
+# 楼层等级划分
+FLOOR_LEVELS = {
+    (1, 8): 'low',      # 低层 1-8
+    (9, 20): 'mid',     # 中层 9-20
+    (21, 30): 'high',   # 高层 21-30
+}
+
+def get_floor_level(total_floors: int) -> str:
+    """根据总楼层数确定楼层等级"""
+    for (min_floor, max_floor), level in FLOOR_LEVELS.items():
+        if min_floor <= total_floors <= max_floor:
+            return level
+    return 'mid'  # 默认中层
+
 def generate_realistic_data(row):
     city = row['city']
     bedrooms = int(row['bedrooms'])
@@ -98,6 +112,9 @@ def generate_realistic_data(row):
     # 总楼层（随机 1-35 层）
     total_floors = random.randint(6, 35)
     
+    # 楼层等级（低层 1-8, 中层 9-20, 高层 21-35）
+    floor_level = get_floor_level(total_floors)
+    
     # 生成标题
     region = row['region']
     title = random.choice(TITLE_TEMPLATES).format(city=city, region=region)
@@ -108,8 +125,9 @@ def generate_realistic_data(row):
     row['price'] = price
     row['bathrooms'] = bathrooms
     row['total_floors'] = total_floors
+    row['floor_level'] = floor_level
     row['orientation'] = orientation
-    row['description'] = f'{bedrooms} bedroom(s), {bathrooms} bathroom(s), {area} sqm, {decoration} decoration, {orientation} facing, move-in ready.'
+    row['description'] = f'{bedrooms} bedroom(s), {bathrooms} bathroom(s), {area} sqm, {decoration} decoration, {orientation} facing, {floor_level} floor, move-in ready.'
     
     return row
 
@@ -118,8 +136,11 @@ print('开始清理数据...')
 
 with open(input_file, 'r', encoding='utf-8') as f:
     reader = csv.DictReader(f)
-    fieldnames = reader.fieldnames
+    original_fieldnames = reader.fieldnames
     rows = list(reader)
+
+# 添加 floor_level 字段
+fieldnames = list(original_fieldnames) + ['floor_level']
 
 print(f'原始数据: {len(rows)} 条')
 

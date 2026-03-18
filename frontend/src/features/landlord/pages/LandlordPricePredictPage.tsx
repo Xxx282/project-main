@@ -21,6 +21,14 @@ const FURNISHING_OPTIONS_I18N: { value: string; i18nKey: string }[] = [
   { value: 'luxury', i18nKey: 'common.luxury' },
 ]
 
+// 朝向选项
+const ORIENTATION_OPTIONS = [
+  { value: 'north', label: '北' },
+  { value: 'south', label: '南' },
+  { value: 'east', label: '东' },
+  { value: 'west', label: '西' },
+]
+
 export function LandlordPricePredictPage() {
   const { message } = App.useApp()
   const { t } = useTranslation()
@@ -50,7 +58,8 @@ export function LandlordPricePredictPage() {
         bathrooms: v.bathrooms,
         propertyType: v.propertyType || 'Super Area',
         decoration: v.decoration || 'rough',
-        totalFloors: v.totalFloors || 5,
+        totalFloors: v.totalFloors,
+        orientation: v.orientation || '',
       }
 
       // 分别请求预测、相似房源和最接近房源，单独处理错误
@@ -147,13 +156,9 @@ export function LandlordPricePredictPage() {
                 <Form
                   layout="vertical"
                   initialValues={{
-                    bedrooms: 2,
-                    bathrooms: 1,
-                    area: 60,
                     city: '',
                     region: '',
                     decoration: 'rough',
-                    totalFloors: 5
                   }}
                   onFinish={handlePredict}
                 >
@@ -172,7 +177,7 @@ export function LandlordPricePredictPage() {
                           style={{ width: '100%' }} 
                           min={0} 
                           size="large"
-                          placeholder="2"
+                          placeholder="..."
                         />
                       </Form.Item>
                     </Col>
@@ -190,7 +195,7 @@ export function LandlordPricePredictPage() {
                           style={{ width: '100%' }} 
                           min={0} 
                           size="large"
-                          placeholder="1"
+                          placeholder="..."
                         />
                       </Form.Item>
                     </Col>
@@ -209,7 +214,7 @@ export function LandlordPricePredictPage() {
                       style={{ width: '100%' }} 
                       min={0} 
                       size="large"
-                      placeholder="60"
+                      placeholder="..."
                     />
                   </Form.Item>
 
@@ -270,6 +275,23 @@ export function LandlordPricePredictPage() {
                     />
                   </Form.Item>
 
+                  <Form.Item
+                    name="orientation"
+                    label={
+                      <span>
+                        <HomeOutlined style={{ marginRight: 8, color: '#b4a5e8' }} />
+                        {t('pages.orientation')}
+                      </span>
+                    }
+                  >
+                    <Select
+                      options={ORIENTATION_OPTIONS}
+                      placeholder={t('pages.selectOrientation') || '选择朝向'}
+                      size="large"
+                      allowClear
+                    />
+                  </Form.Item>
+
                   <Form.Item 
                     name="totalFloors" 
                     label={
@@ -281,7 +303,7 @@ export function LandlordPricePredictPage() {
                   >
                     <InputNumber 
                       style={{ width: '100%' }} 
-                      placeholder={t('pages.example2')}
+                      placeholder="..."
                       size="large"
                     />
                   </Form.Item>

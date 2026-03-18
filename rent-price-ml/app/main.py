@@ -81,19 +81,20 @@ class NewPredictRequest(BaseModel):
 
 
 def map_property_type_to_furnishing(prop_type: str, decoration: str) -> str:
-    """根据房产类型和装修状态映射到家具配置"""
-    prop_type_lower = prop_type.lower()
+    """根据装修状态直接返回（保持与训练数据一致）"""
     decoration_lower = decoration.lower()
 
+    # 直接返回原始值，与训练数据一致
+    if decoration_lower in ["rough", "simple", "fine", "luxury"]:
+        return decoration_lower
+
+    # 兼容其他格式
     if "furnished" in decoration_lower:
-        return "Furnished"
+        return "fine"  # Furnished -> fine
     elif "semi" in decoration_lower:
-        return "Semi-Furnished"
+        return "simple"  # Semi-Furnished -> simple
     else:
-        # 默认根据房产类型判断
-        if "villa" in prop_type_lower or "house" in prop_type_lower:
-            return "Semi-Furnished"
-        return "Unfurnished"
+        return "rough"  # Unfurnished -> rough
 
 
 def map_property_type_to_area_type(prop_type: str) -> str:
@@ -108,17 +109,28 @@ def map_property_type_to_area_type(prop_type: str) -> str:
         return "Apartment"
 
 
+def get_floor_level(total_floors: int) -> str:
+    """根据总楼层数确定楼层等级"""
+    if total_floors <= 8:
+        return 'low'
+    elif total_floors <= 20:
+        return 'mid'
+    else:
+        return 'high'
+
+
 @app.post("/api/v1/predict")
 def api_v1_predict(payload: NewPredictRequest):
     start_time = int(time.time() * 1000)
 
     try:
         # Map request fields to match training data columns
-        furnishing_status = map_property_type_to_furnishing(
+        decoration_value = map_property_type_to_furnishing(
             payload.propertyType,
             payload.decoration
         )
         area_type = map_property_type_to_area_type(payload.propertyType)
+        floor_level = get_floor_level(payload.totalFloors)
 
         # 构建预测记录
         record = {
@@ -132,8 +144,9 @@ def api_v1_predict(payload: NewPredictRequest):
             "area": payload.area,
             "price": 0,
             "total_floors": payload.totalFloors,
+            "floor_level": floor_level,
             "orientation": payload.orientation,
-            "decoration": furnishing_status,
+            "decoration": decoration_value,
             "description": f"Floor {payload.floor}/{payload.totalFloors}, "
                           f"Parking: {payload.hasParking}, "
                           f"Elevator: {payload.hasElevator}, "
@@ -204,7 +217,7 @@ def aggregate_feature_importance(raw_importance: dict) -> dict:
             if len(parts) == 2:
                 prefix, suffix = parts
                 # 检查是否是已知的类别特征
-                if prefix in ["city", "region", "decoration", "orientation", "area_type"]:
+                if prefix in ["city", "region", "decoration", "orientation", "area_type", "floor_level"]:
                     if prefix not in aggregated:
                         aggregated[prefix] = 0
                     aggregated[prefix] += importance

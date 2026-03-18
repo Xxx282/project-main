@@ -26,7 +26,15 @@ public class MlService {
         // 参数校验
         validatePredictionRequest(request);
 
+        log.info("收到预测请求: bedrooms={}, area={}, city={}, region={}, bathrooms={}, propertyType={}, decoration={}, floor={}, totalFloors={}, orientation={}",
+                request.getBedrooms(), request.getArea(), request.getCity(), request.getRegion(),
+                request.getBathrooms(), request.getPropertyType(), request.getDecoration(),
+                request.getFloor(), request.getTotalFloors(), request.getOrientation());
+
         // 设置默认值，避免 ML 服务报错
+        if (request.getFloor() == null) {
+            request.setFloor(2); // 默认中楼层
+        }
         if (request.getOrientation() == null) {
             request.setOrientation("南");
         }

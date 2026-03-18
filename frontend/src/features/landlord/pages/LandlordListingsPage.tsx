@@ -36,7 +36,7 @@ export function LandlordListingsPage() {
     { 
       title: t('common.cityRegion'), 
       render: (_, row) => `${row.city ?? '-'}/${row.region ?? '-'}`,
-      width: 150,
+      width: 180,
     },
     { 
       title: t('common.price'), 
@@ -52,10 +52,10 @@ export function LandlordListingsPage() {
       title: t('common.layout'),
       render: (_, row) => (
         <Tag color="blue" icon={<HomeOutlined />}>
-          {(row.bedrooms ?? '-')}{t('common.bedrooms')} / {(row.bathrooms ?? '-')}{t('common.bathrooms')}
+          {(row.bedrooms ?? '-')} bed / {(row.bathrooms ?? '-')} bath
         </Tag>
       ),
-      width: 150,
+      width: 180,
     },
     {
       title: t('common.decorationOrientation'),
@@ -68,7 +68,7 @@ export function LandlordListingsPage() {
           </Tag>
         )
       },
-      width: 180,
+      width: 200,
     },
     {
       title: t('common.operation'),
@@ -104,7 +104,7 @@ export function LandlordListingsPage() {
           </Popconfirm>
         </Space>
       ),
-      width: 150,
+      width: 180,
       fixed: 'right' as const,
     },
   ]
@@ -116,7 +116,7 @@ export function LandlordListingsPage() {
       background: 'linear-gradient(135deg, #a5d8ff 0%, #b4a5e8 50%, #c4b5fd 100%)',
       padding: '24px',
     }}>
-      <div style={{ maxWidth: 1400, margin: '0 auto' }}>
+      <div style={{ maxWidth: 1600, margin: '0 auto' }}>
         <Space orientation="vertical" size={24} style={{ width: '100%' }}>
           {/* 页面标题 */}
           <Card 
@@ -200,7 +200,7 @@ export function LandlordListingsPage() {
                   showSizeChanger: true,
                   showTotal: (total) => t('pages.totalListings', { total }),
                 }}
-                scroll={{ x: 1000 }}
+                scroll={{ x: 1200 }}
               />
             )}
           </Card>

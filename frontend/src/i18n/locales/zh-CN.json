@@ -172,6 +172,7 @@
     "unfurnished": "无家具",
     "select": "请选择",
     "decoration": "装修状态",
+    "orientation": "朝向",
     "currentFloor": "当前楼层",
     "example": "例如: 1",
     "totalFloors": "总楼层数",

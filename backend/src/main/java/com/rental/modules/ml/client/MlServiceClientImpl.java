@@ -11,7 +11,8 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.*;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * ML 服务客户端实现
@@ -27,6 +28,23 @@ public class MlServiceClientImpl implements MlServiceClient {
     private static final String RECOMMEND_ENDPOINT = "/api/v1/recommend";
     private static final String HEALTH_ENDPOINT = "/api/v1/health";
 
+    // 中文城市名到英文的映射（用于 ML API）
+    private static final Map<String, String> CHINESE_TO_ENGLISH_CITY = new HashMap<>();
+    static {
+        CHINESE_TO_ENGLISH_CITY.put("北京", "Beijing");
+        CHINESE_TO_ENGLISH_CITY.put("上海", "Shanghai");
+        CHINESE_TO_ENGLISH_CITY.put("杭州", "Hangzhou");
+        CHINESE_TO_ENGLISH_CITY.put("广州", "Guangzhou");
+        CHINESE_TO_ENGLISH_CITY.put("深圳", "Shenzhen");
+        CHINESE_TO_ENGLISH_CITY.put("南京", "Nanjing");
+        CHINESE_TO_ENGLISH_CITY.put("成都", "Chengdu");
+        CHINESE_TO_ENGLISH_CITY.put("重庆", "Chongqing");
+        CHINESE_TO_ENGLISH_CITY.put("武汉", "Wuhan");
+        CHINESE_TO_ENGLISH_CITY.put("西安", "Xi'an");
+        CHINESE_TO_ENGLISH_CITY.put("天津", "Tianjin");
+        CHINESE_TO_ENGLISH_CITY.put("苏州", "Suzhou");
+    }
+
     public MlServiceClientImpl(
             RestTemplate mlRestTemplate,
             @Qualifier("mlServiceUrl") String mlServiceUrl) {
@@ -38,6 +56,21 @@ public class MlServiceClientImpl implements MlServiceClient {
     public PricePredictionResponse predictPrice(PricePredictionRequest request) {
         String url = mlServiceUrl + PREDICT_ENDPOINT;
         log.info("调用 ML 预测服务: {}", url);
+
+        // 转换城市名为英文（ML 模型只识别英文城市名）
+        String cityEnglish = CHINESE_TO_ENGLISH_CITY.get(request.getCity());
+        if (cityEnglish != null) {
+            log.info("城市名转换: {} -> {}", request.getCity(), cityEnglish);
+            request.setCity(cityEnglish);
+        } else {
+            log.info("使用原始城市名: {}", request.getCity());
+        }
+
+        log.info("ML 请求体: bedrooms={}, area={}, city={}, region={}, bathrooms={}, propertyType={}, decoration={}, floor={}, totalFloors={}, orientation={}, hasParking={}, hasElevator={}, hasBalcony={}",
+                request.getBedrooms(), request.getArea(), request.getCity(), request.getRegion(),
+                request.getBathrooms(), request.getPropertyType(), request.getDecoration(),
+                request.getFloor(), request.getTotalFloors(), request.getOrientation(),
+                request.getHasParking(), request.getHasElevator(), request.getHasBalcony());
 
         try {
             HttpHeaders headers = new HttpHeaders();

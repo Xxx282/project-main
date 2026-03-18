@@ -4,6 +4,9 @@ backend/target/**/*.jar
 backend/target/**/*.war
 backend/target/
 
+# Backend uploads - property images should not be committed
+backend/uploads/
+
 frontend/node_modules/
 frontend/dist/
 frontend/.nuxt/

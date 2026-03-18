@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -164,19 +166,316 @@ public class PropertyServiceImpl implements PropertyService {
         }
 
         keywordPart = keywordPart.replaceAll("\\s+", " ").trim();
+        // 移除对单个词的限制，现在允许任意关键词进行标题搜索
         if (keywordPart.isEmpty()) {
             keywordPart = null;
-        } else {
-            // 若剩余仅为单个词且不在数据库城市列表中，可能是英文地名等，不按标题过滤以返回其他条件的结果
-            String single = keywordPart.split("\\s+")[0];
-            if (single.equals(keywordPart) && !knownCities.contains(single)) {
-                log.info("  Ignoring single unknown place keyword for broader results: {}", keywordPart);
-                keywordPart = null;
+        }
+
+        // 支持中文城市名和关键词搜索
+        Map<String, String> chineseToEnglish = new HashMap<>();
+        chineseToEnglish.put("上海", "shanghai");
+        chineseToEnglish.put("北京", "beijing");
+        chineseToEnglish.put("广州", "guangzhou");
+        chineseToEnglish.put("深圳", "shenzhen");
+        chineseToEnglish.put("杭州", "hangzhou");
+        chineseToEnglish.put("成都", "chengdu");
+        chineseToEnglish.put("南京", "nanjing");
+        chineseToEnglish.put("武汉", "wuhan");
+        chineseToEnglish.put("西安", "xian");
+        chineseToEnglish.put("苏州", "suzhou");
+        chineseToEnglish.put("天津", "tianjin");
+        chineseToEnglish.put("重庆", "chongqing");
+
+        // 如果检测到中文城市名，转换为英文（保留关键词搜索，但移除已解析的城市名）
+        if (city == null) {
+            for (Map.Entry<String, String> entry : chineseToEnglish.entrySet()) {
+                if (keywordPart.contains(entry.getKey())) {
+                    city = entry.getValue();
+                    // 从关键词中移除已解析的城市名，避免重复搜索
+                    keywordPart = keywordPart.replace(entry.getKey(), " ").trim();
+                    log.info("  Parsed Chinese city: {} -> {}", entry.getKey(), city);
+                    break;
+                }
+            }
+        }
+
+        // 支持区域名/别名映射到城市（如：钱塘 -> 杭州，西湖 -> 杭州）
+        // Key: 中文区域名, Value: 对应城市的英文名
+        // 注意：区域检测应该在城市检测之后执行，即使城市已解析也要继续检测区域
+        Map<String, String> regionToCity = new HashMap<>();
+        // 杭州区域
+        regionToCity.put("钱塘", "hangzhou");
+        regionToCity.put("余杭", "hangzhou");
+        regionToCity.put("西湖", "hangzhou");
+        regionToCity.put("拱墅", "hangzhou");
+        regionToCity.put("滨江", "hangzhou");
+        regionToCity.put("萧山", "hangzhou");
+        regionToCity.put("上城", "hangzhou");
+        regionToCity.put("临平", "hangzhou");
+        regionToCity.put("富阳", "hangzhou");
+        regionToCity.put("临安", "hangzhou");
+        // 上海区域
+        regionToCity.put("浦东", "shanghai");
+        regionToCity.put("黄浦", "shanghai");
+        regionToCity.put("静安", "shanghai");
+        regionToCity.put("徐汇", "shanghai");
+        regionToCity.put("长宁", "shanghai");
+        regionToCity.put("普陀", "shanghai");
+        regionToCity.put("虹口", "shanghai");
+        regionToCity.put("杨浦", "shanghai");
+        regionToCity.put("闵行", "shanghai");
+        regionToCity.put("宝山", "shanghai");
+        regionToCity.put("嘉定", "shanghai");
+        regionToCity.put("金山", "shanghai");
+        regionToCity.put("松江", "shanghai");
+        regionToCity.put("青浦", "shanghai");
+        regionToCity.put("奉贤", "shanghai");
+        regionToCity.put("崇明", "shanghai");
+        // 北京区域
+        regionToCity.put("朝阳", "beijing");
+        regionToCity.put("海淀", "beijing");
+        regionToCity.put("丰台", "beijing");
+        regionToCity.put("石景山", "beijing");
+        regionToCity.put("通州", "beijing");
+        regionToCity.put("顺义", "beijing");
+        regionToCity.put("房山", "beijing");
+        regionToCity.put("大兴", "beijing");
+        regionToCity.put("昌平", "beijing");
+        regionToCity.put("怀柔", "beijing");
+        regionToCity.put("平谷", "beijing");
+        regionToCity.put("门头沟", "beijing");
+        regionToCity.put("延庆", "beijing");
+        regionToCity.put("密云", "beijing");
+        // 广州区域
+        regionToCity.put("天河", "guangzhou");
+        regionToCity.put("越秀", "guangzhou");
+        regionToCity.put("海珠", "guangzhou");
+        regionToCity.put("荔湾", "guangzhou");
+        regionToCity.put("白云", "guangzhou");
+        regionToCity.put("黄埔", "guangzhou");
+        regionToCity.put("番禺", "guangzhou");
+        regionToCity.put("花都", "guangzhou");
+        regionToCity.put("南沙", "guangzhou");
+        regionToCity.put("从化", "guangzhou");
+        regionToCity.put("增城", "guangzhou");
+        // 深圳区域
+        regionToCity.put("福田", "shenzhen");
+        regionToCity.put("罗湖", "shenzhen");
+        regionToCity.put("南山", "shenzhen");
+        regionToCity.put("宝安", "shenzhen");
+        regionToCity.put("龙岗", "shenzhen");
+        regionToCity.put("龙华", "shenzhen");
+        regionToCity.put("盐田", "shenzhen");
+        regionToCity.put("坪山", "shenzhen");
+        regionToCity.put("光明", "shenzhen");
+
+        // 区域名翻译映射：中文区域名 -> 英文区域名
+        Map<String, String> regionTranslation = new HashMap<>();
+        // 杭州区域
+        regionTranslation.put("钱塘", "qiantang");
+        regionTranslation.put("余杭", "yuhang");
+        regionTranslation.put("西湖", "xihu");
+        regionTranslation.put("拱墅", "gongshu");
+        regionTranslation.put("滨江", "binjiang");
+        regionTranslation.put("萧山", "xiaoshan");
+        regionTranslation.put("上城", "shangcheng");
+        regionTranslation.put("临平", "linping");
+        regionTranslation.put("富阳", "fuyang");
+        regionTranslation.put("临安", "linan");
+        // 上海区域
+        regionTranslation.put("浦东", "pudong");
+        regionTranslation.put("黄浦", "huangpu");
+        regionTranslation.put("静安", "jingan");
+        regionTranslation.put("徐汇", "xuhui");
+        regionTranslation.put("长宁", "changning");
+        regionTranslation.put("普陀", "putuo");
+        regionTranslation.put("虹口", "hongkou");
+        regionTranslation.put("杨浦", "yangpu");
+        regionTranslation.put("闵行", "minhang");
+        regionTranslation.put("宝山", "baoshan");
+        regionTranslation.put("嘉定", "jiading");
+        regionTranslation.put("金山", "jinshan");
+        regionTranslation.put("松江", "songjiang");
+        regionTranslation.put("青浦", "qingpu");
+        regionTranslation.put("奉贤", "fengxian");
+        regionTranslation.put("崇明", "chongming");
+        // 北京区域
+        regionTranslation.put("朝阳", "chaoyang");
+        regionTranslation.put("海淀", "haidian");
+        regionTranslation.put("丰台", "fengtai");
+        regionTranslation.put("石景山", "shijingshan");
+        regionTranslation.put("通州", "tongzhou");
+        regionTranslation.put("顺义", "shunyi");
+        regionTranslation.put("房山", "fangshan");
+        regionTranslation.put("大兴", "daxing");
+        regionTranslation.put("昌平", "changping");
+        regionTranslation.put("怀柔", "huairou");
+        regionTranslation.put("平谷", "pinggu");
+        regionTranslation.put("门头沟", "mentougou");
+        regionTranslation.put("延庆", "yanqing");
+        regionTranslation.put("密云", "miyun");
+        // 广州区域
+        regionTranslation.put("天河", "tianhe");
+        regionTranslation.put("越秀", "yuexiu");
+        regionTranslation.put("海珠", "haizhu");
+        regionTranslation.put("荔湾", "liwan");
+        regionTranslation.put("白云", "baiyun");
+        regionTranslation.put("黄埔", "huangpu");
+        regionTranslation.put("番禺", "panyu");
+        regionTranslation.put("花都", "huadu");
+        regionTranslation.put("南沙", "nansha");
+        regionTranslation.put("从化", "conghua");
+        regionTranslation.put("增城", "zengcheng");
+        // 深圳区域
+        regionTranslation.put("福田", "futian");
+        regionTranslation.put("罗湖", "luohu");
+        regionTranslation.put("南山", "nanshan");
+        regionTranslation.put("宝安", "baoan");
+        regionTranslation.put("龙岗", "longgang");
+        regionTranslation.put("龙华", "longhua");
+        regionTranslation.put("盐田", "yantian");
+        regionTranslation.put("坪山", "pingshan");
+        regionTranslation.put("光明", "guangming");
+
+        // 检测区域名并映射到城市，同时翻译为英文
+        // 注意：即使城市已解析，也要继续检测区域名（用户可能输入如 "杭州 钱塘"）
+        if (region == null && keywordPart != null && !keywordPart.isEmpty()) {
+            for (Map.Entry<String, String> entry : regionToCity.entrySet()) {
+                if (keywordPart.contains(entry.getKey())) {
+                    // 如果城市还未解析，从区域映射获取城市
+                    if (city == null) {
+                        city = entry.getValue();
+                    }
+                    // 翻译区域名为英文
+                    String englishRegion = regionTranslation.get(entry.getKey());
+                    region = englishRegion != null ? englishRegion : entry.getKey();
+                    // 从关键词中移除已解析的区域名，避免重复搜索
+                    keywordPart = keywordPart.replace(entry.getKey(), " ").trim();
+                    log.info("  Parsed region: {} -> city: {}, region: {}", entry.getKey(), city, region);
+                    break;
+                }
+            }
+        }
+
+        // 支持英文城市名和关键词搜索（已有城市名时不重复处理）
+        Map<String, String> englishToChinese = new HashMap<>();
+        englishToChinese.put("shanghai", "上海");
+        englishToChinese.put("beijing", "北京");
+        englishToChinese.put("guangzhou", "广州");
+        englishToChinese.put("shenzhen", "深圳");
+        englishToChinese.put("hangzhou", "杭州");
+        englishToChinese.put("chengdu", "成都");
+        englishToChinese.put("nanjing", "南京");
+        englishToChinese.put("wuhan", "武汉");
+        englishToChinese.put("xian", "西安");
+        englishToChinese.put("suzhou", "苏州");
+        englishToChinese.put("tianjin", "天津");
+        englishToChinese.put("chongqing", "重庆");
+
+        // 检查是否包含英文城市名，如果是则提取并转换为英文用于数据库查询
+        String lowerKeyword = keywordPart != null ? keywordPart.toLowerCase() : "";
+        for (Map.Entry<String, String> entry : englishToChinese.entrySet()) {
+            if (lowerKeyword.contains(entry.getKey())) {
+                if (city == null) {
+                    city = entry.getKey();
+                    // 从关键词中移除已解析的英文城市名，避免重复搜索
+                    if (keywordPart != null) {
+                        keywordPart = keywordPart.replaceAll("(?i)" + entry.getKey(), " ").trim();
+                    }
+                    log.info("  Parsed English city: {} -> {}", entry.getKey(), city);
+                }
+                break;
+            }
+        }
+
+        // 支持英文区域名检测（如：qiantang, xihu 等）
+        if (region == null && keywordPart != null && !keywordPart.isEmpty()) {
+            // 英文区域名 -> 中文区域名 -> 城市映射
+            Map<String, String> englishRegionToCity = new HashMap<>();
+            // 杭州区域
+            englishRegionToCity.put("qiantang", "hangzhou");
+            englishRegionToCity.put("yuhang", "hangzhou");
+            englishRegionToCity.put("xihu", "hangzhou");
+            englishRegionToCity.put("gongshu", "hangzhou");
+            englishRegionToCity.put("binjiang", "hangzhou");
+            englishRegionToCity.put("xiaoshan", "hangzhou");
+            englishRegionToCity.put("shangcheng", "hangzhou");
+            englishRegionToCity.put("linping", "hangzhou");
+            englishRegionToCity.put("fuyang", "hangzhou");
+            englishRegionToCity.put("linan", "hangzhou");
+            // 上海区域
+            englishRegionToCity.put("pudong", "shanghai");
+            englishRegionToCity.put("huangpu", "shanghai");
+            englishRegionToCity.put("jingan", "shanghai");
+            englishRegionToCity.put("xuhui", "shanghai");
+            englishRegionToCity.put("changning", "shanghai");
+            englishRegionToCity.put("putuo", "shanghai");
+            englishRegionToCity.put("hongkou", "shanghai");
+            englishRegionToCity.put("yangpu", "shanghai");
+            englishRegionToCity.put("minhang", "shanghai");
+            englishRegionToCity.put("baoshan", "shanghai");
+            englishRegionToCity.put("jiading", "shanghai");
+            englishRegionToCity.put("jinshan", "shanghai");
+            englishRegionToCity.put("songjiang", "shanghai");
+            englishRegionToCity.put("qingpu", "shanghai");
+            englishRegionToCity.put("fengxian", "shanghai");
+            englishRegionToCity.put("chongming", "shanghai");
+            // 北京区域
+            englishRegionToCity.put("chaoyang", "beijing");
+            englishRegionToCity.put("haidian", "beijing");
+            englishRegionToCity.put("fengtai", "beijing");
+            englishRegionToCity.put("shijingshan", "beijing");
+            englishRegionToCity.put("tongzhou", "beijing");
+            englishRegionToCity.put("shunyi", "beijing");
+            englishRegionToCity.put("fangshan", "beijing");
+            englishRegionToCity.put("daxing", "beijing");
+            englishRegionToCity.put("changping", "beijing");
+            englishRegionToCity.put("huairou", "beijing");
+            englishRegionToCity.put("pinggu", "beijing");
+            englishRegionToCity.put("mentougou", "beijing");
+            englishRegionToCity.put("yanqing", "beijing");
+            englishRegionToCity.put("miyun", "beijing");
+            // 广州区域
+            englishRegionToCity.put("tianhe", "guangzhou");
+            englishRegionToCity.put("yuexiu", "guangzhou");
+            englishRegionToCity.put("haizhu", "guangzhou");
+            englishRegionToCity.put("liwan", "guangzhou");
+            englishRegionToCity.put("baiyun", "guangzhou");
+            englishRegionToCity.put("huangpu", "guangzhou");
+            englishRegionToCity.put("panyu", "guangzhou");
+            englishRegionToCity.put("huadu", "guangzhou");
+            englishRegionToCity.put("nansha", "guangzhou");
+            englishRegionToCity.put("conghua", "guangzhou");
+            englishRegionToCity.put("zengcheng", "guangzhou");
+            // 深圳区域
+            englishRegionToCity.put("futian", "shenzhen");
+            englishRegionToCity.put("luohu", "shenzhen");
+            englishRegionToCity.put("nanshan", "shenzhen");
+            englishRegionToCity.put("baoan", "shenzhen");
+            englishRegionToCity.put("longgang", "shenzhen");
+            englishRegionToCity.put("longhua", "shenzhen");
+            englishRegionToCity.put("yantian", "shenzhen");
+            englishRegionToCity.put("pingshan", "shenzhen");
+            englishRegionToCity.put("guangming", "shenzhen");
+
+            for (Map.Entry<String, String> entry : englishRegionToCity.entrySet()) {
+                if (lowerKeyword.contains(entry.getKey())) {
+                    // 如果城市还未解析，从区域映射获取城市
+                    if (city == null) {
+                        city = entry.getValue();
+                    }
+                    // 直接使用英文区域名
+                    region = entry.getKey();
+                    // 从关键词中移除已解析的英文区域名
+                    keywordPart = keywordPart.replaceAll("(?i)" + entry.getKey(), " ").trim();
+                    log.info("  Parsed English region: {} -> city: {}, region: {}", entry.getKey(), city, region);
+                    break;
+                }
             }
         }
 
         log.info("  Final params: city={}, bedrooms={}, maxRent={}, keyword={}", city, bedrooms, maxRent, keywordPart);
-        
+
         return propertyRepository.findByFiltersAndKeyword(
                 city, region, minRent, maxRent, bedrooms, status, keywordPart, pageable);
     }

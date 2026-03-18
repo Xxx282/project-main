@@ -1,3 +1,11 @@
+<!--
+ * @Author: Mendax
+ * @Date: 2026-02-26 16:33:56
+ * @LastEditors: Mendax
+ * @LastEditTime: 2026-03-18 22:02:26
+ * @Description: 
+ * @FilePath: \project-main\readme.md
+-->
 # 智能租房系统
 
 完整的智能租房平台，包含前端、后端和机器学习模块，支持房源管理、用户咨询、AI 智能回复等功能。
@@ -45,7 +53,7 @@ java -jar target\house-rental-backend-1.5.0.jar
 
 ```bash
 python -m venv venv
-venv\Scripts\activate
+.venv\Scripts\activate
 pip install -r requirements.txt
 cd rent-price-ml
 python train.py
@@ -60,7 +68,7 @@ python app/main.py
 
 ```bash
 python -m venv venv
-venv\Scripts\activate
+.venv\Scripts\activate
 pip install -r requirements.txt
 cd payment
 python app/main.py

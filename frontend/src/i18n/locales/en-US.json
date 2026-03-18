@@ -193,6 +193,7 @@
     "unfurnished": "Unfurnished",
     "select": "Please select",
     "decoration": "Decoration Status",
+    "orientation": "Orientation",
     "currentFloor": "Current Floor",
     "example": "e.g.: 1",
     "totalFloors": "Total Floors",
