@@ -1,0 +1,15 @@
+Task Name,Start Date,End Date,Duration (days),Phase
+Basic Framework and User Authentication,2026-01-01,2026-01-15,15,Phase 1
+Property Management Module,2026-01-10,2026-01-25,16,Phase 1
+Consultation Feature Module,2026-01-20,2026-02-05,17,Phase 1
+Payment Function and Email Verification,2026-02-01,2026-02-14,14,Phase 2
+Contract Page and Signing Process,2026-02-08,2026-02-22,15,Phase 2
+Page Optimization and Internationalization,2026-02-15,2026-02-28,14,Phase 2
+Landlord Contract and Payment Confirmation,2026-02-20,2026-03-05,14,Phase 2
+Message Deletion and Recall,2026-03-01,2026-03-08,8,Phase 3
+AI Search and Consultation Reply,2026-03-05,2026-03-15,11,Phase 3
+Prediction Process Optimization,2026-03-08,2026-03-14,7,Phase 3
+Payment Process Implementation,2026-03-10,2026-03-18,9,Phase 3
+Property Comparison and Issue Fixes,2026-03-15,2026-03-28,14,Phase 4
+Performance and Security Optimization,2026-03-22,2026-04-05,15,Phase 5
+Final Testing and Delivery,2026-04-01,2026-04-15,15,Phase 6
