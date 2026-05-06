@@ -307,3 +307,119 @@ body.rental-app-body .rental-page-frame [style*="linear-gradient"] {
   background: transparent !important;
   background-image: none !important;
 }
+
+@media (max-width: 1100px) {
+  body.rental-app-body .recommendation-workspace {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+body.rental-app-body .recommendation-main-card,
+body.rental-app-body .recommendation-side-stack {
+  height: 100%;
+}
+
+body.rental-app-body .recommendation-main-card .ant-card-body {
+  height: 100%;
+}
+
+body.rental-app-body .recommendation-side-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+body.rental-app-body .recommendation-side-card:first-child {
+  flex: 1;
+}
+
+body.rental-app-body .recommendation-slider-card {
+  flex: 0 0 auto;
+}
+
+body.rental-app-body .listing-filter-card {
+  overflow: hidden;
+}
+
+body.rental-app-body .listing-filter-panel {
+  margin-top: 18px;
+  padding: 18px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(245, 243, 255, 0.9), rgba(255, 255, 255, 0.7));
+  border: 1px solid rgba(102, 126, 234, 0.14);
+}
+
+body.rental-app-body .listing-filter-section {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  align-items: start;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+body.rental-app-body .listing-filter-section:last-of-type {
+  border-bottom: 0;
+}
+
+body.rental-app-body .listing-filter-label {
+  color: #334155;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 36px;
+}
+
+body.rental-app-body .listing-filter-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+body.rental-app-body .listing-filter-options .ant-checkbox-wrapper {
+  margin: 0;
+  padding: 7px 14px;
+  min-height: 36px;
+  border-radius: 999px;
+  border: 1px solid rgba(102, 126, 234, 0.18);
+  background: rgba(255, 255, 255, 0.78);
+  color: #334155;
+  transition: all 0.18s ease;
+}
+
+body.rental-app-body .listing-filter-options .ant-checkbox-wrapper:hover {
+  border-color: rgba(102, 126, 234, 0.42);
+  background: rgba(245, 243, 255, 0.95);
+}
+
+body.rental-app-body .listing-filter-options .ant-checkbox-wrapper:has(.ant-checkbox-checked) {
+  color: #5b5bd6;
+  border-color: rgba(102, 126, 234, 0.45);
+  background: rgba(102, 126, 234, 0.12);
+  font-weight: 700;
+}
+
+body.rental-app-body .listing-filter-options .ant-checkbox {
+  display: none;
+}
+
+body.rental-app-body .listing-price-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: flex-end;
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.68);
+}
+
+@media (max-width: 760px) {
+  body.rental-app-body .listing-filter-section {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  body.rental-app-body .listing-filter-label {
+    line-height: 1.4;
+  }
+}

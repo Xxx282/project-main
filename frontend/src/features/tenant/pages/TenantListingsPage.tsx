@@ -173,11 +173,12 @@ export function TenantListingsPage() {
           <Card
             style={{
               width: '100%',
-              borderRadius: 10,
-              border: '1px solid rgba(15, 23, 42, 0.08)',
+              borderRadius: 14,
+              border: '1px solid rgba(255, 255, 255, 0.58)',
               background: 'rgba(255, 255, 255, 0.94)',
             }}
-            styles={{ body: { padding: 20 } }}
+            className="listing-filter-card"
+            styles={{ body: { padding: 22 } }}
           >
             <Form
               key={params.toString()}
@@ -207,7 +208,7 @@ export function TenantListingsPage() {
                     size="large"
                     placeholder={t('pages.searchListings')}
                     allowClear
-                    style={{ height: 46, borderRadius: 8, fontSize: 16 }}
+                    style={{ height: 48, borderRadius: 10, fontSize: 17 }}
                     prefix={<SearchOutlined style={{ color: '#64748b', fontSize: 17 }} />}
                   />
                 </Form.Item>
@@ -217,7 +218,7 @@ export function TenantListingsPage() {
                     htmlType="submit"
                     size="large"
                     style={{
-                      height: 46, paddingInline: 28, borderRadius: 8, fontSize: 16,
+                      height: 48, paddingInline: 30, borderRadius: 10, fontSize: 17,
                       fontWeight: 600, border: 'none',
                     }}
                   >
@@ -228,7 +229,7 @@ export function TenantListingsPage() {
                   <Button
                     size="large"
                     style={{
-                      height: 46, paddingInline: 22, borderRadius: 8, fontSize: 16,
+                      height: 48, paddingInline: 24, borderRadius: 10, fontSize: 17,
                       background: '#f5f3ff', color: '#5b5bd6', fontWeight: 600,
                     }}
                     onClick={() => setFilterOpen(!filterOpen)}
@@ -240,7 +241,7 @@ export function TenantListingsPage() {
                   <Button
                     size="large"
                     style={{
-                      height: 46, paddingInline: 22, borderRadius: 8, fontSize: 16,
+                      height: 48, paddingInline: 24, borderRadius: 10, fontSize: 17,
                       background: '#f5f3ff', color: '#5b5bd6', fontWeight: 600,
                     }}
                     onClick={() => { setParams(new URLSearchParams()); setFilterOpen(false); }}
@@ -262,12 +263,13 @@ export function TenantListingsPage() {
                   label: null,
                   style: { padding: 0 },
                   children: (
-                    <div style={{ padding: '18px 0 4px', color: '#1f2937' }}>
+                    <div className="listing-filter-panel">
                       {/* 第二行：房型 */}
-                      <div style={{ marginBottom: 16 }}>
-                        <div style={{ color: '#475569', fontSize: 15, fontWeight: 600, marginBottom: 8 }}>{t('pages.filterRoomType')}</div>
+                      <div className="listing-filter-section">
+                        <div className="listing-filter-label">{t('pages.filterRoomType')}</div>
                         <Form.Item name="bedrooms" style={{ marginBottom: 0 }}>
                           <Checkbox.Group
+                            className="listing-filter-options"
                             options={[
                               { value: '1', label: t('pages.roomType1') },
                               { value: '2', label: t('pages.roomType2') },
@@ -275,54 +277,53 @@ export function TenantListingsPage() {
                               { value: '4', label: t('pages.roomType4') },
                               { value: '5', label: t('pages.roomType5Plus') },
                             ]}
-                            style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}
                             onChange={(vals) => updateFilterParam('bedrooms', (vals as string[]) || [])}
                           />
                         </Form.Item>
                       </div>
 
                       {/* 第三行：朝向 */}
-                      <div style={{ marginBottom: 16 }}>
-                        <div style={{ color: '#475569', fontSize: 15, fontWeight: 600, marginBottom: 8 }}>{t('pages.filterOrientation')}</div>
+                      <div className="listing-filter-section">
+                        <div className="listing-filter-label">{t('pages.filterOrientation')}</div>
                         <Form.Item name="orientation" style={{ marginBottom: 0 }}>
                           <Checkbox.Group
+                            className="listing-filter-options"
                             options={[
                               { value: 'south', label: t('pages.orientationSouth') },
                               { value: 'north', label: t('pages.orientationNorth') },
                               { value: 'east', label: t('pages.orientationEast') },
                               { value: 'west', label: t('pages.orientationWest') },
                             ]}
-                            style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}
                             onChange={(vals) => updateFilterParam('orientation', (vals as string[]) || [])}
                           />
                         </Form.Item>
                       </div>
 
                       {/* 第四行：装修 */}
-                      <div style={{ marginBottom: 8 }}>
-                        <div style={{ color: '#475569', fontSize: 15, fontWeight: 600, marginBottom: 8 }}>{t('pages.filterDecoration')}</div>
+                      <div className="listing-filter-section">
+                        <div className="listing-filter-label">{t('pages.filterDecoration')}</div>
                         <Form.Item name="decoration" style={{ marginBottom: 0 }}>
                           <Checkbox.Group
+                            className="listing-filter-options"
                             options={[
                               { value: 'rough', label: t('common.rough') },
                               { value: 'simple', label: t('common.simple') },
                               { value: 'fine', label: t('common.fine') },
                               { value: 'luxury', label: t('common.luxury') },
                             ]}
-                            style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}
                             onChange={(vals) => updateFilterParam('decoration', (vals as string[]) || [])}
                           />
                         </Form.Item>
                       </div>
 
                       {/* 价格 */}
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center', marginTop: 12 }}>
+                      <div className="listing-price-filter">
                         <Form.Item name="minPrice" label={<span style={{ color: '#64748b', fontSize: 14 }}>{t('pages.minPrice')}</span>} style={{ marginBottom: 0 }}>
-                          <InputNumber placeholder="0" min={0} step={500} style={{ width: 120, borderRadius: 8 }} prefix="¥" />
+                          <InputNumber placeholder="0" min={0} step={500} style={{ width: 150, borderRadius: 10 }} prefix="¥" />
                         </Form.Item>
                         <span style={{ color: '#94a3b8' }}>-</span>
                         <Form.Item name="maxPrice" label={<span style={{ color: '#64748b', fontSize: 14 }}>{t('pages.maxPrice')}</span>} style={{ marginBottom: 0 }}>
-                          <InputNumber placeholder="99999" min={0} step={500} style={{ width: 120, borderRadius: 8 }} prefix="¥" />
+                          <InputNumber placeholder="99999" min={0} step={500} style={{ width: 150, borderRadius: 10 }} prefix="¥" />
                         </Form.Item>
                       </div>
                     </div>

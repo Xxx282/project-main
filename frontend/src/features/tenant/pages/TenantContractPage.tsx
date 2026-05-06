@@ -8,16 +8,16 @@ import { getListing, getLandlordInfo } from '../../tenant/api/tenantApi'
 import { createContract, signContract } from '../../contract/api/contractApi'
 
 const C = {
-  bg: '#0d0f1a',
-  surface: '#141720',
-  card: '#1a1e2e',
-  border: '#252a3d',
-  accent: '#5b8af0',
-  accentGlow: 'rgba(91,138,240,0.15)',
-  text: '#dde1f0',
-  muted: '#7a7f9a',
-  success: '#34d399',
-  warn: '#fbbf24',
+  bg: 'transparent',
+  surface: 'rgba(255, 255, 255, 0.94)',
+  card: 'rgba(245, 243, 255, 0.82)',
+  border: 'rgba(102, 126, 234, 0.18)',
+  accent: '#667eea',
+  accentGlow: 'rgba(102,126,234,0.13)',
+  text: '#1f2937',
+  muted: '#64748b',
+  success: '#22c55e',
+  warn: '#d97706',
   signBg: '#fcfcff',
 }
 
@@ -279,7 +279,7 @@ export function TenantContractPage() {
           borderRadius: 20, padding: '4px 18px', fontSize: 12,
           letterSpacing: 3, color: C.accent, marginBottom: 16,
         }}>⚖ {t('pages.electronicContractBadge')}</div>
-        <h1 style={{ fontSize: 30, fontWeight: 800, margin: '0 0 8px', letterSpacing: 3, color: '#fff' }}>
+        <h1 style={{ fontSize: 30, fontWeight: 800, margin: '0 0 8px', letterSpacing: 3, color: '#1f2937' }}>
           {t('pages.contractTitle')}
         </h1>
         <div style={{ color: C.muted, fontSize: 13 }}>{t('pages.rentalAgreement')} · {new Date().toLocaleDateString(i18n.language === 'zh-CN' ? 'zh-CN' : 'en-US')}</div>
@@ -292,11 +292,11 @@ export function TenantContractPage() {
         border: `1px solid ${C.border}`,
         borderRadius: 16,
         overflow: 'hidden',
-        boxShadow: '0 24px 80px rgba(0,0,0,0.5)',
+        boxShadow: '0 24px 80px rgba(79, 70, 229, 0.16)',
       }}>
 
         {/* 顶部色带 */}
-        <div style={{ height: 4, background: 'linear-gradient(90deg, #5b8af0, #9b6fd4, #5b8af0)' }} />
+        <div style={{ height: 4, background: 'linear-gradient(90deg, #a5d8ff, #667eea, #c4b5fd)' }} />
 
         <div style={{ padding: '40px 44px' }}>
 
@@ -458,7 +458,8 @@ export function TenantContractPage() {
               left: 0,
               right: 0,
               bottom: 0,
-              background: 'rgba(13, 15, 26, 0.95)',
+              background: 'rgba(102, 126, 234, 0.22)',
+              backdropFilter: 'blur(18px)',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
@@ -471,12 +472,12 @@ export function TenantContractPage() {
                 @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
               `}</style>
               <div style={{
-                background: 'linear-gradient(135deg, #1a1e2e 0%, #141720 100%)',
-                border: '2px solid #34d399',
+                  background: 'rgba(255, 255, 255, 0.96)',
+                  border: '2px solid rgba(102, 126, 234, 0.28)',
                 borderRadius: 24,
                 padding: '60px 80px',
                 textAlign: 'center',
-                boxShadow: '0 20px 60px rgba(52, 211, 153, 0.3), 0 0 80px rgba(52, 211, 153, 0.1)',
+                  boxShadow: '0 20px 60px rgba(102, 126, 234, 0.22), 0 0 80px rgba(180, 165, 232, 0.16)',
                 animation: 'fadeIn 0.6s ease both',
               }}>
                 <div style={{
@@ -487,16 +488,16 @@ export function TenantContractPage() {
                 <div style={{
                   fontSize: 36,
                   fontWeight: 800,
-                  color: '#34d399',
+                  color: '#667eea',
                   marginBottom: 16,
                   letterSpacing: 2,
-                  textShadow: '0 0 20px rgba(52, 211, 153, 0.5)',
+                  textShadow: '0 0 20px rgba(102, 126, 234, 0.25)',
                 }}>
                   {t('pages.contractSignedComplete')}
                 </div>
                 <div style={{
                   fontSize: 16,
-                  color: '#7a7f9a',
+                  color: '#64748b',
                   marginBottom: 40,
                   maxWidth: 400,
                   lineHeight: 1.8,
@@ -506,7 +507,7 @@ export function TenantContractPage() {
                 <button
                   onClick={() => navigate(`/tenant/payments/create?propertyId=${propertyId}&payeeId=${payeeId}`)}
                   style={{
-                    background: 'linear-gradient(135deg, #5b8af0 0%, #9b6fd4 100%)',
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                     border: 'none',
                     borderRadius: 12,
                     color: '#fff',

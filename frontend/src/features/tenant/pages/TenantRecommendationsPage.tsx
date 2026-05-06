@@ -1,10 +1,10 @@
 import { useState, useRef } from 'react'
 import type { MouseEvent } from 'react'
-import { Button, Card, Space, Typography, Empty, Image, Slider, Spin } from 'antd'
+import { Button, Card, Space, Typography, Empty, Image, Slider, Spin, Tag } from 'antd'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { SettingOutlined } from '@ant-design/icons'
+import { HomeOutlined, SettingOutlined, StarOutlined } from '@ant-design/icons'
 import { PageHeader } from '../../../shared/ui/PageHeader'
 import type { Listing } from '../../../shared/api/types'
 import { getRecommendations, getListingImages } from '../api/tenantApi'
@@ -110,6 +110,8 @@ export function TenantRecommendationsPage() {
     setCurrentIndex(targetIndex)
   }
 
+  const currentListing = listings[currentIndex]
+
   // 渲染单个房源卡片（左侧封面图 + 右侧展示标题和价格）
   const renderListingCard = (listing: Listing) => (
     <Card
@@ -170,6 +172,12 @@ export function TenantRecommendationsPage() {
             {listing.price && (
               <Text style={{ fontSize: 18, color: '#6b7280', marginLeft: 4 }}>{t('common.yuanPerMonth')}</Text>
             )}
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 18 }}>
+            {listing.city ? <Tag color="blue">{listing.city}</Tag> : null}
+            {listing.region ? <Tag color="purple">{listing.region}</Tag> : null}
+            {listing.bedrooms ? <Tag>{listing.bedrooms}{t('common.bedrooms')}</Tag> : null}
+            {listing.area ? <Tag>{listing.area} m²</Tag> : null}
           </div>
           <Text
             style={{
@@ -238,17 +246,29 @@ export function TenantRecommendationsPage() {
             description={t('pages.noRecommendations')}
             image={Empty.PRESENTED_IMAGE_SIMPLE}
           >
-            <Button type="primary" onClick={handlePreferences}>
-              {t('pages.setPreferencesForRecommendations')}
-            </Button>
+            <Space>
+              <Button type="primary" icon={<SettingOutlined />} onClick={handlePreferences}>
+                {t('pages.setPreferencesForRecommendations')}
+              </Button>
+              <Button icon={<HomeOutlined />} onClick={() => navigate('/tenant/listings')}>
+                {t('pages.backToListings')}
+              </Button>
+            </Space>
           </Empty>
         </Card>
       ) : (
-        <>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'minmax(0, 1fr) 320px',
+            gap: 24,
+            alignItems: 'stretch',
+          }}
+          className="recommendation-workspace"
+        >
           <Card
+            className="recommendation-main-card"
             style={{
-              maxWidth: 1120,
-              margin: '0 auto',
               borderRadius: 12,
               boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)',
               border: '1px solid #f3f4f6',
@@ -256,7 +276,7 @@ export function TenantRecommendationsPage() {
             styles={{ body: { padding: 32 } }}
           >
             {/* 结果统计说明 */}
-            <div style={{ marginBottom: 16, textAlign: 'center' }}>
+            <div style={{ marginBottom: 16, textAlign: 'left' }}>
               <Text style={{ fontSize: 24, fontWeight: 500 }}>
                 {t('pages.filteredResults')}{' '}
                 <Text strong style={{ fontSize: 32, color: '#f97316', fontWeight: 700 }}>
@@ -267,7 +287,7 @@ export function TenantRecommendationsPage() {
             </div>
 
             {/* 浏览说明 */}
-            <div style={{ marginBottom: 24, textAlign: 'center' }}>
+            <div style={{ marginBottom: 24, textAlign: 'left' }}>
               <Text type="secondary" style={{ fontSize: 17 }}>
                 {t('pages.browseInstructions')}
               </Text>
@@ -314,18 +334,56 @@ export function TenantRecommendationsPage() {
             </div>
           </Card>
 
-          {/* 底部横向滑动条导航 - 可拖动切换 */}
-          <Card
-            style={{
-              maxWidth: 1120,
-              margin: '0 auto',
-              borderRadius: 12,
-              boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)',
-              border: '1px solid #f3f4f6',
-              padding: '24px 32px',
-            }}
-          >
-            <div style={{ padding: '8px 16px 0' }}>
+          <div className="recommendation-side-stack">
+            <Card
+              className="recommendation-side-card"
+              style={{
+                borderRadius: 12,
+                boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)',
+                border: '1px solid #f3f4f6',
+              }}
+              styles={{ body: { padding: 24 } }}
+            >
+              <Space direction="vertical" size={16} style={{ width: '100%' }}>
+                <div>
+                  <StarOutlined style={{ color: '#667eea', marginRight: 8 }} />
+                  <Text strong>{t('pages.recommendationsSubtitle')}</Text>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                  <div>
+                    <Text type="secondary">{t('pages.recommendedListings')}</Text>
+                    <Typography.Title level={3} style={{ margin: '4px 0 0' }}>{listings.length}</Typography.Title>
+                  </div>
+                  <div>
+                    <Text type="secondary">{t('pages.listing')}</Text>
+                    <Typography.Title level={3} style={{ margin: '4px 0 0' }}>{currentIndex + 1}</Typography.Title>
+                  </div>
+                </div>
+                {currentListing ? (
+                  <div style={{ paddingTop: 8, borderTop: '1px solid rgba(102,126,234,0.12)' }}>
+                    <Text type="secondary">{t('pages.currentSelection')}</Text>
+                    <Typography.Title level={5} style={{ margin: '8px 0 0' }} ellipsis={{ rows: 2 }}>
+                      {currentListing.title || t('pages.noTitle')}
+                    </Typography.Title>
+                  </div>
+                ) : null}
+                <Button block type="primary" icon={<SettingOutlined />} onClick={handlePreferences}>
+                  {t('pages.preferenceSettings')}
+                </Button>
+                <Button block icon={<HomeOutlined />} onClick={() => navigate('/tenant/listings')}>
+                  {t('pages.backToListings')}
+                </Button>
+              </Space>
+            </Card>
+            <Card
+              className="recommendation-side-card recommendation-slider-card"
+              style={{
+                borderRadius: 12,
+                boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)',
+                border: '1px solid #f3f4f6',
+              }}
+              styles={{ body: { padding: '24px 28px' } }}
+            >
               <Slider
                 min={1}
                 max={listings.length}
@@ -334,9 +392,9 @@ export function TenantRecommendationsPage() {
                 onChange={handleSliderChange}
                 tooltip={{ formatter: (value) => `${t('pages.listing')} ${value} ${t('pages.set')}` }}
               />
-            </div>
-          </Card>
-        </>
+            </Card>
+          </div>
+        </div>
       )}
     </Space>
       </div>

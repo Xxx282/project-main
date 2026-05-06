@@ -320,7 +320,8 @@ export function TenantComparePage() {
             {favoritesQ.data?.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '60px 0' }}>
                 <HeartFilled style={{ fontSize: 64, color: '#b4a5e8', marginBottom: 24, opacity: 0.6 }} />
-                <p style={{ color: '#666', fontSize: 16, marginBottom: 24 }}>{t('pages.noFavorites')}</p>
+                <p style={{ color: '#666', fontSize: 18, marginBottom: 8 }}>{t('pages.noFavorites')}</p>
+                <p style={{ color: '#999', fontSize: 16, marginBottom: 24 }}>{t('pages.emptyFavoritesHint')}</p>
                 <Link to="/tenant/listings">
                   <Button 
                     type="primary"
@@ -335,7 +336,7 @@ export function TenantComparePage() {
                       boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
                     }}
                   >
-                    {t('pages.goToFavorites')}
+                    {t('pages.browseListingsNow')}
                   </Button>
                 </Link>
               </div>
