@@ -43,7 +43,7 @@ export function TenantListingsPage() {
   const [params, setParams] = useSearchParams()
   const auth = useAuth()
   const isGuest = !auth.user
-  const cardMaxWidth = isGuest ? 1160 : 980
+  const cardMaxWidth = isGuest ? 1360 : 1480
 
   const [settingsModalOpen, setSettingsModalOpen] = useState(false)
   const [filterOpen, setFilterOpen] = useState(false)
@@ -162,22 +162,22 @@ export function TenantListingsPage() {
     <div style={{
       width: '100%',
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #a5d8ff 0%, #b4a5e8 50%, #c4b5fd 100%)',
-      padding: '16px',
-      fontSize: 20,
+      background: 'transparent',
+      padding: '8px 0 32px',
+      fontSize: 16,
     }}>
       <div style={{ maxWidth: cardMaxWidth, margin: '0 auto' }}>
-        <Space orientation="vertical" size={16} style={{ width: '100%' }}>
+        <Space orientation="vertical" size={18} style={{ width: '100%' }}>
 
           {/* 搜索 + 高级筛选面板 */}
           <Card
             style={{
               width: '100%',
-              borderRadius: 12,
-              boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)',
-              border: 'none',
-              background: 'linear-gradient(135deg, #a5d8ff 0%, #b4a5e8 50%, #c4b5fd 100%)',
+              borderRadius: 10,
+              border: '1px solid rgba(15, 23, 42, 0.08)',
+              background: 'rgba(255, 255, 255, 0.94)',
             }}
+            styles={{ body: { padding: 20 } }}
           >
             <Form
               key={params.toString()}
@@ -201,14 +201,14 @@ export function TenantListingsPage() {
               }}
             >
               {/* 关键词搜索行 */}
-              <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 0 }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center', marginBottom: 0 }}>
                 <Form.Item name="q" style={{ marginBottom: 0, flex: 1 }}>
                   <Input
                     size="large"
                     placeholder={t('pages.searchListings')}
                     allowClear
-                    style={{ height: 48, borderRadius: 24, fontSize: 18 }}
-                    prefix={<SearchOutlined style={{ color: '#999', fontSize: 18 }} />}
+                    style={{ height: 46, borderRadius: 8, fontSize: 16 }}
+                    prefix={<SearchOutlined style={{ color: '#64748b', fontSize: 17 }} />}
                   />
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 0 }}>
@@ -217,8 +217,8 @@ export function TenantListingsPage() {
                     htmlType="submit"
                     size="large"
                     style={{
-                      height: 48, paddingInline: 32, borderRadius: 24, fontSize: 18,
-                      background: '#fff', color: '#b4a5e8', fontWeight: 600, border: 'none',
+                      height: 46, paddingInline: 28, borderRadius: 8, fontSize: 16,
+                      fontWeight: 600, border: 'none',
                     }}
                   >
                     {t('common.search')}
@@ -228,8 +228,8 @@ export function TenantListingsPage() {
                   <Button
                     size="large"
                     style={{
-                      height: 48, paddingInline: 24, borderRadius: 24, fontSize: 18,
-                      background: '#fff', color: '#b4a5e8', fontWeight: 600, border: 'none',
+                      height: 46, paddingInline: 22, borderRadius: 8, fontSize: 16,
+                      background: '#f5f3ff', color: '#5b5bd6', fontWeight: 600,
                     }}
                     onClick={() => setFilterOpen(!filterOpen)}
                   >
@@ -240,8 +240,8 @@ export function TenantListingsPage() {
                   <Button
                     size="large"
                     style={{
-                      height: 48, paddingInline: 24, borderRadius: 24, fontSize: 18,
-                      background: '#fff', color: '#b4a5e8', fontWeight: 600, border: 'none',
+                      height: 46, paddingInline: 22, borderRadius: 8, fontSize: 16,
+                      background: '#f5f3ff', color: '#5b5bd6', fontWeight: 600,
                     }}
                     onClick={() => { setParams(new URLSearchParams()); setFilterOpen(false); }}
                   >
@@ -262,10 +262,10 @@ export function TenantListingsPage() {
                   label: null,
                   style: { padding: 0 },
                   children: (
-                    <div style={{ padding: '16px 0 8px', color: '#fff' }}>
+                    <div style={{ padding: '18px 0 4px', color: '#1f2937' }}>
                       {/* 第二行：房型 */}
                       <div style={{ marginBottom: 16 }}>
-                        <div style={{ color: 'rgba(255,255,255,0.9)', fontSize: 15, fontWeight: 600, marginBottom: 8 }}>{t('pages.filterRoomType')}</div>
+                        <div style={{ color: '#475569', fontSize: 15, fontWeight: 600, marginBottom: 8 }}>{t('pages.filterRoomType')}</div>
                         <Form.Item name="bedrooms" style={{ marginBottom: 0 }}>
                           <Checkbox.Group
                             options={[
@@ -283,7 +283,7 @@ export function TenantListingsPage() {
 
                       {/* 第三行：朝向 */}
                       <div style={{ marginBottom: 16 }}>
-                        <div style={{ color: 'rgba(255,255,255,0.9)', fontSize: 15, fontWeight: 600, marginBottom: 8 }}>{t('pages.filterOrientation')}</div>
+                        <div style={{ color: '#475569', fontSize: 15, fontWeight: 600, marginBottom: 8 }}>{t('pages.filterOrientation')}</div>
                         <Form.Item name="orientation" style={{ marginBottom: 0 }}>
                           <Checkbox.Group
                             options={[
@@ -300,7 +300,7 @@ export function TenantListingsPage() {
 
                       {/* 第四行：装修 */}
                       <div style={{ marginBottom: 8 }}>
-                        <div style={{ color: 'rgba(255,255,255,0.9)', fontSize: 15, fontWeight: 600, marginBottom: 8 }}>{t('pages.filterDecoration')}</div>
+                        <div style={{ color: '#475569', fontSize: 15, fontWeight: 600, marginBottom: 8 }}>{t('pages.filterDecoration')}</div>
                         <Form.Item name="decoration" style={{ marginBottom: 0 }}>
                           <Checkbox.Group
                             options={[
@@ -317,11 +317,11 @@ export function TenantListingsPage() {
 
                       {/* 价格 */}
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center', marginTop: 12 }}>
-                        <Form.Item name="minPrice" label={<span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 14 }}>{t('pages.minPrice')}</span>} style={{ marginBottom: 0 }}>
+                        <Form.Item name="minPrice" label={<span style={{ color: '#64748b', fontSize: 14 }}>{t('pages.minPrice')}</span>} style={{ marginBottom: 0 }}>
                           <InputNumber placeholder="0" min={0} step={500} style={{ width: 120, borderRadius: 8 }} prefix="¥" />
                         </Form.Item>
-                        <span style={{ color: 'rgba(255,255,255,0.7)' }}>-</span>
-                        <Form.Item name="maxPrice" label={<span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 14 }}>{t('pages.maxPrice')}</span>} style={{ marginBottom: 0 }}>
+                        <span style={{ color: '#94a3b8' }}>-</span>
+                        <Form.Item name="maxPrice" label={<span style={{ color: '#64748b', fontSize: 14 }}>{t('pages.maxPrice')}</span>} style={{ marginBottom: 0 }}>
                           <InputNumber placeholder="99999" min={0} step={500} style={{ width: 120, borderRadius: 8 }} prefix="¥" />
                         </Form.Item>
                       </div>
@@ -341,11 +341,10 @@ export function TenantListingsPage() {
             }
             style={{
               width: '100%',
-              borderRadius: 12,
-              boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)',
-              border: 'none',
+              borderRadius: 10,
+              border: '1px solid rgba(15, 23, 42, 0.08)',
             }}
-            styles={{ body: { padding: '16px', fontSize: 18 } }}
+            styles={{ body: { padding: '10px 12px 16px', fontSize: 16 } }}
           >
             <Table<Listing>
               rowKey="id"
@@ -354,7 +353,7 @@ export function TenantListingsPage() {
               dataSource={filteredListings}
               size="middle"
               showHeader={false}
-              pagination={{ pageSize: 4, showSizeChanger: false, placement: ['bottomCenter'] }}
+              pagination={{ pageSize: 6, showSizeChanger: false, placement: ['bottomCenter'] }}
             />
           </Card>
 
@@ -426,8 +425,8 @@ function ListingRow({ listing, settings }: { listing: Listing; settings: FieldOp
       style={{
         display: 'flex',
         alignItems: 'stretch',
-        padding: '12px 16px',
-        gap: 16,
+        padding: '18px 14px',
+        gap: 18,
         cursor: 'pointer',
         borderRadius: 8,
         transition: 'background-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease',
@@ -455,8 +454,8 @@ function ListingRow({ listing, settings }: { listing: Listing; settings: FieldOp
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'stretch',
-          borderBottom: '1px solid #f3f4f6',
-          paddingBottom: 8,
+        borderBottom: '1px solid #e5e7eb',
+        paddingBottom: 12,
         }}
       >
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -464,7 +463,7 @@ function ListingRow({ listing, settings }: { listing: Listing; settings: FieldOp
             {show('title') && (
               <span
                 style={{
-                  fontSize: 30,
+                fontSize: 22,
                   fontWeight: 600,
                   color: '#111827',
                 }}
@@ -488,7 +487,7 @@ function ListingRow({ listing, settings }: { listing: Listing; settings: FieldOp
         {show('price') && (
           <div
             style={{
-              minWidth: 140,
+              minWidth: 150,
               textAlign: 'right',
               display: 'flex',
               flexDirection: 'column',
@@ -497,11 +496,11 @@ function ListingRow({ listing, settings }: { listing: Listing; settings: FieldOp
               gap: 6,
             }}
           >
-            <Typography.Text strong style={{ color: '#f97316', fontSize: 28 }}>
+            <Typography.Text strong style={{ color: '#dc5f00', fontSize: 24 }}>
               ¥ {listing.price}
             </Typography.Text>
             <span style={{ fontSize: 15, color: '#9ca3af' }}>{t('common.yuanPerMonth')}</span>
-            <span style={{ fontSize: 15, color: '#3b82f6' }}>{t('common.viewDetails')}</span>
+            <span style={{ fontSize: 14, color: '#667eea' }}>{t('common.viewDetails')}</span>
           </div>
         )}
       </div>
@@ -523,11 +522,11 @@ function ListingThumbnail({ propertyId }: { propertyId: number }) {
   return (
     <div
       style={{
-        width: 300,
-        height: 220,
+        width: 240,
+        height: 168,
         overflow: 'hidden',
         borderRadius: 10,
-        boxShadow: '0 10px 25px rgba(15, 23, 42, 0.18)',
+        boxShadow: 'none',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -538,8 +537,8 @@ function ListingThumbnail({ propertyId }: { propertyId: number }) {
         <Image
           src={buildImageUrl(cover!.imageUrl)}
           alt={t('common.coverImage')}
-          width={300}
-          height={220}
+          width={240}
+          height={168}
           style={{ objectFit: 'cover' }}
           preview={false}
         />

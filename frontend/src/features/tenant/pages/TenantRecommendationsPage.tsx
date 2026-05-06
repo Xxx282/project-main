@@ -115,7 +115,7 @@ export function TenantRecommendationsPage() {
     <Card
       hoverable
       style={{
-        maxWidth: 1000,
+        maxWidth: 1120,
         margin: '0 auto',
         borderRadius: 16,
         boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
@@ -154,7 +154,7 @@ export function TenantRecommendationsPage() {
             level={3}
             style={{
               margin: '0 0 16px 0',
-              fontSize: 24,
+              fontSize: 28,
               fontWeight: 600,
               color: '#1f2937',
               lineHeight: 1.4,
@@ -168,13 +168,13 @@ export function TenantRecommendationsPage() {
               {listing.price ? `¥${listing.price}` : t('pages.pricePending')}
             </Text>
             {listing.price && (
-              <Text style={{ fontSize: 16, color: '#6b7280', marginLeft: 4 }}>{t('common.yuanPerMonth')}</Text>
+              <Text style={{ fontSize: 18, color: '#6b7280', marginLeft: 4 }}>{t('common.yuanPerMonth')}</Text>
             )}
           </div>
           <Text
             style={{
-              fontSize: 14,
-              color: '#3b82f6',
+              fontSize: 17,
+              color: '#667eea',
               marginTop: 16,
               cursor: 'pointer',
             }}
@@ -193,7 +193,7 @@ export function TenantRecommendationsPage() {
       background: 'linear-gradient(135deg, #a5d8ff 0%, #b4a5e8 50%, #c4b5fd 100%)',
       padding: '24px',
     }}>
-      <div style={{ maxWidth: 1000, margin: '0 auto' }}>
+      <div style={{ maxWidth: 1180, margin: '0 auto' }}>
     <Space orientation="vertical" size={24} style={{ width: '100%' }}>
       <PageHeader
         title={t('pages.tenantRecommendations')}
@@ -211,7 +211,7 @@ export function TenantRecommendationsPage() {
 
       {recoQ.isLoading ? (
         <Card style={{
-          maxWidth: 800,
+          maxWidth: 960,
           margin: '0 auto',
           textAlign: 'center',
           borderRadius: 12,
@@ -227,7 +227,7 @@ export function TenantRecommendationsPage() {
         </Card>
       ) : listings.length === 0 ? (
         <Card style={{
-          maxWidth: 800,
+          maxWidth: 960,
           margin: '0 auto',
           textAlign: 'center',
           borderRadius: 12,
@@ -247,7 +247,7 @@ export function TenantRecommendationsPage() {
         <>
           <Card
             style={{
-              maxWidth: 1040,
+              maxWidth: 1120,
               margin: '0 auto',
               borderRadius: 12,
               boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)',
@@ -268,7 +268,7 @@ export function TenantRecommendationsPage() {
 
             {/* 浏览说明 */}
             <div style={{ marginBottom: 24, textAlign: 'center' }}>
-              <Text type="secondary" style={{ fontSize: 14 }}>
+              <Text type="secondary" style={{ fontSize: 17 }}>
                 {t('pages.browseInstructions')}
               </Text>
             </div>
@@ -307,7 +307,7 @@ export function TenantRecommendationsPage() {
               </div>
 
               <div style={{ marginTop: 20, textAlign: 'center' }}>
-                <Text type="secondary" style={{ fontSize: 15 }}>
+                <Text type="secondary" style={{ fontSize: 17 }}>
                   {currentIndex + 1} / {listings.length}
                 </Text>
               </div>
@@ -317,7 +317,7 @@ export function TenantRecommendationsPage() {
           {/* 底部横向滑动条导航 - 可拖动切换 */}
           <Card
             style={{
-              maxWidth: 1040,
+              maxWidth: 1120,
               margin: '0 auto',
               borderRadius: 12,
               boxShadow: '0 18px 45px rgba(15, 23, 42, 0.06)',
@@ -390,7 +390,7 @@ function ListingThumbnail({ propertyId }: { propertyId: number }) {
           preview={false}
         />
       ) : (
-        <span style={{ color: '#9ca3af', fontSize: 14 }}>{t('common.noImage')}</span>
+        <span style={{ color: '#9ca3af', fontSize: 17 }}>{t('common.noImage')}</span>
       )}
     </div>
   )
