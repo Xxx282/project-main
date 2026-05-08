@@ -1,5 +1,0 @@
-Risk,Impact Level,Countermeasure,Status
-Testing time tight,High,Task scheduling daily follow-up,Pending
-AI service stability,Medium,Local+cloud dual solution,Pending
-User experience,Medium,Feedback channel responsive check,Pending
-Payment security,High,Signature verification idempotent processing,Pending
