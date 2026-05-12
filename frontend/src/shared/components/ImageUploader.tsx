@@ -1,7 +1,6 @@
 import { Button, Card, Image, message, Upload, Popconfirm } from 'antd'
 import { PlusOutlined, DeleteOutlined, LoadingOutlined } from '@ant-design/icons'
 import { useState } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
 import type { PropertyImage } from '../api/types'
 import { uploadPropertyImages, deletePropertyImage } from '../../features/landlord/api/landlordApi'
 
@@ -10,7 +9,6 @@ interface ImageUploaderProps {
   images: PropertyImage[]
   onImagesChange: (images: PropertyImage[]) => void
   disabled?: boolean
-  queryKey?: string[]
 }
 
 // 构建完整的图片URL - 后端已返回完整URL，这里直接返回
@@ -24,9 +22,8 @@ const buildImageUrl = (imageUrl: string) => {
   return imageUrl
 }
 
-export function ImageUploader({ propertyId, images, onImagesChange, disabled, queryKey }: ImageUploaderProps) {
+export function ImageUploader({ propertyId, images, onImagesChange, disabled }: ImageUploaderProps) {
   const [uploading, setUploading] = useState(false)
-  const queryClient = useQueryClient()
 
   // 处理文件上传
   const handleUpload = async (file: File) => {
@@ -35,10 +32,6 @@ export function ImageUploader({ propertyId, images, onImagesChange, disabled, qu
       const uploadedImages = await uploadPropertyImages(propertyId, [file])
       onImagesChange([...images, uploadedImages[0]])
       message.success('上传成功')
-      // 上传成功后刷新缓存
-      if (queryKey) {
-        queryClient.invalidateQueries({ queryKey })
-      }
     } catch {
       message.error('上传失败')
     } finally {
@@ -52,10 +45,6 @@ export function ImageUploader({ propertyId, images, onImagesChange, disabled, qu
       await deletePropertyImage(propertyId, imageId)
       onImagesChange(images.filter((img) => img.id !== imageId))
       message.success('删除成功')
-      // 删除成功后刷新缓存
-      if (queryKey) {
-        queryClient.invalidateQueries({ queryKey })
-      }
     } catch {
       message.error('删除失败')
     }

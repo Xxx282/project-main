@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { Avatar, Button, Card, Space, Tag, Typography } from 'antd'
+import { Avatar, Card, Space, Tag, Typography } from 'antd'
 import { MessageOutlined, UserOutlined, HomeOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -127,15 +127,7 @@ export function InquiriesList({ role, title, subtitle, chatPath, queryKey }: Inq
             {conversations.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '60px 40px', color: '#999' }}>
                 <MessageOutlined style={{ fontSize: 64, marginBottom: 16, color: '#d9d9d9' }} />
-                <p style={{ fontSize: 18, marginBottom: 8 }}>{t('pages.noInquiries')}</p>
-                <p style={{ fontSize: 16, marginBottom: 24 }}>{t('pages.emptyInquiriesHint')}</p>
-                <Button
-                  type="primary"
-                  icon={<HomeOutlined />}
-                  onClick={() => navigate(role === 'tenant' ? '/tenant/listings' : '/landlord/all-listings')}
-                >
-                  {role === 'tenant' ? t('pages.browseListingsNow') : t('nav.listings')}
-                </Button>
+                <p style={{ fontSize: 16 }}>{t('pages.noInquiries')}</p>
               </div>
             ) : (
               <div>

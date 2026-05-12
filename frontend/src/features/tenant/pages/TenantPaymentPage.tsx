@@ -242,7 +242,6 @@ export function TenantPaymentPage() {
         <PageHeader
           title={t('pages.paymentConfirm')}
           subtitle={t('pages.pleaseCompletePayment')}
-          back={{ label: t('common.back'), onClick: () => navigate('/tenant/payments') }}
         />
         <Card>
           <PaymentStatusDisplay status={monitorStatus} onPay={handleIPaid} />
@@ -258,7 +257,6 @@ export function TenantPaymentPage() {
         <PageHeader
           title={t('pages.paymentConfirm')}
           subtitle={t('pages.pleaseCompletePayment')}
-          back={{ label: t('common.back'), onClick: () => navigate('/tenant/payments') }}
         />
         <Row gutter={24}>
           <Col xs={24} md={12}>
@@ -356,7 +354,6 @@ export function TenantPaymentPage() {
       <PageHeader
         title={t('pages.createPayment')}
         subtitle={t('pages.createPaymentSubtitle')}
-        back={{ label: t('common.back'), onClick: () => navigate(-1) }}
       />
 
       <Card>

@@ -11,8 +11,7 @@ import {
   EnvironmentOutlined,
   BuildOutlined,
   FileTextOutlined,
-  PictureOutlined,
-  LeftOutlined
+  PictureOutlined
 } from '@ant-design/icons'
 import type { Listing, PropertyImage } from '../../../shared/api/types'
 import { createListing, updateListing, getPropertyImages, uploadPropertyImages } from '../api/landlordApi'
@@ -91,24 +90,7 @@ export function LandlordListingEditPage(props: { mode: 'create' | 'edit' }) {
               border: 'none',
             }}
           >
-            <div style={{ textAlign: 'center', padding: '12px 0', position: 'relative' }}>
-              <Button
-                type="primary"
-                icon={<LeftOutlined />}
-                onClick={() => navigate('/landlord/listings')}
-                style={{
-                  position: 'absolute',
-                  left: 0,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  borderRadius: 8,
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  boxShadow: '0 2px 8px rgba(102, 126, 234, 0.4)',
-                  fontWeight: 500,
-                }}
-              >
-                {t('common.back')}
-              </Button>
+            <div style={{ textAlign: 'center', padding: '12px 0' }}>
               {props.mode === 'create' ? (
                 <PlusOutlined style={{ fontSize: 32, color: '#b4a5e8', marginBottom: 8 }} />
               ) : (
@@ -423,7 +405,6 @@ export function LandlordListingEditPage(props: { mode: 'create' | 'edit' }) {
                     propertyId={numericId}
                     images={images}
                     onImagesChange={setImages}
-                    queryKey={['landlord', 'listing', numericId, 'images']}
                   />
                 </div>
               </>

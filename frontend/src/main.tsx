@@ -16,14 +16,12 @@ createRoot(document.getElementById('root')!).render(
     <ConfigProvider
       theme={{
         token: {
+          // 提升全局基础字号，解决字体偏小问题
           fontSize: 18,
-          colorPrimary: '#6d5dfc',
-          colorInfo: '#6d5dfc',
-          colorBgLayout: '#f1efff',
+          // 统一主色和背景色，让整体配色更协调
+          colorPrimary: '#1677ff',
+          colorBgLayout: '#f3f4f6',
           colorBgContainer: '#ffffff',
-          colorText: '#1f2937',
-          colorTextSecondary: '#64748b',
-          colorBorder: '#dcd8ff',
           borderRadius: 8,
         },
       }}

@@ -1,6 +1,5 @@
-import { Button, Breadcrumb, Space, Typography } from 'antd'
+import { Breadcrumb, Space, Typography } from 'antd'
 import type { BreadcrumbProps } from 'antd'
-import { ArrowLeftOutlined } from '@ant-design/icons'
 import React from 'react'
 
 export function PageHeader(props: {
@@ -9,10 +8,6 @@ export function PageHeader(props: {
   breadcrumbItems?: BreadcrumbProps['items']
   extra?: React.ReactNode
   align?: 'left' | 'center'
-  back?: {
-    label?: string
-    onClick: () => void
-  }
 }) {
   // 默认居中，保证所有页面标题区域统一居中展示
   const align = props.align ?? 'center'
@@ -27,18 +22,8 @@ export function PageHeader(props: {
         style={{
           width: '100%',
           justifyContent: align === 'center' ? 'center' : 'space-between',
-          position: 'relative',
         }}
       >
-        {props.back ? (
-          <Button
-            icon={<ArrowLeftOutlined />}
-            onClick={props.back.onClick}
-            style={align === 'center' ? { position: 'absolute', left: 0, top: 0 } : undefined}
-          >
-            {props.back.label}
-          </Button>
-        ) : null}
         <Space
           orientation="vertical"
           size={0}

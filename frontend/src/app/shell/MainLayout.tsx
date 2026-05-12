@@ -162,6 +162,7 @@ export function MainLayout() {
   const { authModal, openAuthModal, closeAuthModal } = useAuthModal()
   const selectedKey = pathToKey(location.pathname)
   const [scrollY, setScrollY] = useState(0)
+  const [currentLanguage, setCurrentLanguage] = useState(i18n.language)
 
   // 监听滚动位置
   useEffect(() => {
@@ -171,6 +172,11 @@ export function MainLayout() {
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  // 同步i18n语言变化到本地状态
+  useEffect(() => {
+    setCurrentLanguage(i18n.language)
+  }, [i18n.language])
 
   // 处理从 RequireAuth 重定向回来时自动打开登录弹窗
   useEffect(() => {
@@ -185,7 +191,6 @@ export function MainLayout() {
   // 判断是否是首页
   const isHomePage = location.pathname === '/'
   const isProfilePage = location.pathname.startsWith('/profile')
-  const isAppPage = !isHomePage
   // 与个人中心一致：渐变铺满、无白边。包含：个人中心、房源列表、推荐、收藏、我的订单、咨询、房东订单/房源/预测等
   const isGradientFullBleed =
     isProfilePage ||
@@ -203,11 +208,12 @@ export function MainLayout() {
     location.pathname.startsWith('/landlord/predict')
   const isFullBleedPage = isHomePage || isProfilePage || isGradientFullBleed
 
-  // 非首页使用真实租房平台的应用壳层，首页保持原来的沉浸式背景。
+  // 个人中心页：给 body 加渐变背景类（在 Layout 里做，确保路由一切换就生效）
+  // 应用到所有页面
   useEffect(() => {
-    document.body.classList.toggle('rental-app-body', isAppPage)
-    return () => document.body.classList.remove('rental-app-body')
-  }, [isAppPage])
+    document.body.classList.add('profile-page-body')
+    return () => document.body.classList.remove('profile-page-body')
+  }, [])
 
   // 首页导航栏透明，其他页面使用深色背景
   const headerStyle: React.CSSProperties = isHomePage
@@ -224,25 +230,28 @@ export function MainLayout() {
         backdropFilter: 'blur(8px)',
       }
     : {
-        position: 'sticky',
-        top: 0,
-        zIndex: 100,
-        height: 72,
-        lineHeight: '72px',
         display: 'flex',
         alignItems: 'center',
-        paddingInline: 'clamp(20px, 4vw, 56px)',
-        background: 'linear-gradient(135deg, rgba(165, 216, 255, 0.78) 0%, rgba(180, 165, 232, 0.86) 50%, rgba(196, 181, 253, 0.82) 100%)',
-        backdropFilter: 'blur(18px)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.22)',
-        boxShadow: '0 10px 28px rgba(102, 126, 234, 0.1)',
+        paddingInline: 32,
+        background: '#001529',
       }
 
   // 导航栏文字颜色
-  const navTextColor = '#fff'
+  const navTextColor = isHomePage ? '#fff' : '#fff'
 
   // 未登录默认显示租客菜单；登录后按用户角色显示
   const effectiveRole: UserRole = auth.user?.role ?? 'tenant'
+
+  // 处理语言切换
+  const handleLanguageChange = async (value: string) => {
+    try {
+      await i18n.changeLanguage(value)
+      setCurrentLanguage(value)
+      localStorage.setItem('language', value)
+    } catch (error) {
+      console.error('Language change failed:', error)
+    }
+  }
 
   const menuItems: MenuProps['items'] = useMemo(() => {
     // 未登录时：首页 + 房源 + 租房(跳转登录) + 发布(跳转登录)
@@ -278,22 +287,15 @@ export function MainLayout() {
   }, [effectiveRole, auth.user, navigate, t, openAuthModal])
 
   return (
-    <Layout
-      className={isAppPage ? 'rental-app-shell' : undefined}
-      style={{ minHeight: '100vh', background: isAppPage ? 'transparent' : 'transparent' }}
-    >
+    <Layout style={{ minHeight: '100vh', background: 'transparent' }}>
       <Header style={headerStyle}>
-        <Typography.Text
-          className={isAppPage ? 'rental-brand' : undefined}
-          style={{ color: navTextColor, fontWeight: 700, marginRight: 32, fontSize: isAppPage ? 22 : 18 }}
-        >
-          {t('common.appName')}
+        <Typography.Text style={{ color: navTextColor, fontWeight: 600, marginRight: 32, fontSize: 18 }}>
+          Smart Rental
         </Typography.Text>
         {/* 中间区域：让顶栏菜单居中显示 */}
         <div style={{ flex: 1, display: 'flex', justifyContent: 'center', minWidth: 0 }}>
           <Menu
-            theme={isHomePage ? 'dark' : 'light'}
-            className={isAppPage ? 'rental-top-menu' : undefined}
+            theme={isHomePage ? 'dark' : 'dark'}
             mode="horizontal"
             selectedKeys={[selectedKey]}
             items={menuItems}
@@ -301,8 +303,8 @@ export function MainLayout() {
             style={{
               background: 'transparent',
               borderBottom: 'none',
-              fontSize: isAppPage ? 18 : 25,
-              fontWeight: isAppPage ? 600 : 500,
+              fontSize: 25,
+              fontWeight: 500,
               color: navTextColor,
               width: '100%',
               maxWidth: 'none',
@@ -313,10 +315,11 @@ export function MainLayout() {
         <Space size="middle">
           {/* 语言切换下拉菜单 */}
           <Select
-            value={i18n.language}
+            defaultValue={i18n.language}
             onChange={(value: string) => {
               i18n.changeLanguage(value)
               localStorage.setItem('language', value)
+              setCurrentLanguage(value)
             }}
             style={{
               width: 100,
@@ -325,7 +328,7 @@ export function MainLayout() {
               { value: 'zh-CN', label: t('language.chinese') },
               { value: 'en-US', label: t('language.english') },
             ]}
-            className={isAppPage ? 'rental-language-selector' : 'language-selector'}
+            className="language-selector"
           />
           {auth.user ? (
             <>
@@ -353,11 +356,11 @@ export function MainLayout() {
                   style={{
                     color: navTextColor,
                     cursor: 'pointer',
-                    padding: isAppPage ? '6px 12px' : '4px 8px',
-                    borderRadius: isAppPage ? 999 : 4,
+                    padding: '4px 8px',
+                    borderRadius: 4,
                     transition: 'background 0.3s',
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = isAppPage ? 'rgba(15,23,42,0.06)' : 'rgba(255,255,255,0.1)')}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.1)')}
                   onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                 >
                   {auth.user.username}
@@ -387,12 +390,7 @@ export function MainLayout() {
         </Space>
       </Header>
 
-      <Content
-        style={{
-          padding: isAppPage ? 0 : isFullBleedPage ? 0 : 24,
-          background: isAppPage ? 'transparent' : 'transparent',
-        }}
-      >
+      <Content style={{ padding: isFullBleedPage ? 0 : 24, background: 'transparent' }}>
         {/* 首页视差背景 */}
         {isHomePage && (
           <div
@@ -445,16 +443,15 @@ export function MainLayout() {
         )}
 
         <div
-          className={isAppPage ? 'rental-page-frame' : undefined}
           style={{
             position: 'relative',
-            borderRadius: isAppPage ? 0 : isFullBleedPage ? 0 : 24,
-            padding: isAppPage ? '28px clamp(20px, 4vw, 56px) 48px' : isFullBleedPage ? 0 : 32,
+            borderRadius: isFullBleedPage ? 0 : 24,
+            padding: isFullBleedPage ? 0 : 32,
             minHeight: isFullBleedPage ? '100vh' : '70vh',
-            background: isAppPage ? 'transparent' : isFullBleedPage ? 'transparent' : 'rgba(255, 255, 255, 0.75)',
-            backdropFilter: isAppPage ? 'none' : isFullBleedPage ? 'none' : 'blur(12px)',
-            overflow: isAppPage ? 'visible' : 'hidden',
-            boxShadow: isAppPage ? 'none' : isFullBleedPage ? 'none' : '0 22px 45px rgba(15, 23, 42, 0.15)',
+            background: isFullBleedPage ? 'transparent' : 'rgba(255, 255, 255, 0.75)',
+            backdropFilter: isFullBleedPage ? 'none' : 'blur(12px)',
+            overflow: 'hidden',
+            boxShadow: isFullBleedPage ? 'none' : '0 22px 45px rgba(15, 23, 42, 0.15)',
           }}
         >
           <div style={{ position: 'relative' }}>
